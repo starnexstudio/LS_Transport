@@ -1,0 +1,14 @@
+{
+  "status": "passed",
+  "checks": [
+    "Hero entrance",
+    "Service transition",
+    "Keyboard selection",
+    "Live reduced-motion preference change",
+    "Reduced-motion tabs",
+    "Mobile menu Escape",
+    "Responsive overflow",
+    "Content visible without JavaScript",
+    "No runtime errors"
+  ]
+}

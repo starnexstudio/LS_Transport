@@ -1,0 +1,25 @@
+{
+  "status": "passed",
+  "viewports": [
+    1440,
+    1024,
+    768,
+    390,
+    320
+  ],
+  "checks": [
+    "German language",
+    "No horizontal overflow",
+    "Mobile navigation",
+    "Service tabs",
+    "Keyboard navigation",
+    "Service preselection",
+    "German validation",
+    "Email draft contents",
+    "FAQ expansion",
+    "Image loading",
+    "Legal routes",
+    "German 404",
+    "No runtime exceptions"
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "status": "passed",
+  "routes": [
+    "clearance",
+    "disposal",
+    "dismantling",
+    "furniture-transport",
+    "furniture-assembly"
+  ],
+  "checks": [
+    "Static service routes",
+    "Service-specific metadata",
+    "Preselected inquiry",
+    "Service FAQ",
+    "Responsive widths 320–1440",
+    "Accessibility scans",
+    "Licensed moving image loading and attribution",
+    "No runtime errors"
+  ],
+  "contactStatus": "Phone and WhatsApp controls await confirmed numbers"
+}

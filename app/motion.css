@@ -1,0 +1,164 @@
+/* Motion follows a single quick, decelerating rhythm. Content is visible by default. */
+:root {
+  --motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes entrance-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes image-settle {
+  from {
+    opacity: 0.5;
+    transform: scale(1.035);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes line-draw {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hero-copy > .eyebrow {
+    animation: entrance-rise 600ms var(--motion-ease) both;
+  }
+  .hero-copy > h1 {
+    animation: entrance-rise 750ms 70ms var(--motion-ease) both;
+  }
+  .hero-copy > p {
+    animation: entrance-rise 650ms 140ms var(--motion-ease) both;
+  }
+  .hero-copy > .button {
+    animation: entrance-rise 600ms 210ms var(--motion-ease) backwards;
+  }
+  .hero-copy > .hero-more,
+  .hero-availability {
+    animation: entrance-rise 600ms 270ms var(--motion-ease) backwards;
+  }
+  .hero-visual > img {
+    animation: image-settle 1100ms var(--motion-ease) both;
+  }
+  .hero-stamp {
+    animation: entrance-rise 700ms 250ms var(--motion-ease) both;
+  }
+  .small-line {
+    transform-origin: left;
+    animation: line-draw 700ms 150ms var(--motion-ease) both;
+  }
+  .navigation.is-open {
+    animation: entrance-rise 250ms var(--motion-ease);
+  }
+  .faq-list details[open] > p,
+  .service-planning details[open] > p,
+  .draft {
+    animation: entrance-rise 300ms var(--motion-ease);
+  }
+  .faq-plus {
+    transition: transform 250ms var(--motion-ease);
+  }
+  .moving-photo img {
+    transition: transform 800ms var(--motion-ease);
+  }
+  .button,
+  .header-cta {
+    transition:
+      background 220ms,
+      color 220ms,
+      transform 260ms var(--motion-ease),
+      box-shadow 260ms;
+  }
+  .button svg,
+  .header-cta svg,
+  .text-link svg,
+  .service-detail-link svg,
+  .service-list button svg,
+  .related-services a svg,
+  .service-overview-list > a > svg {
+    transition: transform 300ms var(--motion-ease);
+  }
+  .service-list button {
+    transition:
+      background 220ms,
+      padding 300ms var(--motion-ease),
+      border-color 220ms;
+  }
+  .inquiry input,
+  .inquiry select,
+  .inquiry textarea {
+    transition:
+      border-color 200ms,
+      box-shadow 200ms,
+      background 200ms;
+  }
+  .inquiry input:focus,
+  .inquiry select:focus,
+  .inquiry textarea:focus {
+    background: #fff;
+    box-shadow: 0 3px 0 -1px var(--orange);
+  }
+  .button:active,
+  .header-cta:active {
+    transform: translateY(0) scale(0.985);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .moving-photo:hover img {
+      transform: scale(1.035);
+    }
+    .button:hover svg,
+    .header-cta:hover svg,
+    .text-link:hover svg,
+    .service-detail-link:hover svg {
+      transform: translate(3px, -2px);
+    }
+    .service-list button:hover svg,
+    .related-services a:hover svg,
+    .service-overview-list > a:hover > svg {
+      transform: translateX(4px);
+    }
+    .button:hover {
+      box-shadow: 0 6px 16px #24272012;
+    }
+  }
+}
+.navigation > a:not(.header-cta) {
+  position: relative;
+}
+.navigation > a:not(.header-cta)::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--orange);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 250ms var(--motion-ease);
+}
+.navigation > a:not(.header-cta):hover::after,
+.navigation > a:not(.header-cta):focus-visible::after {
+  transform: scaleX(1);
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Manrope } from "next/font/google";
 import "./globals.css";
 import "./motion.css";
+import "./hero.css";
+import { FloatingContact } from "@/components/floating-contact";
 import { MotionEffects } from "@/components/motion-effects";
 const manrope = Manrope({
   subsets: ["latin"],
@@ -11,7 +13,7 @@ const manrope = Manrope({
 export const metadata: Metadata = {
   title: "L&S | Entrümpelung & Demontagearbeiten",
   description:
-    "Platz für Neues. Entrümpelung, fachgerechte Entsorgung, Demontage und Möbelservice. Deutschlandweit nach Absprache. Jetzt Ihr Vorhaben anfragen.",
+    "Platz für Neues. Entrümpelung, fachgerechte Entsorgung, Demontage, Möbeltransport und Reinigung. Deutschlandweit nach Absprache. Jetzt Ihr Vorhaben anfragen.",
   robots: { index: false, follow: false },
 };
 export default function RootLayout({
@@ -21,6 +23,7 @@ export default function RootLayout({
     <html lang="de">
       <body className={manrope.variable}>
         {children}
+        <FloatingContact />
         <MotionEffects />
       </body>
     </html>

@@ -41,7 +41,7 @@ await page
   .press("ArrowDown");
 assert.match(
   await page.getByRole("tabpanel").innerText(),
-  /Abgebaut. Angekommen/,
+  /Besenrein übergeben/,
 );
 await page
   .getByRole("tabpanel")
@@ -49,7 +49,7 @@ await page
   .click();
 assert.equal(
   await page.locator("#service").inputValue(),
-  "Möbelmontage & Demontage",
+  "Reinigung nach Räumung",
 );
 await page.getByRole("button", { name: "E-Mail-Anfrage vorbereiten" }).click();
 assert.equal(
@@ -80,7 +80,7 @@ await page
 assert.ok(
   await page
     .locator("details[open]")
-    .filter({ hasText: "Jedes Vorhaben ist anders" })
+    .filter({ hasText: "Der Preis richtet sich" })
     .isVisible(),
 );
 assert.ok(

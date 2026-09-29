@@ -26,7 +26,7 @@ assert.ok(
 await page
   .getByRole("tab", { name: "04 Möbeltransport & Lieferung" })
   .press("ArrowDown");
-assert.match(await page.locator("#service-panel").innerText(), /Abgebaut/);
+assert.match(await page.locator("#service-panel").innerText(), /Besenrein/);
 await page.emulateMedia({ reducedMotion: "reduce" });
 await page.waitForFunction(
   () =>

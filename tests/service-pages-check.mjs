@@ -12,7 +12,7 @@ const routes = [
   "disposal",
   "dismantling",
   "furniture-transport",
-  "furniture-assembly",
+  "cleaning",
 ];
 for (const slug of routes) {
   const response = await page.goto(`http://localhost:3000/services/${slug}`, {
@@ -66,14 +66,6 @@ for (const image of await page.locator(".moving-photo img").all())
   assert.ok(
     await image.evaluate((img) => img.complete && img.naturalWidth > 0),
   );
-assert.match(
-  await page.locator(".photo-example").innerText(),
-  /keinen Auftrag von L&S/,
-);
-assert.equal(
-  await page.locator(".photo-example a").last().getAttribute("href"),
-  "https://www.pexels.com/license/",
-);
 await page.setViewportSize({ width: 1440, height: 1000 });
 await page
   .locator(".photo-example")

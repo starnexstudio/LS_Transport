@@ -71,19 +71,19 @@ export const serviceDetails: ServiceDetail[] = [
   {
     slug: "dismantling",
     introduction:
-      "Bevor Neues entstehen kann, muss Vorhandenes manchmal weichen. Wir übernehmen abgestimmte Demontagearbeiten und berücksichtigen dabei den Zugang und die Gegebenheiten vor Ort.",
+      "Vor der Renovierung muss Altes raus. Wir bauen zurück, sortieren und entsorgen – vom Boden bis zur Decke.",
     scope: [
       {
-        title: "Den Umfang festlegen",
-        text: "Welche Teile sollen demontiert werden, welche bleiben bestehen? Gemeinsam grenzen wir die gewünschten Arbeiten ab und besprechen die Situation vor Ort.",
+        title: "Böden, Fliesen & Wände",
+        text: "Parkett, Laminat, Teppich, Fliesen, Tapeten sowie Decken- und Wandverkleidungen.",
       },
       {
-        title: "Die Demontage planen",
-        text: "Maße, Befestigungen und Zugänglichkeit helfen bei der Einschätzung. Fotos und vorhandene Unterlagen können dafür eine gute Grundlage sein.",
+        title: "Bad, Küche & Türen",
+        text: "Badewannen, Waschbecken, WC und Armaturen, Küchen, Türen und Zargen.",
       },
       {
-        title: "Den nächsten Schritt organisieren",
-        text: "Sollen die Teile aufbewahrt, transportiert oder entsorgt werden? Diese Schritte lassen sich nach Absprache mit dem Auftrag verbinden.",
+        title: "Einbauten & Entsorgung",
+        text: "Einbauten und nichttragende Trockenbauelemente – anschließend sortiert und entsorgt.",
       },
     ],
     preparation: [
@@ -112,8 +112,8 @@ export const serviceDetails: ServiceDetail[] = [
         text: "Am Ziel sind Etage, Aufzug, Zufahrt und mögliche Tragewege wichtig. Diese Angaben gehören ebenso zur Planung wie die Strecke zwischen den Adressen.",
       },
       {
-        title: "Montage ergänzen",
-        text: "Wenn ein Möbelstück vor dem Transport zerlegt und am Ziel wieder aufgebaut werden soll, fragen Sie Demontage und Montage direkt mit an.",
+        title: "Mit Räumung verbinden",
+        text: "Transport, Entrümpelung und Reinigung lassen sich in einem Auftrag kombinieren.",
       },
     ],
     preparation: [
@@ -123,39 +123,38 @@ export const serviceDetails: ServiceDetail[] = [
       "Gewünschten Termin und mögliche Alternativen nennen",
     ],
     priceFactors:
-      "Transportstrecke, Anzahl und Abmessungen der Möbel, Zugang an beiden Orten sowie zusätzliche Montagearbeiten werden bei der individuellen Preisabsprache berücksichtigt.",
+      "Transportstrecke, Anzahl und Abmessungen der Möbel sowie der Zugang an beiden Orten werden bei der individuellen Preisabsprache berücksichtigt.",
     question: "Transportieren Sie auch einzelne Möbelstücke?",
     answer:
       "Sie können auch den Transport eines einzelnen Möbelstücks anfragen. Nennen Sie dafür Maße, Abholort und Zieladresse. Ob der Auftrag und Ihr Wunschtermin möglich sind, klären wir persönlich.",
   },
   {
-    slug: "furniture-assembly",
+    slug: "cleaning",
     introduction:
-      "Neue Möbel aufbauen oder vorhandene für einen Standortwechsel zerlegen: Wir unterstützen Sie bei Möbelmontage und Möbeldemontage. Die konkreten Arbeiten stimmen wir anhand Ihrer Möbel ab.",
+      "Wenn die Räume leer sind, machen wir sauber. So übergeben Sie Wohnung, Keller oder Gewerberaum besenrein.",
     scope: [
       {
-        title: "Neue Möbel montieren",
-        text: "Teilen Sie uns Möbelart, Modell und Anzahl mit. Eine Montageanleitung oder ein Produktlink hilft dabei, den benötigten Aufwand einzuschätzen.",
+        title: "Direkt nach der Räumung",
+        text: "Die Reinigung folgt im Anschluss an Entrümpelung, Demontage oder Transport – ohne zweiten Termin.",
       },
       {
-        title: "Vorhandene Möbel demontieren",
-        text: "Vor einem Umzug oder einer Räumung kann ein Abbau nötig sein. Wir klären, ob und wie die Möbel zerlegt werden sollen und welche Teile erhalten bleiben.",
+        title: "Besenreine Übergabe",
+        text: "Böden, Flächen und Nebenräume werden für die Übergabe an Vermieter oder Käufer vorbereitet.",
       },
       {
-        title: "Aufbau und Transport verbinden",
-        text: "Für einen Standortwechsel können Sie Abbau, Möbeltransport und erneuten Aufbau gemeinsam anfragen. Die Durchführbarkeit wird für Ihren Auftrag geprüft.",
+        title: "Alle Raumarten",
+        text: "Wohnungen, Häuser, Keller, Dachböden und Gewerberäume.",
       },
     ],
     preparation: [
-      "Möbelart, Modell und Anzahl angeben",
-      "Montageanleitung oder Produktlink bereithalten",
-      "Fotos vorhandener Möbel und des Stellplatzes ergänzen",
-      "Benötigte Wandbefestigungen oder Anschlüsse nennen",
+      "Größe der Räume ungefähr angeben",
+      "Gewünschten Übergabetermin nennen",
+      "Besondere Verschmutzungen erwähnen",
     ],
     priceFactors:
-      "Anzahl, Konstruktion und Zustand der Möbel sowie gewünschte Befestigungen, Demontage und zusätzliche Transportleistungen beeinflussen die individuelle Preisabsprache.",
-    question: "Können ältere Möbel wieder aufgebaut werden?",
+      "Fläche, Zustand der Räume und der gewünschte Termin bestimmen den Aufwand.",
+    question: "Kann die Reinigung mit der Räumung kombiniert werden?",
     answer:
-      "Das hängt von Konstruktion, Zustand und vorhandenen Verbindungsteilen ab. Bitte senden Sie dazu eine Beschreibung und Fotos. Eine Zusage zum Wiederaufbau erfolgt erst nach Abstimmung.",
+      "Ja. Am einfachsten fragen Sie Räumung und Reinigung zusammen an – dann planen wir beides in einem Ablauf.",
   },
 ];

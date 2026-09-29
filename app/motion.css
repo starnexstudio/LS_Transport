@@ -30,32 +30,141 @@
     transform: scaleX(1);
   }
 }
+@keyframes hero-zoom {
+  from {
+    transform: scale(1.12);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+@keyframes badge-float {
+  0%,
+  100% {
+    transform: rotate(3deg) translateY(0);
+  }
+  50% {
+    transform: rotate(1.5deg) translateY(-8px);
+  }
+}
+@keyframes badge-in {
+  from {
+    opacity: 0;
+    transform: rotate(-8deg) scale(0.7);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(3deg) scale(1);
+  }
+}
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes status-pulse {
+  0% {
+    box-shadow: 0 0 0 0 #4ade8099;
+  }
+  100% {
+    box-shadow: 0 0 0 10px #4ade8000;
+  }
+}
+@keyframes contact-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1.7);
+    opacity: 0;
+  }
+}
+@keyframes contact-in {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
 @media (prefers-reduced-motion: no-preference) {
-  .hero-copy > .eyebrow {
+  .hero-pill {
     animation: entrance-rise 600ms var(--motion-ease) both;
   }
+  .hero-pill .status-dot {
+    animation: status-pulse 1.8s ease-out infinite;
+  }
   .hero-copy > h1 {
-    animation: entrance-rise 750ms 70ms var(--motion-ease) both;
+    animation: entrance-rise 800ms 90ms var(--motion-ease) both;
+  }
+  .hero-accent::after {
+    animation: line-draw 900ms 700ms var(--motion-ease) both;
   }
   .hero-copy > p {
-    animation: entrance-rise 650ms 140ms var(--motion-ease) both;
+    animation: entrance-rise 700ms 200ms var(--motion-ease) both;
   }
-  .hero-copy > .button {
-    animation: entrance-rise 600ms 210ms var(--motion-ease) backwards;
-  }
-  .hero-copy > .hero-more,
-  .hero-availability {
-    animation: entrance-rise 600ms 270ms var(--motion-ease) backwards;
+  .hero-actions {
+    animation: entrance-rise 700ms 300ms var(--motion-ease) backwards;
   }
   .hero-visual > img {
-    animation: image-settle 1100ms var(--motion-ease) both;
+    animation: hero-zoom 9s var(--motion-ease) both;
   }
-  .hero-stamp {
-    animation: entrance-rise 700ms 250ms var(--motion-ease) both;
+  .hero-card {
+    animation: card-in 900ms 350ms var(--motion-ease) both;
   }
-  .small-line {
-    transform-origin: left;
-    animation: line-draw 700ms 150ms var(--motion-ease) both;
+  .hero-card li {
+    animation: entrance-rise 600ms var(--motion-ease) backwards;
+  }
+  .hero-card li:nth-child(1) {
+    animation-delay: 550ms;
+  }
+  .hero-card li:nth-child(2) {
+    animation-delay: 620ms;
+  }
+  .hero-card li:nth-child(3) {
+    animation-delay: 690ms;
+  }
+  .hero-card li:nth-child(4) {
+    animation-delay: 760ms;
+  }
+  .hero-card li:nth-child(5) {
+    animation-delay: 830ms;
+  }
+  .hero-card li a {
+    transition:
+      background 220ms,
+      padding 300ms var(--motion-ease);
+  }
+  .hero-card li a > svg:last-child {
+    transition:
+      opacity 220ms,
+      transform 300ms var(--motion-ease);
+  }
+  .hero-card li a:hover > svg:last-child {
+    transform: translate(3px, -2px);
+  }
+  .hero-badge {
+    animation:
+      badge-in 700ms 900ms cubic-bezier(0.34, 1.56, 0.64, 1) both,
+      badge-float 5s 1.6s ease-in-out infinite;
+  }
+  .floating-contact a {
+    animation: contact-in 600ms 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    transition: transform 250ms var(--motion-ease);
+  }
+  .floating-contact a:nth-child(2) {
+    animation-delay: 1.35s;
+  }
+  .floating-contact a::before {
+    animation: contact-ring 2.4s 2s ease-out infinite;
   }
   .navigation.is-open {
     animation: entrance-rise 250ms var(--motion-ease);

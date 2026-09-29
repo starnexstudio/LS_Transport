@@ -8,7 +8,7 @@ import { serviceDetails } from "@/lib/service-details";
 export const metadata: Metadata = {
   title: "Alle Leistungen | L&S",
   description:
-    "Entrümpelung, fachgerechte Entsorgung, Demontage, Möbeltransport und Möbelmontage: Erfahren Sie, was wir übernehmen und welche Angaben bei Ihrer Anfrage helfen.",
+    "Entrümpelung, fachgerechte Entsorgung, Demontage, Möbeltransport und Reinigung: Erfahren Sie, was wir übernehmen und welche Angaben bei Ihrer Anfrage helfen.",
 };
 export default function ServiceOverview() {
   return (

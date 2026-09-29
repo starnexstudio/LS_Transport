@@ -1,0 +1,323 @@
+/* Full-bleed photo hero with glass service card, plus always-visible quick contact. */
+.hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: clamp(640px, calc(100svh - 102px), 860px);
+  display: flex;
+  align-items: center;
+  color: #fff;
+  background: #1b1d18;
+}
+.hero-visual {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+}
+.hero-visual img {
+  object-fit: cover;
+  object-position: 60% 50%;
+}
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(
+      100deg,
+      #16181aee 0%,
+      #16181ad0 42%,
+      #16181a80 70%,
+      #16181a55 100%
+    ),
+    linear-gradient(0deg, #16181acc 0%, transparent 35%);
+}
+.hero::after {
+  /* Faint dot grid for texture. */
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: radial-gradient(#ffffff14 1px, transparent 1px);
+  background-size: 28px 28px;
+  pointer-events: none;
+}
+.hero-inner {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 80px 7.5%;
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+.hero-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  border: 1px solid #ffffff33;
+  border-radius: 999px;
+  background: #ffffff14;
+  backdrop-filter: blur(8px);
+  font-size: 13px;
+  font-weight: 600;
+}
+.hero-pill .status-dot {
+  background: #4ade80;
+  box-shadow: 0 0 0 0 #4ade8099;
+}
+.hero-copy h1 {
+  font-size: clamp(46px, 6.2vw, 96px);
+  line-height: 1.02;
+  letter-spacing: -0.055em;
+  font-weight: 750;
+  margin: 28px 0 26px;
+}
+.hero-accent {
+  position: relative;
+  display: inline-block;
+  color: var(--orange);
+}
+.hero-accent::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0.02em;
+  height: 0.07em;
+  border-radius: 99px;
+  background: var(--orange);
+  transform-origin: left;
+}
+.hero-copy > p {
+  font-size: clamp(17px, 1.4vw, 21px);
+  line-height: 1.6;
+  max-width: 520px;
+  color: #e4e6df;
+}
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 38px;
+}
+.hero-actions .button {
+  border-radius: 14px;
+  min-height: 60px;
+  padding: 18px 26px;
+  gap: 14px;
+  font-size: 16px;
+  font-weight: 700;
+}
+.button-orange {
+  background: var(--orange);
+  color: var(--ink);
+  box-shadow: 0 10px 30px -10px #f78a3caa;
+}
+.button-orange:hover {
+  background: #f99b56;
+  transform: translateY(-2px);
+}
+.button-glass {
+  color: #fff;
+  border: 1px solid #ffffff40 !important;
+  background: #ffffff12;
+  backdrop-filter: blur(8px);
+}
+.button-glass:hover {
+  background: #ffffff24;
+  transform: translateY(-2px);
+}
+.hero-card {
+  position: relative;
+  padding: 34px 30px 26px;
+  border: 1px solid #ffffff2e;
+  border-radius: 22px;
+  background: #ffffff14;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 30px 60px -20px #0008;
+}
+.hero-badge {
+  position: absolute;
+  top: -58px;
+  right: -18px;
+  padding: 18px 24px;
+  border-radius: 16px;
+  background: var(--orange);
+  color: var(--ink);
+  font-size: 22px;
+  font-weight: 750;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  transform: rotate(3deg);
+  box-shadow: 0 18px 40px -12px #0009;
+}
+.hero-badge small {
+  display: block;
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.hero-card ul {
+  list-style: none;
+  margin: 26px 0 0;
+  padding: 0;
+}
+.hero-card li + li {
+  border-top: 1px solid #ffffff1f;
+}
+.hero-card li a {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 6px;
+  font-size: 16px;
+  font-weight: 650;
+  border-radius: 10px;
+}
+.hero-card li a > svg:first-child {
+  color: var(--orange);
+  flex-shrink: 0;
+}
+.hero-card li a > svg:last-child {
+  margin-left: auto;
+  opacity: 0.55;
+}
+.hero-card li a:hover {
+  background: #ffffff12;
+  padding-left: 12px;
+}
+.hero-card li a:hover > svg:last-child {
+  opacity: 1;
+  color: var(--orange);
+}
+.hero-facts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: 18px;
+  padding-top: 20px;
+  border-top: 1px solid #ffffff2e;
+  text-align: center;
+  font-size: 12px;
+  color: #d5d8cf;
+}
+.hero-facts strong {
+  display: block;
+  font-size: 22px;
+  font-weight: 750;
+  color: var(--orange);
+  letter-spacing: -0.03em;
+}
+
+/* Quick contact – fixed on every page. */
+.floating-contact {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.floating-contact a {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  position: relative;
+  box-shadow: 0 12px 28px -8px #0008;
+}
+.floating-contact a:hover {
+  transform: scale(1.08);
+}
+.floating-call {
+  background: var(--orange);
+  color: var(--ink);
+}
+.floating-whatsapp {
+  background: #1f8f4e;
+  color: #fff;
+}
+.floating-contact a::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: inherit;
+  z-index: -1;
+}
+
+@media (max-width: 1100px) {
+  .hero-inner {
+    grid-template-columns: 1fr;
+    gap: 90px;
+    padding: 64px 6% 72px;
+  }
+  .hero-card {
+    max-width: 560px;
+  }
+  .hero-badge {
+    right: 18px;
+  }
+}
+@media (max-width: 760px) {
+  .hero {
+    min-height: auto;
+  }
+  .hero::before {
+    background: linear-gradient(
+      180deg,
+      #16181acc 0%,
+      #16181ae6 60%,
+      #16181af2 100%
+    );
+  }
+  .hero-inner {
+    padding: 44px 6% 56px;
+    gap: 80px;
+  }
+  .hero-pill {
+    font-size: 12px;
+  }
+  .hero-copy h1 {
+    font-size: clamp(42px, 12vw, 60px);
+    margin: 22px 0 18px;
+  }
+  .hero-actions .button {
+    width: 100%;
+    justify-content: center;
+  }
+  .hero-card {
+    padding: 30px 18px 20px;
+  }
+  .hero-badge {
+    top: -52px;
+    right: 12px;
+    font-size: 18px;
+    padding: 14px 18px;
+  }
+  .hero-facts strong {
+    font-size: 19px;
+  }
+  .floating-contact {
+    right: 14px;
+    bottom: 14px;
+  }
+  .floating-contact a {
+    width: 54px;
+    height: 54px;
+  }
+}
+.button-whatsapp {
+  color: #fff;
+  background: #1f8f4e;
+}
+.button-whatsapp:hover {
+  background: #23a359;
+  transform: translateY(-2px);
+}

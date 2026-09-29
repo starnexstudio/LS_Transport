@@ -1,7 +1,6 @@
-import Image from "next/image";
-import { asset } from "@/lib/base-path";
-import { ArrowUpRight, ArrowDown, MapPin, Clock3 } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { Header } from "@/components/header";
+import { Hero } from "@/components/hero";
 import { Services } from "@/components/services";
 import { Inquiry } from "@/components/inquiry";
 import { Footer } from "@/components/footer";
@@ -10,23 +9,23 @@ import { PhotoExample } from "@/components/photo-example";
 const faqs = [
   [
     "Was kostet mein Auftrag?",
-    "Jedes Vorhaben ist anders. Der Preis wird individuell abgestimmt. Beschreiben Sie uns die gewünschten Arbeiten, den Umfang und den Einsatzort, damit wir Ihren Auftrag einschätzen können.",
+    "Der Preis richtet sich nach Umfang und Aufwand. Beschreiben Sie kurz Ihr Vorhaben – Sie erhalten ein individuelles Angebot.",
   ],
   [
     "In welchen Regionen ist L&S im Einsatz?",
-    "Unser Servicegebiet ist Deutschland. Ob und wie wir Ihren Einsatzort bedienen können, klären wir individuell mit Ihnen. Bitte nennen Sie uns dafür Ihre Postleitzahl und den Ort.",
+    "Deutschlandweit nach Absprache. Nennen Sie uns einfach Postleitzahl und Ort.",
   ],
   [
     "Kann ich mehrere Leistungen kombinieren?",
-    "Ja, fragen Sie die gewünschten Leistungen gemeinsam an – zum Beispiel Demontage mit Entsorgung oder Möbeltransport mit anschließendem Aufbau. Den genauen Umfang stimmen wir mit Ihnen ab.",
+    "Ja – zum Beispiel Entrümpelung, Entsorgung und Reinigung in einem Auftrag.",
   ],
   [
     "Welche Angaben helfen bei meiner Anfrage?",
-    "Hilfreich sind die gewünschte Leistung, Einsatzort, ungefähre Menge, Etage und Zugang sowie Ihr Wunschtermin. Fotos können Sie anschließend direkt in Ihrem E-Mail-Programm anhängen.",
+    "Leistung, Ort, ungefähre Menge, Etage und Wunschtermin. Fotos helfen besonders.",
   ],
   [
     "Wann kann ich Sie erreichen?",
-    "Sie können uns rund um die Uhr per E-Mail kontaktieren. 24 Stunden erreichbar bedeutet nicht, dass jeder Einsatz sofort möglich ist. Termine vereinbaren wir persönlich mit Ihnen.",
+    "Rund um die Uhr. Den Termin für den Einsatz vereinbaren wir persönlich mit Ihnen.",
   ],
 ];
 export default function Home() {
@@ -37,77 +36,7 @@ export default function Home() {
       </a>
       <Header />
       <main id="inhalt">
-        <section className="hero">
-          <div className="hero-copy">
-            <div className="eyebrow">
-              <span className="small-line" /> ANPACKEN. ORDNUNG SCHAFFEN.
-            </div>
-            <h1>
-              Wir schaffen Platz.
-              <br />
-              <span>
-                Für das, was
-                <br className="desktop-break" /> kommt.
-              </span>
-            </h1>
-            <p>
-              Entrümpelung, Demontage und Möbelservice.
-              <br className="desktop-break" /> Wir übernehmen die Arbeit. Sie
-              den nächsten Schritt.
-            </p>
-            <a href="#anfrage" className="button button-dark">
-              Ihr Vorhaben anfragen <ArrowUpRight size={20} />
-            </a>
-            <a href="#leistungen" className="hero-more">
-              Unsere Leistungen entdecken <ArrowDown size={16} />
-            </a>
-            <ContactActions compact />
-            <div className="hero-availability">
-              <span className="status-dot" />
-              24 Stunden erreichbar <span className="divider">/</span> Einsatz
-              nach Absprache
-            </div>
-          </div>
-          <div className="hero-visual">
-            <Image
-              src={asset("/images/cleared-room.webp")}
-              alt="Heller Raum mit Umzugskartons und vorbereiteten Möbelteilen – illustrative Darstellung"
-              fill
-              sizes="(max-width: 760px) 100vw, 52vw"
-              priority
-            />
-            <div className="image-label">NEUER RAUM. NEUE MÖGLICHKEITEN.</div>
-            <div className="hero-stamp">
-              <ArrowUpRight size={38} strokeWidth={1.4} />
-              <span>
-                Weniger Ballast.
-                <br />
-                <strong>Mehr Freiraum.</strong>
-              </span>
-            </div>
-            <span className="image-credit">Illustrative Darstellung</span>
-          </div>
-        </section>
-        <div className="facts-bar">
-          <div>
-            <MapPin size={19} />
-            <span>
-              Deutschlandweit <small>nach Absprache</small>
-            </span>
-          </div>
-          <div>
-            <Clock3 size={19} />
-            <span>
-              24 Stunden <small>erreichbar</small>
-            </span>
-          </div>
-          <div>
-            <span className="fact-mark">↗</span>
-            <span>
-              Individuelles Angebot <small>für Ihr Vorhaben</small>
-            </span>
-          </div>
-        </div>
+        <Hero />
         <section className="section services" id="leistungen">
           <div className="section-top">
             <div>
@@ -118,13 +47,7 @@ export default function Home() {
                 Was wir übernehmen.
               </h2>
             </div>
-            <p>
-              Vom ersten Abbau bis zum letzten Möbelstück.
-              <br />
-              Einzelne Arbeiten oder mehrere Leistungen
-              <br className="desktop-break" /> zusammen – passend zu Ihrem
-              Vorhaben.
-            </p>
+            <p>Einzeln oder kombiniert – passend zu Ihrem Vorhaben.</p>
           </div>
           <Services />
         </section>
@@ -136,10 +59,7 @@ export default function Home() {
               <br />
               <span>ein klares Gespräch.</span>
             </h2>
-            <p>
-              Damit Sie wissen, was passiert, stimmen wir Umfang, Preis und
-              Termin vor Beginn mit Ihnen ab.
-            </p>
+            <p>Drei Schritte – ohne Überraschungen.</p>
             <a href="#anfrage" className="text-link">
               Lassen Sie uns anfangen <ArrowUpRight size={18} />
             </a>
@@ -152,31 +72,21 @@ export default function Home() {
               <span>01</span>
               <div>
                 <h3>Sie erzählen. Wir hören zu.</h3>
-                <p>
-                  Was soll weg, was soll mit? Teilen Sie uns mit, welche
-                  Arbeiten Sie planen und wo Unterstützung gebraucht wird.
-                </p>
+                <p>Kurz beschreiben, was ansteht – gern mit Fotos.</p>
               </div>
             </li>
             <li>
               <span>02</span>
               <div>
                 <h3>Wir klären die Details.</h3>
-                <p>
-                  Gemeinsam besprechen wir den Umfang, den Zugang und Ihren
-                  Wunschtermin. Sie erhalten einen individuell abgestimmten
-                  Preis.
-                </p>
+                <p>Umfang, Termin und Preis – verbindlich abgestimmt.</p>
               </div>
             </li>
             <li>
               <span>03</span>
               <div>
                 <h3>Wir packen an.</h3>
-                <p>
-                  Zum vereinbarten Termin kümmern wir uns um die besprochenen
-                  Arbeiten. Damit Ihr nächster Schritt beginnen kann.
-                </p>
+                <p>Pünktlich zum Termin. Besenrein übergeben.</p>
               </div>
             </li>
           </ol>
@@ -190,11 +100,7 @@ export default function Home() {
               <br />
               Frage offen?
             </h2>
-            <p>
-              Hier finden Sie die ersten Antworten.
-              <br />
-              Alles Weitere klären wir persönlich.
-            </p>
+            <p>Alles Weitere klären wir persönlich.</p>
             <a
               className="text-link"
               href="mailto:Info@entruempelung-demontage.de"
@@ -224,11 +130,7 @@ export default function Home() {
               <br />
               für Sie anpacken?
             </h2>
-            <p>
-              Erzählen Sie uns kurz von Ihrem Vorhaben.
-              <br />
-              Die Details besprechen wir gemeinsam.
-            </p>
+            <p>Kurz beschreiben – wir melden uns.</p>
             <a
               className="contact-email"
               href="mailto:Info@entruempelung-demontage.de"

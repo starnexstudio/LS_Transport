@@ -6,6 +6,7 @@ import { Inquiry } from "@/components/inquiry";
 import { Footer } from "@/components/footer";
 import { ContactActions } from "@/components/contact-actions";
 import { PhotoExample } from "@/components/photo-example";
+import { BeforeAfter } from "@/components/before-after";
 const faqs = [
   [
     "Was kostet mein Auftrag?",
@@ -91,6 +92,7 @@ export default function Home() {
             </li>
           </ol>
         </section>
+        <BeforeAfter />
         <PhotoExample />
         <section className="questions section" id="fragen">
           <div>

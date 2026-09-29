@@ -9,10 +9,10 @@ export function Footer() {
       <div className="footer-top">
         <Link href="/" aria-label="L&S Startseite">
           <Image
-            src={asset("/images/ls-logo.png")}
+            src={asset("/images/ls-logo.webp")}
             alt="L&S Entrümpelung & Demontagearbeiten"
-            width={140}
-            height={93}
+            width={520}
+            height={328}
           />
         </Link>
         <p>

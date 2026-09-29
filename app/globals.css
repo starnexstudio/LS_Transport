@@ -81,50 +81,152 @@ h3 {
   font-weight: 600;
   letter-spacing: -0.05em;
 }
+h1,
+h2 {
+  font-family: var(--font-display), var(--font-manrope), Arial, sans-serif;
+  letter-spacing: -0.03em;
+}
+/* Slim utility bar above the header: availability left, direct contact right. */
+.topbar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  height: 42px;
+  padding: 0 5.2%;
+  background: #0c0d0b;
+  border-bottom: 1px solid #ffffff0d;
+  font-size: 13px;
+  line-height: 1;
+  color: #a3a79b;
+}
+.topbar::before {
+  /* Hairline brand accent that fades out across the bar. */
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 2px;
+  background: linear-gradient(90deg, var(--orange) 0%, #f78a3c00 55%);
+}
+.topbar ul {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+.topbar li {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  white-space: nowrap;
+}
+.topbar li + li {
+  margin-left: 22px;
+  padding-left: 22px;
+  border-left: 1px solid #ffffff1a;
+}
+.topbar strong {
+  font-weight: 700;
+  color: #eceee7;
+}
+.topbar svg {
+  flex-shrink: 0;
+  color: var(--orange);
+}
+.topbar-contact a {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: #d9dbd3;
+}
+.topbar-contact a:hover {
+  color: #fff;
+}
+.topbar-whatsapp svg {
+  color: #5fd08f;
+}
+.topbar-live {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 0 3px #4ade8026;
+}
+@media (max-width: 1100px) {
+  .topbar {
+    padding: 0 5%;
+  }
+  .topbar .topbar-mail {
+    display: none;
+  }
+}
+@media (max-width: 760px) {
+  .topbar {
+    height: 38px;
+    font-size: 12.5px;
+  }
+  .topbar .topbar-region,
+  .topbar .topbar-whatsapp {
+    display: none;
+  }
+}
+/* Dark, low-glare header that suits the logo and flows into the hero. */
 .header {
-  height: 102px;
+  --header-text: #c9ccc3;
+  --header-line: #ffffff1f;
+  height: 96px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 5.2%;
-  border-bottom: 1px solid var(--line);
-  background: var(--paper);
+  border-bottom: 1px solid #ffffff12;
+  background: #141513;
+  color: #f1f2ec;
   position: relative;
   z-index: 20;
+}
+.header :focus-visible {
+  outline-color: var(--orange);
 }
 .brand {
   display: flex;
   align-items: center;
-  gap: 17px;
 }
 .brand img {
-  width: 102px;
-  height: 68px;
+  width: auto;
+  height: 76px;
   object-fit: contain;
-  background: transparent;
-}
-.brand > span {
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  line-height: 1.8;
-  font-weight: 700;
 }
 .navigation {
   display: flex;
   align-items: center;
-  gap: 32px;
-  font-size: 13px;
+  gap: 34px;
+  font-size: 14px;
   font-weight: 600;
+  color: var(--header-text);
 }
 .navigation > a:hover {
-  color: #a74909;
+  color: #fff;
 }
 .header-cta {
   display: flex;
   align-items: center;
-  gap: 22px;
-  padding: 12px 16px;
-  border: 1px solid var(--ink);
+  gap: 12px;
+  padding: 11px 18px;
+  border: 1px solid var(--header-line);
+  border-radius: 10px;
+  color: #fff;
+}
+.header-cta:hover {
+  background: var(--orange);
+  border-color: var(--orange);
+  color: var(--ink);
 }
 .menu-toggle {
   display: none;
@@ -643,9 +745,6 @@ h2 {
   }
 }
 @media (max-width: 1100px) {
-  .brand > span {
-    display: none;
-  }
   .header {
     padding: 0 5%;
   }
@@ -688,17 +787,11 @@ h2 {
     scroll-padding-top: 25px;
   }
   .header {
-    height: 83px;
-    padding: 0 6%;
+    height: 80px;
+    padding: 0 5%;
   }
   .brand img {
-    width: 83px;
-    height: 55px;
-  }
-  .brand > span {
-    display: block;
-    font-size: 8px;
-    letter-spacing: 0.07em;
+    height: 60px;
   }
   .menu-toggle {
     display: flex;
@@ -706,19 +799,21 @@ h2 {
     justify-content: center;
     width: 44px;
     height: 44px;
-    border: 1px solid var(--line);
+    border: 1px solid var(--header-line);
+    border-radius: 10px;
     background: transparent;
+    color: inherit;
   }
   .navigation {
     display: none;
     position: absolute;
     left: 0;
     right: 0;
-    top: 82px;
-    background: var(--paper);
-    padding: 24px 6%;
-    border-bottom: 1px solid var(--line);
-    box-shadow: 0 12px 20px #24272012;
+    top: 79px;
+    background: #141513;
+    padding: 16px 5% 24px;
+    border-bottom: 1px solid #ffffff12;
+    box-shadow: 0 24px 40px -12px #0009;
   }
   .navigation.is-open {
     display: flex;
@@ -728,7 +823,10 @@ h2 {
   }
   .navigation > a {
     padding: 15px;
-    font-size: 14px;
+    font-size: 15px;
+  }
+  .navigation > a:not(.header-cta) + a:not(.header-cta) {
+    border-top: 1px solid #ffffff0f;
   }
   .header-cta {
     justify-content: space-between;
@@ -1138,20 +1236,6 @@ h2 {
 .direct-contact svg {
   flex-shrink: 0;
 }
-.header > .direct-contact {
-  margin: 0 0 0 16px;
-  flex-wrap: nowrap;
-}
-.header > .direct-contact a {
-  font-size: 12px;
-  padding: 10px;
-}
-.header:has(> .direct-contact) .navigation {
-  gap: 16px;
-}
-.header:has(> .direct-contact) .brand > span {
-  display: none;
-}
 .photo-example {
   padding-top: 65px;
 }
@@ -1191,13 +1275,6 @@ h2 {
   text-underline-offset: 3px;
 }
 @media (max-width: 1100px) {
-  .header > .direct-contact a span {
-    display: none;
-  }
-  .header > .direct-contact a {
-    width: 44px;
-    justify-content: center;
-  }
   .service-page-heading,
   .service-scope,
   .service-planning {
@@ -1205,14 +1282,6 @@ h2 {
   }
 }
 @media (max-width: 760px) {
-  .header > .direct-contact {
-    margin-left: auto;
-    margin-right: 10px;
-    gap: 5px;
-  }
-  .header:has(> .direct-contact) .brand > span {
-    display: none;
-  }
   .service-page-heading,
   .service-scope,
   .service-planning {

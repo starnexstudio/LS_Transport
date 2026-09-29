@@ -1,8 +1,24 @@
 # Image provenance
 
-`public/images/ls-logo.png` is the original asset supplied in the workspace and has been preserved.
+`public/images/ls-logo.webp` is the owner-supplied logo (`logo.png`, with the truck and the "Schnell | Zuverlässig | Sauber" tagline). It was only trimmed to its visible edges and resized to 520 px wide WebP for fast loading; the artwork itself is unchanged.
 
 `public/images/cleared-room.webp` was generated with the built-in Imagegen tool and converted to WebP for efficient delivery. It is an illustrative scene, not a company project photograph. The website labels it accordingly.
+
+`public/images/vorher.jpg` and `public/images/nachher.jpg` (before/after slider) come from two owner-supplied files, `moving1.jpg` and `moving2.png`:
+
+- `moving1.jpg` is a bedroom full of moving boxes, credited "Roger Mommaerts / Flickr / CC" in its corner. The exact Creative Commons variant could not be verified because the Flickr account is no longer reachable. Confirm that it allows commercial use and modification (no NC or ND clause) before publishing, or replace the pair with the owner's own photos.
+- `moving2.png` is an edited version of the same scene with the boxes removed.
+- Processing: `moving2` was aligned onto `moving1` (SIFT feature matching and a homography, mean error about 1.3 px). Both were cropped to the same 16:9 area, which also removes the corner watermark, and exported at 1600 × 900. The after image's colours were matched to the before image. The website caption credits the photographer and states that the after view is edited.
+- To swap in new photos, keep both files the same size and taken from the same spot.
+
+`public/images/vorher-2.jpg` and `public/images/nachher-2.jpg` (second slider, portrait 3:4) come from the owner-supplied files `movebefore2.jpg` (480 × 640) and `moveafter2.png` (1086 × 1448, an edited version of the same scene):
+
+- Source and licence of the original photo are unknown. Confirm them before publishing.
+- Alignment: a homography (mean error about 1 px). `moveafter2` is effectively the same frame at 2.26× the size.
+- The before photo only has 480 px of real detail, so the after photo was brought to the same detail level. This keeps sharpness equal on both sides of the divider.
+- The after image's colours were matched to the before image.
+- The TV screen was blurred in both images because the before photo showed personal streaming-profile names.
+- Both images were cropped to the same 3:4 area. The crop removes warp edges and a stray object in the bottom-left corner. They were exported at 750 × 1000.
 
 ## Generation prompt
 

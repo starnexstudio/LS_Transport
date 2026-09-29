@@ -27,6 +27,12 @@ export default function LegalNotice() {
         ladungsfähige Anschrift und gegebenenfalls Vertretungsberechtigte,
         Registerangaben und Umsatzsteuer-Identifikationsnummer.
       </p>
+      <h2>Bildnachweis</h2>
+      <p>
+        Vorher-Nachher-Vergleiche auf der Startseite: Symbolbilder, keine
+        L&S-Projekte; die Nachher-Ansichten wurden bearbeitet. Foto
+        Schlafzimmer: Roger Mommaerts / Flickr (CC).
+      </p>
     </main>
   );
 }

@@ -1,0 +1,247 @@
+/* Before/after comparisons: draggable split views, each in its photo's own proportions. */
+.before-after-gallery {
+  display: grid;
+  grid-template-columns: var(--columns);
+  gap: 24px;
+  align-items: start;
+}
+.before-after-item {
+  margin: 0;
+  min-width: 0;
+}
+.before-after-item figcaption {
+  margin-top: 14px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+.before-after-item figcaption strong {
+  display: block;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.compare {
+  --position: 50%;
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #1b1c19;
+  box-shadow: 0 40px 70px -40px #24272059;
+  user-select: none;
+}
+.compare img {
+  object-fit: cover;
+}
+.compare-before {
+  position: absolute;
+  inset: 0;
+  clip-path: inset(0 calc(100% - var(--position)) 0 0);
+}
+.compare-tag {
+  position: absolute;
+  top: 16px;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 13px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #fff;
+  background: #141513b8;
+  backdrop-filter: blur(10px);
+  border: 1px solid #ffffff26;
+  pointer-events: none;
+  transition: opacity 200ms;
+}
+.compare-tag.is-hidden {
+  opacity: 0;
+}
+.compare-tag::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+.compare-tag-before {
+  left: 16px;
+}
+.compare-tag-before::before {
+  background: #f0715a;
+}
+.compare-tag-after {
+  right: 16px;
+}
+.compare-tag-after::before {
+  background: #4ade80;
+}
+.compare-divider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--position);
+  z-index: 3;
+  width: 2px;
+  margin-left: -1px;
+  background: #fff;
+  box-shadow: 0 0 18px #0006;
+  pointer-events: none;
+}
+.compare-handle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--ink);
+  background: var(--orange);
+  border: 3px solid #fff;
+  box-shadow: 0 12px 28px -8px #000a;
+  transform: translate(-50%, -50%);
+}
+.compare-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  z-index: 5;
+  padding: 7px 13px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 650;
+  white-space: nowrap;
+  color: #fff;
+  background: #141513b8;
+  backdrop-filter: blur(10px);
+  transform: translateX(-50%);
+  pointer-events: none;
+  transition: opacity 400ms;
+}
+.compare.is-touched .compare-hint {
+  opacity: 0;
+}
+/* The native range input covers the image: drag anywhere, arrow keys, screen readers. */
+.compare input[type="range"] {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: ew-resize;
+  touch-action: pan-y;
+}
+.compare:has(input:focus-visible) .compare-handle {
+  outline: 3px solid var(--orange);
+  outline-offset: 4px;
+}
+
+/* Highlights and call to action under the gallery */
+.before-after-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  margin-top: 44px;
+  padding-top: 32px;
+  border-top: 1px solid var(--line);
+}
+.before-after-footer ul {
+  list-style: none;
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px 28px;
+  margin: 0;
+  padding: 0;
+}
+.before-after-footer li {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+.before-after-footer li strong {
+  display: block;
+  font-size: 15px;
+  color: var(--ink);
+}
+.before-after-icon {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  color: #a74909;
+  background: #f78a3c24;
+}
+.before-after-cta.button {
+  flex-shrink: 0;
+  justify-content: center;
+  gap: 12px;
+  min-height: 56px;
+  padding: 0 26px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+@media (max-width: 1100px) {
+  .before-after-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .before-after-cta.button {
+    align-self: flex-start;
+  }
+}
+/* Too narrow for side-by-side frames: stack them, keeping each photo's shape. */
+@media (max-width: 960px) {
+  .before-after-gallery {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .before-after-item.is-portrait {
+    width: 100%;
+    max-width: 480px;
+  }
+}
+@media (max-width: 760px) {
+  .compare {
+    border-radius: 16px;
+  }
+  .compare-tag {
+    top: 12px;
+    padding: 6px 11px;
+    font-size: 11px;
+  }
+  .compare-tag-before {
+    left: 12px;
+  }
+  .compare-tag-after {
+    right: 12px;
+  }
+  .compare-handle {
+    width: 48px;
+    height: 48px;
+  }
+  .compare-hint {
+    bottom: 12px;
+  }
+  .before-after-footer ul {
+    grid-template-columns: 1fr;
+  }
+  .before-after-cta.button {
+    align-self: stretch;
+  }
+}

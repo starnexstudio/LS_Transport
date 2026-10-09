@@ -29,13 +29,13 @@ export const pairs = {
       src: "/images/bedroom-before.webp",
       alt: "Bedroom with a wooden bed frame, chest of drawers and chair",
       width: 800,
-      height: 1067,
+      height: 1066,
     },
     after: {
       src: "/images/bedroom-after.webp",
       alt: "The same bedroom empty after the furniture was removed",
       width: 800,
-      height: 1067,
+      height: 1066,
     },
   },
   bathroom: {

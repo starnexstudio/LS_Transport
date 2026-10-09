@@ -44,7 +44,7 @@ The office-cleanup collage is no longer used. The homepage now shows these two i
 
 ## Owner-supplied photos (October 2026)
 
-Supplied in the project folder and exported as WebP (quality 80), without retouching. Pairs were trimmed by a few pixels at most, so both photos in a pair share one exact size.
+Supplied in the project folder and exported as WebP (quality 80), without retouching. The pairs are shown as drag-to-reveal sliders. The two photos in each pair were taken from slightly different positions, and automatic feature matching failed, so each pair was aligned by a measured offset against fixed reference points: the window (clearance), the room corner (bedroom) and the water heater (bathroom). The shared area was then cropped to the same size. Small differences remain where the camera angle changed.
 
 | File | Source file | Used on |
 |---|---|---|

@@ -13,14 +13,17 @@ import { serviceDetails } from "@/lib/service-details";
 
 // Photos shown under each service's intro, keyed by slug.
 const media: Record<string, MediaItem[]> = {
-  clearance: [{ pair: pairs.clearance }],
+  clearance: [{ pair: pairs.clearance, label: "Clearance" }],
   disposal: [
     { photo: photos.disposalFurniture },
     { photo: photos.disposalRecycling },
   ],
-  dismantling: [{ photo: photos.bathtubRemoval }, { pair: pairs.bathroom }],
+  dismantling: [
+    { photo: photos.bathtubRemoval },
+    { pair: pairs.bathroom, label: "Bathroom strip-out" },
+  ],
   "furniture-transport": [
-    { pair: pairs.bedroom },
+    { pair: pairs.bedroom, label: "Furniture removal" },
     { photo: photos.wrappedFurniture },
   ],
   cleaning: [

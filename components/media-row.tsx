@@ -1,71 +1,74 @@
 import Image from "next/image";
 import { asset } from "@/lib/base-path";
 import type { Pair, Photo } from "@/lib/gallery";
+import { CompareSlider } from "@/components/compare-slider";
 
-export type MediaItem = { pair: Pair } | { photo: Photo };
+// A before/after pair (shown as a drag-to-reveal slider) or a single photo.
+export type MediaItem = { pair: Pair; label: string } | { photo: Photo };
 
 // Tallest a row may get on wide screens; narrower rows shrink to keep this height.
-const MAX_HEIGHT = 500;
+const MAX_HEIGHT = 600;
 const GAP = 12;
 
-type Cell = { photo: Photo; label?: "Before" | "After" };
-
-function cells(items: MediaItem[]): Cell[] {
-  return items.flatMap((item) =>
-    "pair" in item
-      ? [
-          { photo: item.pair.before, label: "Before" as const },
-          { photo: item.pair.after, label: "After" as const },
-        ]
-      : [{ photo: item.photo }],
-  );
-}
+const ratio = (photo: Photo) => photo.width / photo.height;
 
 /**
- * Photos side by side at one shared height, each in its own proportions
- * (column widths follow the aspect ratios). Stacks on mobile; before/after
- * pairs are labelled and stay next to each other.
+ * Photos and sliders side by side at one shared height, each in its own
+ * proportions (column widths follow the aspect ratios). Stacks on mobile.
  */
 export function MediaRow({ items }: { items: MediaItem[] }) {
-  const list = cells(items);
-  const ratios = list.map(({ photo }) => photo.width / photo.height);
-  const total = ratios.reduce((sum, ratio) => sum + ratio, 0);
-  const maxWidth = Math.round(total * MAX_HEIGHT + GAP * (list.length - 1));
+  const ratios = items.map((item) =>
+    ratio("pair" in item ? item.pair.before : item.photo),
+  );
+  const total = ratios.reduce((sum, value) => sum + value, 0);
+  const maxWidth = Math.round(total * MAX_HEIGHT + GAP * (items.length - 1));
   return (
     <div
       className="media-row"
       style={
         {
-          "--columns": ratios.map((ratio) => `minmax(0, ${ratio}fr)`).join(" "),
+          // Normalised so the fractions always add up to the full row width.
+          "--columns": ratios
+            .map((value) => `minmax(0, ${value / total}fr)`)
+            .join(" "),
           "--max-width": `${maxWidth}px`,
         } as React.CSSProperties
       }
     >
-      {list.map(({ photo, label }) => (
-        <figure
-          key={photo.src}
-          className="media-photo"
-          style={{ aspectRatio: `${photo.width} / ${photo.height}` }}
-        >
-          <Image
-            src={asset(photo.src)}
-            alt={photo.alt}
-            fill
-            sizes="(max-width: 760px) 90vw, 40vw"
+      {items.map((item) =>
+        "pair" in item ? (
+          <CompareSlider
+            key={item.pair.before.src}
+            pair={{
+              label: item.label,
+              width: item.pair.before.width,
+              height: item.pair.before.height,
+              before: item.pair.before,
+              after: item.pair.after,
+            }}
           />
-          {label ? (
-            <figcaption
-              className={`compare-tag compare-tag-${label.toLowerCase()}`}
-            >
-              {label}
-            </figcaption>
-          ) : (
-            photo.caption && (
-              <figcaption className="media-caption">{photo.caption}</figcaption>
-            )
-          )}
-        </figure>
-      ))}
+        ) : (
+          <figure
+            key={item.photo.src}
+            className="media-photo"
+            style={{
+              aspectRatio: `${item.photo.width} / ${item.photo.height}`,
+            }}
+          >
+            <Image
+              src={asset(item.photo.src)}
+              alt={item.photo.alt}
+              fill
+              sizes="(max-width: 760px) 90vw, 40vw"
+            />
+            {item.photo.caption && (
+              <figcaption className="media-caption">
+                {item.photo.caption}
+              </figcaption>
+            )}
+          </figure>
+        ),
+      )}
     </div>
   );
 }

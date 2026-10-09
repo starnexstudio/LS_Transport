@@ -1,22 +1,9 @@
-"use client";
-import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, ChevronsLeftRight } from "lucide-react";
-import { asset } from "@/lib/base-path";
+import { ArrowRight } from "lucide-react";
 import { pairs as photoPairs } from "@/lib/gallery";
-import { MediaRow } from "@/components/media-row";
+import { CompareSlider, type SliderPair } from "@/components/compare-slider";
 
-type Pair = {
-  id: string;
-  label: string;
-  title: string;
-  // Pixel size shared by both photos; sets the frame's proportions.
-  width: number;
-  height: number;
-  before: { src: string; alt: string };
-  after: { src: string; alt: string };
-};
+type Pair = SliderPair & { id: string; title: string };
 
 // Both photos of a pair must show the same room from the same spot, at the
 // same size, so the slider seam lines up.
@@ -75,91 +62,6 @@ const pairRows = [
   },
 ];
 
-// Room each corner label needs (label width plus its inset), in pixels.
-const TAG_SPACE = 130;
-
-function CompareSlider({ pair }: { pair: Pair }) {
-  const [position, setPosition] = useState(50);
-  const [touched, setTouched] = useState(false);
-  const [width, setWidth] = useState(0);
-  const frame = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const element = frame.current;
-    if (!element) return;
-    const observer = new ResizeObserver(([entry]) =>
-      setWidth(entry.contentRect.width),
-    );
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, []);
-  // Hide a label once its side is too narrow to hold it, so it never sits
-  // on the wrong photo or under the divider.
-  const divider = (position / 100) * width;
-  const hideBefore = width > 0 && divider < TAG_SPACE;
-  const hideAfter = width > 0 && width - divider < TAG_SPACE;
-  const sizes = "(max-width: 960px) 90vw, 60vw";
-  return (
-    <div
-      ref={frame}
-      className={touched ? "compare is-touched" : "compare"}
-      style={
-        {
-          "--position": `${position}%`,
-          aspectRatio: `${pair.width} / ${pair.height}`,
-        } as React.CSSProperties
-      }
-    >
-      <Image
-        src={asset(pair.after.src)}
-        alt={pair.after.alt}
-        fill
-        sizes={sizes}
-      />
-      <div className="compare-before">
-        <Image
-          src={asset(pair.before.src)}
-          alt={pair.before.alt}
-          fill
-          sizes={sizes}
-        />
-      </div>
-      <span
-        className={`compare-tag compare-tag-before${hideBefore ? " is-hidden" : ""}`}
-        aria-hidden="true"
-      >
-        Before
-      </span>
-      <span
-        className={`compare-tag compare-tag-after${hideAfter ? " is-hidden" : ""}`}
-        aria-hidden="true"
-      >
-        After
-      </span>
-      <span className="compare-divider" aria-hidden="true">
-        <span className="compare-handle">
-          <ChevronsLeftRight size={22} />
-        </span>
-      </span>
-      <span className="compare-hint" aria-hidden="true">
-        Drag to compare
-      </span>
-      <input
-        type="range"
-        min={0}
-        max={100}
-        step={1}
-        value={position}
-        aria-label={`Before-and-after comparison, ${pair.label}: move the slider left or right`}
-        aria-valuetext={`${position}% of the before photo visible`}
-        onChange={(event) => {
-          setPosition(Number(event.target.value));
-          setTouched(true);
-        }}
-      />
-    </div>
-  );
-}
-
 export function BeforeAfter() {
   return (
     <section className="section before-after" id="vorher-nachher">
@@ -172,23 +74,44 @@ export function BeforeAfter() {
             Cleared out.
           </h2>
         </div>
-        <p>See the difference, room by room.</p>
+        <p>Drag the slider to see the difference.</p>
       </div>
-      <div className="pair-rows">
+      {/* Column widths follow each photo's proportions, so all sliders share one height. */}
+      <div
+        className="before-after-gallery"
+        style={
+          {
+            "--columns": pairRows
+              .map(
+                ({ pair }) =>
+                  `minmax(0, ${pair.before.width / pair.before.height}fr)`,
+              )
+              .join(" "),
+          } as React.CSSProperties
+        }
+      >
         {pairRows.map(({ pair, label, title, href }) => (
-          <div key={label} className="pair-row">
-            <MediaRow items={[{ pair }]} />
-            <div className="pair-row-text">
-              <span className="eyebrow">{label.toUpperCase()}</span>
-              <h3>{title}</h3>
-              <Link className="text-link" href={href}>
-                About this service <ArrowRight size={18} />
+          <figure key={label} className="before-after-item is-portrait">
+            <CompareSlider
+              pair={{
+                label,
+                width: pair.before.width,
+                height: pair.before.height,
+                before: pair.before,
+                after: pair.after,
+              }}
+            />
+            <figcaption>
+              <strong>{label}</strong>
+              {title}
+              <Link className="before-after-link" href={href}>
+                About this service <ArrowRight size={16} />
               </Link>
-            </div>
-          </div>
+            </figcaption>
+          </figure>
         ))}
       </div>
-      <h3 className="slider-heading">Drag to compare</h3>
+      <h3 className="slider-heading">More examples</h3>
       {/* Column widths follow each photo's proportions, so all frames share one height. */}
       <div
         className="before-after-gallery"

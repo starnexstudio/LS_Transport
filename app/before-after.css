@@ -15,6 +15,21 @@
   line-height: 1.45;
   color: var(--muted);
 }
+.before-after-link {
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: 650;
+  color: var(--ink);
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 3px;
+}
+.before-after-link:hover {
+  color: #a64b0f;
+}
 .before-after-item figcaption strong {
   display: block;
   font-size: 15px;

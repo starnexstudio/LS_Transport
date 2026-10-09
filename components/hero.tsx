@@ -47,14 +47,8 @@ export function Hero() {
           priority
         />
       </div>
-      <div className="hero-glow hero-glow-a" aria-hidden="true" />
-      <div className="hero-glow hero-glow-b" aria-hidden="true" />
       <div className="hero-inner">
         <div className="hero-copy">
-          <p className="hero-badge">
-            <span className="hero-badge-dot" aria-hidden="true" />
-            {services.length} services, one team
-          </p>
           <h1 id="hero-title">
             Clearance
             <br />

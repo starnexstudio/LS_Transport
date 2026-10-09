@@ -84,9 +84,6 @@
   .hero-facts {
     animation: entrance-rise 700ms 420ms var(--motion-ease) backwards;
   }
-  .hero-badge {
-    animation: entrance-rise 600ms var(--motion-ease) both;
-  }
   .hero-visual > img {
     animation: hero-zoom 9s var(--motion-ease) both;
   }

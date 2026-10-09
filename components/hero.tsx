@@ -37,16 +37,22 @@ export function Hero() {
       </div>
       <div className="hero-inner">
         <div className="hero-copy">
-          <p className="hero-eyebrow">Fast · Reliable · Clean</p>
           <h1 id="hero-title">
             Clearance
             <br />
             &amp; Dismantling.
             <span className="hero-accent">Done right.</span>
           </h1>
-          <p className="hero-lead">
-            Clearing, dismantling, transport and cleaning – all from one team.
-          </p>
+          {/* German wording as supplied by the owner. */}
+          <div className="hero-lead" lang="de">
+            <p className="hero-lead-title">
+              Schnell, zuverlässig und stressfrei
+            </p>
+            <p className="hero-lead-text">
+              Wir übernehmen die komplette Räumung – von der Planung bis zur
+              besenreinen Übergabe.
+            </p>
+          </div>
           <div className="hero-actions">
             <a href="#anfrage" className="button button-orange">
               Request a quote <ArrowRight size={18} />

@@ -72,9 +72,6 @@
   .topbar-live {
     animation: live-pulse 2s ease-out infinite;
   }
-  .hero-eyebrow {
-    animation: entrance-rise 600ms var(--motion-ease) both;
-  }
   .hero-copy > h1 {
     animation: entrance-rise 800ms 90ms var(--motion-ease) both;
   }

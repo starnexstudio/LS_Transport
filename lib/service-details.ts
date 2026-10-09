@@ -11,150 +11,149 @@ export const serviceDetails: ServiceDetail[] = [
   {
     slug: "clearance",
     introduction:
-      "Wenn sich Dinge angesammelt haben oder ein Raum eine neue Aufgabe bekommen soll, hilft ein klarer Schnitt. Wir unterstützen Sie bei der Entrümpelung – vom einzelnen Bereich bis zu mehreren Räumen nach Absprache.",
+      "From a single room to a whole flat – we clear what has to go and leave what you want to keep.",
     scope: [
       {
-        title: "Wohnräume freimachen",
-        text: "Teilen Sie uns mit, welche Möbel und Gegenstände entfernt werden sollen. Was Sie behalten möchten, wird vor dem Auftrag eindeutig abgestimmt.",
+        title: "Living spaces",
+        text: "You decide what goes; we agree it clearly before we start.",
       },
       {
-        title: "Keller und Dachboden räumen",
-        text: "Auch Nebenräume können Teil Ihrer Anfrage sein. Treppen, niedrige Durchgänge und längere Tragewege berücksichtigen wir bei der Planung.",
+        title: "Basements and attics",
+        text: "Stairs and long carrying routes are part of the plan.",
       },
       {
-        title: "Abbau und Entsorgung mitdenken",
-        text: "Wenn Möbel vor dem Abtransport zerlegt werden müssen oder eine Entsorgung gewünscht ist, fragen Sie diese Leistungen direkt mit an.",
+        title: "Dismantling and disposal",
+        text: "Add them to your request and we handle everything in one go.",
       },
     ],
     preparation: [
-      "Einsatzort und betroffene Räume nennen",
-      "Ungefähre Menge beschreiben oder Fotos bereithalten",
-      "Gegenstände markieren, die bleiben sollen",
-      "Etage, Aufzug und Parkmöglichkeiten angeben",
+      "Location and rooms",
+      "Approximate amount or photos",
+      "Items that should stay",
+      "Floor, lift and parking",
     ],
     priceFactors:
-      "Der Umfang der Räumung, die Art und Menge der Gegenstände, der Zugang sowie zusätzlich vereinbarte Demontage- und Entsorgungsarbeiten fließen in die individuelle Preisabsprache ein.",
-    question: "Muss vor der Entrümpelung alles sortiert sein?",
+      "Scope, amount, access and any extra work. The price is agreed before we start.",
+    question: "Does everything need to be sorted beforehand?",
     answer:
-      "Bitte legen Sie vorab fest, was bleiben soll. Wie viel Vorbereitung darüber hinaus sinnvoll ist, besprechen wir anhand Ihrer Situation. Persönliche Dokumente und Dinge, die Sie behalten möchten, sollten Sie separat aufbewahren.",
+      "Just decide what stays and keep personal documents separate. We'll handle the rest.",
   },
   {
     slug: "disposal",
     introduction:
-      "Nach einer Räumung oder Demontage stellt sich die Frage: Wohin mit den Materialien? Wir übernehmen die fachgerechte Entsorgung im vereinbarten Umfang und klären vorab, was anfällt.",
+      "After a clearance or strip-out, we sort everything and dispose of it properly.",
     scope: [
       {
-        title: "Materialien erfassen",
-        text: "Möbel, Holz, Metall oder gemischte Gegenstände: Beschreiben Sie die anfallenden Materialien möglichst genau, damit die Entsorgung passend geplant werden kann.",
+        title: "Sorted by material",
+        text: "Furniture, wood, metal and mixed items, each to the right place.",
       },
       {
-        title: "Mit Räumung verbinden",
-        text: "Die Entsorgung kann zusammen mit einer Entrümpelung oder Demontage angefragt werden. So werden Abbau, Abtransport und Entsorgung gemeinsam abgestimmt.",
+        title: "Combined with clearance",
+        text: "Dismantling, removal and disposal planned as one job.",
       },
       {
-        title: "Besonderheiten vorab klären",
-        text: "Unbekannte Stoffe, Flüssigkeiten oder besondere Materialien bitte ausdrücklich angeben. Ob wir diese übernehmen können, muss vor einer Beauftragung geklärt sein.",
+        title: "Special materials",
+        text: "Mention them in advance so we can confirm before you book.",
       },
     ],
     preparation: [
-      "Materialarten und ungefähre Mengen angeben",
-      "Fotos der Gegenstände bereithalten",
-      "Besondere oder unbekannte Stoffe nennen",
-      "Standort und Zugang zur Abholung beschreiben",
+      "Types of material and amounts",
+      "Photos of the items",
+      "Any special or unknown substances",
+      "Location and access for collection",
     ],
     priceFactors:
-      "Die Materialart, Menge, erforderlichen Tragewege und die vereinbarte Abholung beeinflussen den Aufwand. Deshalb stimmen wir den Preis individuell für Ihren Auftrag ab.",
-    question: "Kann jede Art von Material mitgenommen werden?",
+      "Material, amount, carrying distance and collection. The price is agreed before we start.",
+    question: "Can you take every kind of material?",
     answer:
-      "Eine pauschale Zusage ist nicht möglich. Bitte nennen Sie alle Materialarten bereits bei der Anfrage. Für besondere Stoffe klären wir zunächst, ob und unter welchen Bedingungen eine Übernahme möglich ist.",
+      "Not automatically. List all materials in your request and we'll confirm what we can take.",
   },
   {
     slug: "dismantling",
     introduction:
-      "Vor der Renovierung muss Altes raus. Wir bauen zurück, sortieren und entsorgen – vom Boden bis zur Decke.",
+      "Before a renovation, the old has to go. We strip out, sort and dispose – from floor to ceiling.",
     scope: [
       {
-        title: "Böden, Fliesen & Wände",
-        text: "Parkett, Laminat, Teppich, Fliesen, Tapeten sowie Decken- und Wandverkleidungen.",
+        title: "Floors, tiles & walls",
+        text: "Parquet, laminate, carpet, tiles, wallpaper and panelling.",
       },
       {
-        title: "Bad, Küche & Türen",
-        text: "Badewannen, Waschbecken, WC und Armaturen, Küchen, Türen und Zargen.",
+        title: "Bathroom, kitchen & doors",
+        text: "Bathtubs, sinks, toilets, fittings, kitchens, doors and frames.",
       },
       {
-        title: "Einbauten & Entsorgung",
-        text: "Einbauten und nichttragende Trockenbauelemente – anschließend sortiert und entsorgt.",
+        title: "Built-in units & disposal",
+        text: "Non-load-bearing drywall and fitted units, sorted and disposed of.",
       },
     ],
     preparation: [
-      "Bauteile oder Einbauten mit Fotos beschreiben",
-      "Maße und bekannte Befestigungen nennen",
-      "Anschlüsse oder Leitungen im Arbeitsbereich angeben",
-      "Festlegen, welche Teile erhalten bleiben sollen",
+      "Photos of what should come out",
+      "Dimensions and fixings",
+      "Pipes or cables in the work area",
+      "Parts that should stay",
     ],
     priceFactors:
-      "Art, Größe und Befestigung der zu demontierenden Teile sowie Zugänglichkeit, Abtransport und gewünschte Entsorgung bestimmen den Umfang der Preisabsprache.",
-    question: "Sind Elektro- oder Sanitäranschlüsse eingeschlossen?",
+      "Type, size and fixing of the parts, access and disposal. The price is agreed before we start.",
+    question: "Are electrical or plumbing connections included?",
     answer:
-      "Arbeiten an Elektro-, Gas- oder Wasseranschlüssen sind nicht pauschal Bestandteil der Demontage. Vorhandene Anschlüsse müssen Sie bei der Anfrage nennen; erforderliche Facharbeiten und Zuständigkeiten werden vor Beginn geklärt.",
+      "Not automatically. Mention any connections and we'll clarify specialist work before we start.",
   },
   {
     slug: "furniture-transport",
     introduction:
-      "Ein Möbelstück wechselt den Standort, eine Lieferung steht an oder mehrere Möbel sollen mit umziehen. Wir stimmen Ihren Möbeltransport von der Abholadresse bis zum Ziel mit Ihnen ab.",
+      "A single piece or a full load – carefully packed, collected and delivered.",
     scope: [
       {
-        title: "Abholung abstimmen",
-        text: "Wir klären, welche Möbel transportiert werden sollen, wo sie stehen und wie sie erreichbar sind. Bitte nennen Sie auch besondere Maße oder ein bekanntes hohes Gewicht.",
+        title: "Collection",
+        text: "Tell us what moves, where it stands and any unusual sizes or weights.",
       },
       {
-        title: "Lieferung vorbereiten",
-        text: "Am Ziel sind Etage, Aufzug, Zufahrt und mögliche Tragewege wichtig. Diese Angaben gehören ebenso zur Planung wie die Strecke zwischen den Adressen.",
+        title: "Delivery",
+        text: "Floor, lift and access at the destination are part of the plan.",
       },
       {
-        title: "Mit Räumung verbinden",
-        text: "Transport, Entrümpelung und Reinigung lassen sich in einem Auftrag kombinieren.",
+        title: "Combined jobs",
+        text: "Transport, clearance and cleaning in one booking.",
       },
     ],
     preparation: [
-      "Abhol- und Zielort einschließlich Etagen nennen",
-      "Anzahl und Maße der Möbel angeben",
-      "Zugänge, Aufzüge und Parkmöglichkeiten beschreiben",
-      "Gewünschten Termin und mögliche Alternativen nennen",
+      "Both addresses, including floors",
+      "Number and size of the pieces",
+      "Access, lifts and parking",
+      "Preferred date and alternatives",
     ],
     priceFactors:
-      "Transportstrecke, Anzahl und Abmessungen der Möbel sowie der Zugang an beiden Orten werden bei der individuellen Preisabsprache berücksichtigt.",
-    question: "Transportieren Sie auch einzelne Möbelstücke?",
+      "Distance, number and size of pieces, and access at both ends. The price is agreed before we start.",
+    question: "Do you move single pieces of furniture?",
     answer:
-      "Sie können auch den Transport eines einzelnen Möbelstücks anfragen. Nennen Sie dafür Maße, Abholort und Zieladresse. Ob der Auftrag und Ihr Wunschtermin möglich sind, klären wir persönlich.",
+      "Yes. Send us the dimensions and both addresses, and we'll confirm the date with you.",
   },
   {
     slug: "cleaning",
     introduction:
-      "Wenn die Räume leer sind, machen wir sauber. So übergeben Sie Wohnung, Keller oder Gewerberaum besenrein.",
+      "Once the rooms are empty, we clean – so you can hand over swept clean.",
     scope: [
       {
-        title: "Direkt nach der Räumung",
-        text: "Die Reinigung folgt im Anschluss an Entrümpelung, Demontage oder Transport – ohne zweiten Termin.",
+        title: "Straight after clearance",
+        text: "No second appointment needed.",
       },
       {
-        title: "Besenreine Übergabe",
-        text: "Böden, Flächen und Nebenräume werden für die Übergabe an Vermieter oder Käufer vorbereitet.",
+        title: "Swept-clean handover",
+        text: "Floors, surfaces and storage rooms ready for the landlord or buyer.",
       },
       {
-        title: "Alle Raumarten",
-        text: "Wohnungen, Häuser, Keller, Dachböden und Gewerberäume.",
+        title: "Every type of space",
+        text: "Flats, houses, basements, attics and commercial spaces.",
       },
     ],
     preparation: [
-      "Größe der Räume ungefähr angeben",
-      "Gewünschten Übergabetermin nennen",
-      "Besondere Verschmutzungen erwähnen",
+      "Approximate size of the rooms",
+      "Handover date",
+      "Any heavy soiling",
     ],
     priceFactors:
-      "Fläche, Zustand der Räume und der gewünschte Termin bestimmen den Aufwand.",
-    question: "Kann die Reinigung mit der Räumung kombiniert werden?",
-    answer:
-      "Ja. Am einfachsten fragen Sie Räumung und Reinigung zusammen an – dann planen wir beides in einem Ablauf.",
+      "Area, condition and date. The price is agreed before we start.",
+    question: "Can cleaning be combined with the clearance?",
+    answer: "Yes – request both together and we plan them as one job.",
   },
 ];

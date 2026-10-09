@@ -19,27 +19,27 @@ export function Inquiry({ initialService = "" }: { initialService?: string }) {
       place = String(f.get("place") ?? "").trim(),
       message = String(f.get("message") ?? "").trim();
     const next: Record<string, string> = {};
-    if (!service) next.service = "Bitte wählen Sie eine Leistung aus.";
-    if (!name) next.name = "Bitte geben Sie Ihren Namen an.";
-    if (!place) next.place = "Bitte nennen Sie Ihren Einsatzort.";
-    if (!message) next.message = "Bitte beschreiben Sie kurz Ihr Vorhaben.";
+    if (!service) next.service = "Please select a service.";
+    if (!name) next.name = "Please enter your name.";
+    if (!place) next.place = "Please enter the job location.";
+    if (!message) next.message = "Please briefly describe your job.";
     setErrors(next);
     if (Object.keys(next).length) {
       document.getElementById(Object.keys(next)[0])?.focus();
       return;
     }
     setDraft(
-      `Guten Tag L&S,\n\nich möchte folgendes Vorhaben anfragen:\n\nLeistung: ${service}\nName: ${name}\nEinsatzort: ${place}\n\n${message}\n\nMit freundlichen Grüßen\n${name}`,
+      `Hello L&S,\n\nI would like to request a quote for the following job:\n\nService: ${service}\nName: ${name}\nLocation: ${place}\n\n${message}\n\nKind regards\n${name}`,
     );
     setCopied(false);
   }
   return (
     <form className="inquiry" noValidate onSubmit={submit}>
       <div className="form-heading">
-        <span>Ihre Anfrage</span>
-        <small>* Pflichtfelder</small>
+        <span>Your request</span>
+        <small>* Required fields</small>
       </div>
-      <label htmlFor="service">Wobei können wir helfen? *</label>
+      <label htmlFor="service">How can we help? *</label>
       <select
         id="service"
         name="service"
@@ -51,11 +51,11 @@ export function Inquiry({ initialService = "" }: { initialService?: string }) {
         aria-invalid={!!errors.service}
         aria-describedby={errors.service ? "service-error" : undefined}
       >
-        <option value="">Leistung auswählen</option>
+        <option value="">Select a service</option>
         {services.map((s) => (
           <option key={s.title}>{s.title}</option>
         ))}
-        <option>Mehrere Leistungen / Sonstiges</option>
+        <option>Several services / other</option>
       </select>
       {errors.service && (
         <span className="error" id="service-error">
@@ -64,13 +64,13 @@ export function Inquiry({ initialService = "" }: { initialService?: string }) {
       )}
       <div className="form-grid">
         <div>
-          <label htmlFor="name">Ihr Name *</label>
+          <label htmlFor="name">Your name *</label>
           <input
             id="name"
             name="name"
             autoComplete="name"
             maxLength={120}
-            placeholder="Vor- und Nachname"
+            placeholder="First and last name"
             aria-invalid={!!errors.name}
             aria-describedby={errors.name ? "name-error" : undefined}
             onChange={() => setDraft("")}
@@ -82,13 +82,13 @@ export function Inquiry({ initialService = "" }: { initialService?: string }) {
           )}
         </div>
         <div>
-          <label htmlFor="place">Einsatzort *</label>
+          <label htmlFor="place">Job location *</label>
           <input
             id="place"
             name="place"
             autoComplete="address-level2"
             maxLength={160}
-            placeholder="PLZ und Ort"
+            placeholder="Postcode and town"
             aria-invalid={!!errors.place}
             aria-describedby={errors.place ? "place-error" : undefined}
             onChange={() => setDraft("")}
@@ -100,13 +100,13 @@ export function Inquiry({ initialService = "" }: { initialService?: string }) {
           )}
         </div>
       </div>
-      <label htmlFor="message">Ihr Vorhaben in wenigen Worten *</label>
+      <label htmlFor="message">Your job in a few words *</label>
       <textarea
         id="message"
         name="message"
         rows={3}
         maxLength={2500}
-        placeholder="Was steht an? Ungefähre Menge, Etage und Wunschtermin …"
+        placeholder="What needs doing? Approximate amount, floor and preferred date …"
         aria-invalid={!!errors.message}
         aria-describedby={errors.message ? "message-error" : undefined}
         onChange={() => setDraft("")}
@@ -117,28 +117,27 @@ export function Inquiry({ initialService = "" }: { initialService?: string }) {
         </span>
       )}
       <p className="form-hint">
-        Ihre Angaben bleiben zunächst in Ihrem Browser. Im nächsten Schritt
-        öffnen Sie den Entwurf in Ihrem E-Mail-Programm und senden ihn selbst
-        ab.
+        Your details stay in your browser for now. In the next step, you open
+        the draft in your email app and send it yourself.
       </p>
       <button className="button button-dark" type="submit">
-        E-Mail-Anfrage vorbereiten <ArrowUpRight size={19} />
+        Prepare email request <ArrowUpRight size={19} />
       </button>
       {draft && (
         <div className="draft" role="status">
           <h3>
-            <Check size={18} /> Ihr Entwurf ist bereit.
+            <Check size={18} /> Your draft is ready.
           </h3>
           <p>
-            Es wurde noch nichts gesendet. Öffnen Sie Ihr E-Mail-Programm oder
-            kopieren Sie den Text. Fotos können Sie dort ergänzen.
+            Nothing has been sent yet. Open your email app or copy the text. You
+            can add photos there.
           </p>
           <div className="draft-actions">
             <a
               className="text-link"
-              href={`mailto:${business.email}?subject=${encodeURIComponent("Projektanfrage – " + service)}&body=${encodeURIComponent(draft)}`}
+              href={`mailto:${business.email}?subject=${encodeURIComponent("Quote request – " + service)}&body=${encodeURIComponent(draft)}`}
             >
-              <Mail size={16} /> E-Mail öffnen
+              <Mail size={16} /> Open email
             </a>
             <button
               type="button"
@@ -151,19 +150,19 @@ export function Inquiry({ initialService = "" }: { initialService?: string }) {
                   setCopied(false);
                   setErrors({
                     ...errors,
-                    copy: "Kopieren nicht möglich. Markieren Sie den Text im Feld unten.",
+                    copy: "Copying isn't possible. Please select the text in the field below.",
                   });
                 }
               }}
             >
               <Copy size={16} />
-              {copied ? "Text kopiert" : "Text kopieren"}
+              {copied ? "Text copied" : "Copy text"}
             </button>
           </div>
           <details>
-            <summary>Anfragetext anzeigen</summary>
+            <summary>Show request text</summary>
             <textarea
-              aria-label="Vorbereiteter Anfragetext"
+              aria-label="Prepared request text"
               readOnly
               value={draft}
               rows={9}

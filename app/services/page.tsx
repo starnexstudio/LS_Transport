@@ -6,30 +6,30 @@ import { Footer } from "@/components/footer";
 import { services } from "@/lib/content";
 import { serviceDetails } from "@/lib/service-details";
 export const metadata: Metadata = {
-  title: "Alle Leistungen | L&S",
+  title: "All services | L&S",
   description:
-    "Entrümpelung, fachgerechte Entsorgung, Demontage, Möbeltransport und Reinigung: Erfahren Sie, was wir übernehmen und welche Angaben bei Ihrer Anfrage helfen.",
+    "Clearance, professional disposal, dismantling, furniture transport and cleaning: find out what we take on and which details help with your request.",
 };
 export default function ServiceOverview() {
   return (
     <>
       <a href="#inhalt" className="skip-link">
-        Zum Inhalt springen
+        Skip to content
       </a>
       <Header />
       <main id="inhalt" className="section service-overview">
         <Link href="/" className="text-link">
-          ← Zur Startseite
+          ← Back to home
         </Link>
-        <span className="eyebrow">L&S / UNSERE LEISTUNGEN</span>
+        <span className="eyebrow">L&S / OUR SERVICES</span>
         <h1>
-          Was Sie vorhaben.
+          What you have planned.
           <br />
-          Was wir beitragen.
+          What we bring to it.
         </h1>
         <p>
-          Erfahren Sie mehr über Umfang, Vorbereitung und Preisgestaltung.
-          Einzelne Leistungen lassen sich nach Absprache miteinander verbinden.
+          Learn more about scope, preparation and pricing. Individual services
+          can be combined by arrangement.
         </p>
         <div className="service-overview-list">
           {services.map((service, index) => (

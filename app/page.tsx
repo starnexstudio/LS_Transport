@@ -1,7 +1,6 @@
 import { ArrowUpRight } from "lucide-react";
 import { Header } from "@/components/header";
 import { Hero } from "@/components/hero";
-import { Services } from "@/components/services";
 import { Inquiry } from "@/components/inquiry";
 import { Footer } from "@/components/footer";
 import { ContactActions } from "@/components/contact-actions";
@@ -9,60 +8,46 @@ import { PhotoExample } from "@/components/photo-example";
 import { BeforeAfter } from "@/components/before-after";
 const faqs = [
   [
-    "Was kostet mein Auftrag?",
-    "Der Preis richtet sich nach Umfang und Aufwand. Beschreiben Sie kurz Ihr Vorhaben – Sie erhalten ein individuelles Angebot.",
+    "How much will my job cost?",
+    "The price depends on the scope and the work involved. Briefly describe your job and you'll receive an individual quote.",
   ],
   [
-    "In welchen Regionen ist L&S im Einsatz?",
-    "Deutschlandweit nach Absprache. Nennen Sie uns einfach Postleitzahl und Ort.",
+    "Which areas does L&S cover?",
+    "All of Germany, by arrangement. Just tell us the postcode and town.",
   ],
   [
-    "Kann ich mehrere Leistungen kombinieren?",
-    "Ja – zum Beispiel Entrümpelung, Entsorgung und Reinigung in einem Auftrag.",
+    "Can I combine several services?",
+    "Yes – for example clearance, disposal and cleaning in one job.",
   ],
   [
-    "Welche Angaben helfen bei meiner Anfrage?",
-    "Leistung, Ort, ungefähre Menge, Etage und Wunschtermin. Fotos helfen besonders.",
+    "Which details help with my request?",
+    "The service, location, approximate amount, floor and preferred date. Photos are especially helpful.",
   ],
   [
-    "Wann kann ich Sie erreichen?",
-    "Rund um die Uhr. Den Termin für den Einsatz vereinbaren wir persönlich mit Ihnen.",
+    "When can I reach you?",
+    "Around the clock. We arrange the date for the job with you personally.",
   ],
 ];
 export default function Home() {
   return (
     <>
       <a href="#inhalt" className="skip-link">
-        Zum Inhalt springen
+        Skip to content
       </a>
       <Header />
       <main id="inhalt">
         <Hero />
-        <section className="section services" id="leistungen">
-          <div className="section-top">
-            <div>
-              <span className="eyebrow">01 / UNSERE LEISTUNGEN</span>
-              <h2>
-                Was ansteht.
-                <br />
-                Was wir übernehmen.
-              </h2>
-            </div>
-            <p>Einzeln oder kombiniert – passend zu Ihrem Vorhaben.</p>
-          </div>
-          <Services />
-        </section>
         <section className="process section" id="ablauf">
           <div className="process-intro">
-            <span className="eyebrow">02 / KLARER ABLAUF</span>
+            <span className="eyebrow">01 / A CLEAR PROCESS</span>
             <h2>
-              Ein guter Anfang:
+              A good start:
               <br />
-              <span>ein klares Gespräch.</span>
+              <span>a clear conversation.</span>
             </h2>
-            <p>Drei Schritte – ohne Überraschungen.</p>
+            <p>Three steps – no surprises.</p>
             <a href="#anfrage" className="text-link">
-              Lassen Sie uns anfangen <ArrowUpRight size={18} />
+              Let&apos;s get started <ArrowUpRight size={18} />
             </a>
             <div className="process-wordmark" aria-hidden="true">
               L<span>&</span>S<span className="wordmark-dot">.</span>
@@ -72,22 +57,22 @@ export default function Home() {
             <li>
               <span>01</span>
               <div>
-                <h3>Sie erzählen. Wir hören zu.</h3>
-                <p>Kurz beschreiben, was ansteht – gern mit Fotos.</p>
+                <h3>You tell us. We listen.</h3>
+                <p>Briefly describe what needs doing – photos are welcome.</p>
               </div>
             </li>
             <li>
               <span>02</span>
               <div>
-                <h3>Wir klären die Details.</h3>
-                <p>Umfang, Termin und Preis – verbindlich abgestimmt.</p>
+                <h3>We clarify the details.</h3>
+                <p>Scope, date and price – firmly agreed.</p>
               </div>
             </li>
             <li>
               <span>03</span>
               <div>
-                <h3>Wir packen an.</h3>
-                <p>Pünktlich zum Termin. Besenrein übergeben.</p>
+                <h3>We get to work.</h3>
+                <p>On time for the appointment. Handed over swept clean.</p>
               </div>
             </li>
           </ol>
@@ -96,18 +81,17 @@ export default function Home() {
         <PhotoExample />
         <section className="questions section" id="fragen">
           <div>
-            <span className="eyebrow">03 / GUT ZU WISSEN</span>
+            <span className="eyebrow">02 / GOOD TO KNOW</span>
             <h2>
-              Noch eine
-              <br />
-              Frage offen?
+              Still have
+              <br />a question?
             </h2>
-            <p>Alles Weitere klären wir persönlich.</p>
+            <p>We&apos;ll clarify everything else with you personally.</p>
             <a
               className="text-link"
               href="mailto:Info@entruempelung-demontage.de"
             >
-              Schreiben Sie uns <ArrowUpRight size={18} />
+              Write to us <ArrowUpRight size={18} />
             </a>
           </div>
           <div className="faq-list">
@@ -126,13 +110,13 @@ export default function Home() {
         </section>
         <section className="contact section" id="anfrage">
           <div className="contact-intro">
-            <span className="eyebrow">04 / IHR NÄCHSTER SCHRITT</span>
+            <span className="eyebrow">03 / YOUR NEXT STEP</span>
             <h2>
-              Was dürfen wir
+              What can we
               <br />
-              für Sie anpacken?
+              take on for you?
             </h2>
-            <p>Kurz beschreiben – wir melden uns.</p>
+            <p>Describe it briefly – we&apos;ll get back to you.</p>
             <a
               className="contact-email"
               href="mailto:Info@entruempelung-demontage.de"
@@ -143,9 +127,9 @@ export default function Home() {
             <div className="contact-note">
               <span className="status-dot" />
               <span>
-                24 Stunden erreichbar
+                Available 24 hours a day
                 <br />
-                <small>Deutschland – Einsatzbereich nach Absprache</small>
+                <small>Germany – service area by arrangement</small>
               </span>
             </div>
           </div>

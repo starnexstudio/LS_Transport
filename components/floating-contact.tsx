@@ -1,5 +1,5 @@
 import { MessageCircle, Phone } from "lucide-react";
-import { business } from "@/lib/content";
+import { business, whatsappGreeting } from "@/lib/content";
 
 // Always-visible quick contact on every page.
 export function FloatingContact() {
@@ -11,7 +11,7 @@ export function FloatingContact() {
         <a
           className="floating-call"
           href={`tel:${phone.replace(/[^+\d]/g, "")}`}
-          aria-label={`L&S anrufen: ${phone}`}
+          aria-label={`Call L&S: ${phone}`}
         >
           <Phone size={24} />
         </a>
@@ -19,10 +19,10 @@ export function FloatingContact() {
       {whatsapp && (
         <a
           className="floating-whatsapp"
-          href={`https://wa.me/${whatsapp.replace(/\D/g, "")}?text=${encodeURIComponent("Guten Tag L&S, ich möchte ein Vorhaben anfragen.")}`}
+          href={`https://wa.me/${whatsapp.replace(/\D/g, "")}?text=${encodeURIComponent(whatsappGreeting)}`}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="L&S auf WhatsApp schreiben (öffnet einen neuen Tab)"
+          aria-label="Message L&S on WhatsApp (opens in a new tab)"
         >
           <MessageCircle size={24} />
         </a>

@@ -4,6 +4,7 @@ import "./globals.css";
 import "./motion.css";
 import "./hero.css";
 import "./before-after.css";
+import "./media.css";
 import { FloatingContact } from "@/components/floating-contact";
 import { MotionEffects } from "@/components/motion-effects";
 const manrope = Manrope({
@@ -19,16 +20,16 @@ const archivo = Archivo({
   display: "swap",
 });
 export const metadata: Metadata = {
-  title: "L&S | Entrümpelung & Demontagearbeiten",
+  title: "L&S | Clearance & Dismantling",
   description:
-    "Platz für Neues. Entrümpelung, fachgerechte Entsorgung, Demontage, Möbeltransport und Reinigung. Deutschlandweit nach Absprache. Jetzt Ihr Vorhaben anfragen.",
+    "Room for something new. Clearance, professional disposal, dismantling, furniture transport and cleaning. Across Germany by arrangement. Request a quote today.",
   robots: { index: false, follow: false },
 };
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="de">
+    <html lang="en">
       <body className={`${manrope.variable} ${archivo.variable}`}>
         {children}
         <FloatingContact />

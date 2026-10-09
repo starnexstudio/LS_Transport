@@ -16,17 +16,6 @@ assert.equal(
     .evaluate((el) => getComputedStyle(el).animationName),
   "entrance-rise",
 );
-await page.locator("#leistungen").scrollIntoViewIfNeeded();
-await page.getByRole("tab", { name: "04 Möbeltransport & Lieferung" }).click();
-assert.ok(
-  await page
-    .locator("#service-panel")
-    .evaluate((el) => el.getAnimations({ subtree: true }).length > 0),
-);
-await page
-  .getByRole("tab", { name: "04 Möbeltransport & Lieferung" })
-  .press("ArrowDown");
-assert.match(await page.locator("#service-panel").innerText(), /Besenrein/);
 await page.emulateMedia({ reducedMotion: "reduce" });
 await page.waitForFunction(
   () =>
@@ -39,13 +28,6 @@ assert.equal(
     .evaluate((el) => getComputedStyle(el).animationName),
   "none",
 );
-await page.getByRole("tab", { name: "01 Entrümpelung" }).click();
-assert.equal(
-  await page
-    .locator("#service-panel")
-    .evaluate((el) => el.getAnimations({ subtree: true }).length),
-  0,
-);
 for (const width of [1440, 390, 320]) {
   await page.setViewportSize({ width, height: 844 });
   assert.ok(
@@ -55,11 +37,11 @@ for (const width of [1440, 390, 320]) {
   );
 }
 await page.setViewportSize({ width: 390, height: 844 });
-await page.getByRole("button", { name: "Menü öffnen" }).click();
-await page.getByRole("button", { name: "Menü schließen" }).press("Escape");
+await page.getByRole("button", { name: "Open menu" }).click();
+await page.getByRole("button", { name: "Close menu" }).press("Escape");
 assert.equal(
   await page
-    .getByRole("button", { name: "Menü öffnen" })
+    .getByRole("button", { name: "Open menu" })
     .getAttribute("aria-expanded"),
   "false",
 );
@@ -86,10 +68,7 @@ await fs.writeFile(
       status: "passed",
       checks: [
         "Hero entrance",
-        "Service transition",
-        "Keyboard selection",
         "Live reduced-motion preference change",
-        "Reduced-motion tabs",
         "Mobile menu Escape",
         "Responsive overflow",
         "Content visible without JavaScript",

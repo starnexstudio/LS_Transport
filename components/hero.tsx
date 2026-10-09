@@ -19,9 +19,9 @@ const serviceIcons = [PackageOpen, Recycle, Hammer, Truck, Sparkles];
 
 // Availability and region live in the top bar; the hero names service qualities.
 const facts = [
-  { Icon: UserCheck, title: "Ein Ansprechpartner", text: "von A bis Z" },
-  { Icon: Recycle, title: "Fachgerecht", text: "entsorgt" },
-  { Icon: Sparkles, title: "Besenrein", text: "übergeben" },
+  { Icon: UserCheck, title: "One contact", text: "from start to finish" },
+  { Icon: Recycle, title: "Professional", text: "disposal" },
+  { Icon: Sparkles, title: "Swept clean", text: "at handover" },
 ];
 
 export function Hero() {
@@ -39,19 +39,19 @@ export function Hero() {
       </div>
       <div className="hero-inner">
         <div className="hero-copy">
-          <p className="hero-eyebrow">Schnell · Zuverlässig · Sauber</p>
+          <p className="hero-eyebrow">Fast · Reliable · Clean</p>
           <h1 id="hero-title">
-            Entrümpelung
+            Clearance
             <br />
-            &amp; Demontage.
-            <span className="hero-accent">Sauber erledigt.</span>
+            &amp; Dismantling.
+            <span className="hero-accent">Done right.</span>
           </h1>
           <p className="hero-lead">
-            Räumen, rückbauen, transportieren, reinigen – alles aus einer Hand.
+            Clearing, dismantling, transport and cleaning – all from one team.
           </p>
           <div className="hero-actions">
             <a href="#anfrage" className="button button-orange">
-              Jetzt anfragen <ArrowRight size={18} />
+              Request a quote <ArrowRight size={18} />
             </a>
             {phone && (
               <a
@@ -76,9 +76,9 @@ export function Hero() {
             ))}
           </ul>
         </div>
-        <aside className="hero-card" aria-label="Unsere Leistungen">
-          <p className="hero-card-label">Unsere Leistungen</p>
-          <p className="hero-card-title">Alles aus einer Hand</p>
+        <aside className="hero-card" aria-label="Our services">
+          <p className="hero-card-label">Our services</p>
+          <p className="hero-card-title">All from one team</p>
           <ul>
             {services.map((service, index) => {
               const Icon = serviceIcons[index];
@@ -99,7 +99,7 @@ export function Hero() {
             })}
           </ul>
           <Link className="hero-card-all" href="/services">
-            Alle Leistungen im Detail <ArrowRight size={17} />
+            All services in detail <ArrowRight size={17} />
           </Link>
         </aside>
       </div>

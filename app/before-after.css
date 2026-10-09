@@ -143,47 +143,10 @@
   outline-offset: 4px;
 }
 
-/* Highlights and call to action under the gallery */
+/* Call to action under the gallery */
 .before-after-footer {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 32px;
   margin-top: 44px;
-  padding-top: 32px;
-  border-top: 1px solid var(--line);
-}
-.before-after-footer ul {
-  list-style: none;
-  flex: 1;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 20px 28px;
-  margin: 0;
-  padding: 0;
-}
-.before-after-footer li {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  font-size: 14px;
-  line-height: 1.45;
-  color: var(--muted);
-}
-.before-after-footer li strong {
-  display: block;
-  font-size: 15px;
-  color: var(--ink);
-}
-.before-after-icon {
-  width: 42px;
-  height: 42px;
-  flex-shrink: 0;
-  display: grid;
-  place-items: center;
-  border-radius: 12px;
-  color: #a74909;
-  background: #f78a3c24;
 }
 .before-after-cta.button {
   flex-shrink: 0;
@@ -196,15 +159,6 @@
   font-weight: 700;
 }
 
-@media (max-width: 1100px) {
-  .before-after-footer {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .before-after-cta.button {
-    align-self: flex-start;
-  }
-}
 /* Too narrow for side-by-side frames: stack them, keeping each photo's shape. */
 @media (max-width: 960px) {
   .before-after-gallery {
@@ -238,10 +192,7 @@
   .compare-hint {
     bottom: 12px;
   }
-  .before-after-footer ul {
-    grid-template-columns: 1fr;
-  }
   .before-after-cta.button {
-    align-self: stretch;
+    flex: 1;
   }
 }

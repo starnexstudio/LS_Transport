@@ -1,6 +1,6 @@
 # L&S website
 
-A German-language, frontend-only website for L&S Entrümpelung & Demontagearbeiten.
+An English-language, frontend-only website for L&S Entrümpelung & Demontagearbeiten.
 
 ## Development
 
@@ -11,7 +11,7 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:3000. The public interface is German; source and documentation use English.
+Open http://localhost:3000. The public interface, source and documentation are all in English. The company name, "L&S Entrümpelung & Demontagearbeiten", stays in German.
 
 ## Production
 
@@ -31,12 +31,12 @@ node tests/accessibility-check.mjs
 npm run typecheck
 ```
 
-The browser checks cover responsive overflow, navigation, keyboard-operated service tabs, service preselection, form validation, generated mailto contents, FAQ expansion, local image loading, legal pages, the German 404 page, and runtime exceptions. Screenshots and machine-readable results are saved under `artifacts/`.
+The browser checks cover responsive overflow, navigation, service preselection, form validation, generated mailto contents, FAQ expansion, local image loading, legal pages, the custom 404 page, and runtime exceptions. Screenshots and machine-readable results are saved under `artifacts/`.
 
 ## Project structure
 
-- `app/`: home page, German legal draft pages, metadata, global styles, favicon, and German not-found page.
-- `components/`: shared header, footer, service selector, and inquiry form.
+- `app/`: home page, legal draft pages, metadata, global styles, favicon, and not-found page.
+- `components/`: shared header, top bar, hero, before/after comparisons, footer, and inquiry form.
 - `lib/content.ts`: confirmed contact information and service content.
 - `public/images/`: original supplied logo and generated editorial illustration.
 - `tests/`: browser and accessibility checks.
@@ -59,10 +59,10 @@ No phone number, street address, certifications, reviews, fixed prices, or proje
 
 `/services` lists five detailed routes generated from `lib/service-details.ts`. Each route includes scope, preparation, pricing factors, a relevant question, related services, and a preselected inquiry form.
 
-Phone and WhatsApp links are implemented in `components/contact-actions.tsx`. Set `business.phone` and `business.whatsapp` in `lib/content.ts` to the confirmed international numbers. These values deliberately remain empty until supplied by the owner; the corresponding controls stay hidden to avoid publishing fabricated numbers or broken destinations. Call links use `tel:`; WhatsApp links use `wa.me` with a German draft message and open only after a visitor clicks. No WhatsApp script is embedded.
+Phone and WhatsApp links are implemented in `components/contact-actions.tsx`. Set `business.phone` and `business.whatsapp` in `lib/content.ts` to the confirmed international numbers. These values deliberately remain empty until supplied by the owner; the corresponding controls stay hidden to avoid publishing fabricated numbers or broken destinations. Call links use `tel:`; WhatsApp links use `wa.me` with a prefilled message (`whatsappGreeting` in `lib/content.ts`) and open only after a visitor clicks. No WhatsApp script is embedded.
 
 The homepage includes two licensed Pexels photographs of packed moving boxes and protected living-room furniture. They are labeled as illustrative photos, not L&S projects or a before/after pair. See `ASSET_NOTES.md` for provenance.
 
 ## Motion
 
-`app/motion.css` defines coordinated hero entrances and small hover/focus transitions. `components/motion-effects.tsx` uses IntersectionObserver and the Web Animations API for one-time scroll reveals; it does not hide server-rendered content or install scroll listeners. Service-tab transitions preserve DOM and focus. The reduced-motion preference disables CSS and JavaScript animations, including when changed while the page is open. Run `node tests/motion-check.mjs` with the dev server running to verify these behaviors.
+`app/motion.css` defines coordinated hero entrances and small hover/focus transitions. `components/motion-effects.tsx` uses IntersectionObserver and the Web Animations API for one-time scroll reveals; it does not hide server-rendered content or install scroll listeners. The reduced-motion preference disables CSS and JavaScript animations, including when changed while the page is open. Run `node tests/motion-check.mjs` with the dev server running to verify these behaviors.

@@ -41,3 +41,24 @@ The office-cleanup collage is no longer used. The homepage now shows these two i
 - `public/images/packed-moving-boxes.jpg`: Ketut Subiyanto, https://www.pexels.com/photo/empty-apartment-with-packed-carton-boxes-before-moving-4246119/
 - `public/images/wrapped-living-room.jpg`: MART PRODUCTION, https://www.pexels.com/photo/furniture-covered-with-plastics-7415019/
 - License: https://www.pexels.com/license/ (website and marketing use permitted). Both source pages mark the images free to use. Local copies are displayed with responsive CSS cropping and photographer credits. No pixel editing or AI generation was used for these photos.
+
+## Owner-supplied photos (October 2026)
+
+Supplied in the project folder and exported as WebP (quality 80), without retouching. Pairs were trimmed by a few pixels at most, so both photos in a pair share one exact size.
+
+| File | Source file | Used on |
+|---|---|---|
+| `clearance-before.webp` / `clearance-after.webp` (800 × 1200) | `Before_ Cluttered Room Restoration-2.png`, `Restored view of a cleared room-1.png` | Home page before/after, clearance page |
+| `bedroom-before.webp` / `bedroom-after.webp` (800 × 1067) | `Original bedroom before restoration-1.png`, `Sunlit empty room with parquet floors-2.png` | Home page before/after, furniture transport page, cleaning page (after photo only) |
+| `bathroom-before.webp` / `bathroom-after.webp` (800 × 1067) | `Teal-tiled bathroom before restoration-2.png`, `Exposed Bathroom After Demolition-3.png` | Home page before/after, dismantling page |
+| `bathtub-removal.webp` (1400 × 926) | `Bathroom demolition with tub removal-1.png` | Dismantling page |
+
+The origin of these files is not recorded. The site labels them only "Before" and "After" and does not call them L&S projects. If any of them are not genuine L&S jobs, add a note that they are example photos.
+
+## Additional Pexels photos (October 2026)
+
+Pexels license: https://www.pexels.com/license/. Free use and modification; attribution is not required but is given in the legal notice.
+
+- `disposal-furniture.webp`: "High angle shot of broken chairs and tables" by Wayee Tan, https://www.pexels.com/photo/high-angle-shot-of-a-broken-chairs-and-tables-9714795/
+- `disposal-recycling.webp`: "Cardboard only dumpster" by David McElwee, https://www.pexels.com/photo/cardboard-only-dumpster-11930707/
+- `cleaning-floor.webp`: "A person cleaning the floor with a mop" by Polina Tankilevitch, https://www.pexels.com/photo/a-person-cleaning-the-floor-with-a-mop-4440568/

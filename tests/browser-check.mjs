@@ -7,7 +7,7 @@ const failures = [];
 page.on("pageerror", (error) => failures.push(error.message));
 await page.goto("http://localhost:3000", { waitUntil: "networkidle" });
 await page.evaluate(() => document.fonts.ready);
-assert.equal(await page.locator("html").getAttribute("lang"), "de");
+assert.equal(await page.locator("html").getAttribute("lang"), "en");
 await page.screenshot({ path: "artifacts/desktop.png", fullPage: true });
 for (const width of [1440, 1024, 768, 390, 320]) {
   await page.setViewportSize({ width, height: 900 });
@@ -20,67 +20,50 @@ for (const width of [1440, 1024, 768, 390, 320]) {
 }
 await page.setViewportSize({ width: 390, height: 844 });
 await page.screenshot({ path: "artifacts/mobile.png", fullPage: true });
-await page.getByRole("button", { name: "Menü öffnen" }).click();
+await page.getByRole("button", { name: "Open menu" }).click();
 await page
   .getByRole("navigation")
-  .getByRole("link", { name: "Leistungen", exact: true })
+  .getByRole("link", { name: "How it works", exact: true })
   .click();
 assert.equal(
   await page
-    .getByRole("button", { name: "Menü öffnen" })
+    .getByRole("button", { name: "Open menu" })
     .getAttribute("aria-expanded"),
   "false",
 );
-await page.getByRole("tab", { name: "04 Möbeltransport & Lieferung" }).click();
-assert.match(
-  await page.getByRole("tabpanel").innerText(),
-  /Von hier nach dort/,
-);
-await page
-  .getByRole("tab", { name: "04 Möbeltransport & Lieferung" })
-  .press("ArrowDown");
-assert.match(
-  await page.getByRole("tabpanel").innerText(),
-  /Besenrein übergeben/,
-);
-await page
-  .getByRole("tabpanel")
-  .getByRole("link", { name: /anfragen/ })
-  .click();
+await page.locator("#service").selectOption("Cleaning after clearance");
 assert.equal(
   await page.locator("#service").inputValue(),
-  "Reinigung nach Räumung",
+  "Cleaning after clearance",
 );
-await page.getByRole("button", { name: "E-Mail-Anfrage vorbereiten" }).click();
+await page.getByRole("button", { name: "Prepare email request" }).click();
 assert.equal(
   await page.locator("#name-error").innerText(),
-  "Bitte geben Sie Ihren Namen an.",
+  "Please enter your name.",
 );
 await page.locator("#name").fill("Erika Muster");
 await page.locator("#place").fill("10115 Berlin");
 await page
   .locator("#message")
-  .fill("Ein Schrank, 2. Etage. Gewünschter Termin nach Absprache.");
-await page.getByRole("button", { name: "E-Mail-Anfrage vorbereiten" }).click();
+  .fill("One wardrobe, 2nd floor. Date to be agreed.");
+await page.getByRole("button", { name: "Prepare email request" }).click();
 assert.ok(
-  await page
-    .getByRole("heading", { name: "Ihr Entwurf ist bereit." })
-    .isVisible(),
+  await page.getByRole("heading", { name: "Your draft is ready." }).isVisible(),
 );
 const mailto = await page
-  .getByRole("link", { name: "E-Mail öffnen" })
+  .getByRole("link", { name: "Open email" })
   .getAttribute("href");
 assert.match(mailto, /^mailto:Info@entruempelung-demontage.de/);
 assert.match(decodeURIComponent(mailto), /Erika Muster/);
 assert.match(decodeURIComponent(mailto), /10115 Berlin/);
 await page
   .locator("summary")
-  .filter({ hasText: "Was kostet mein Auftrag?" })
+  .filter({ hasText: "How much will my job cost?" })
   .click();
 assert.ok(
   await page
     .locator("details[open]")
-    .filter({ hasText: "Der Preis richtet sich" })
+    .filter({ hasText: "The price depends on" })
     .isVisible(),
 );
 assert.ok(
@@ -92,13 +75,13 @@ for (const route of ["legal-notice", "privacy"]) {
   const response = await page.goto(`http://localhost:3000/${route}`);
   assert.equal(response.status(), 200);
   assert.ok(
-    await page.getByRole("link", { name: "← Zur Startseite" }).isVisible(),
+    await page.getByRole("link", { name: "← Back to home" }).isVisible(),
   );
 }
 const missing = await page.goto("http://localhost:3000/missing-page");
 assert.equal(missing.status(), 404);
 assert.ok(
-  await page.getByRole("heading", { name: "Hier ist noch Platz." }).isVisible(),
+  await page.getByRole("heading", { name: "Plenty of room here." }).isVisible(),
 );
 assert.deepEqual(failures, []);
 await browser.close();
@@ -109,18 +92,16 @@ await fs.writeFile(
       status: "passed",
       viewports: [1440, 1024, 768, 390, 320],
       checks: [
-        "German language",
+        "English language",
         "No horizontal overflow",
         "Mobile navigation",
-        "Service tabs",
-        "Keyboard navigation",
         "Service preselection",
-        "German validation",
+        "Form validation",
         "Email draft contents",
         "FAQ expansion",
         "Image loading",
         "Legal routes",
-        "German 404",
+        "Custom 404",
         "No runtime exceptions",
       ],
     },

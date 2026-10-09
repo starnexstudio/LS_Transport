@@ -2,14 +2,14 @@ import Link from "next/link";
 export default function NotFound() {
   return (
     <main className="legal">
-      <span className="eyebrow">L&S / SEITE NICHT GEFUNDEN</span>
-      <h1>Hier ist noch Platz.</h1>
+      <span className="eyebrow">L&S / PAGE NOT FOUND</span>
+      <h1>Plenty of room here.</h1>
       <p>
-        Die gewünschte Seite gibt es nicht. Auf unserer Startseite finden Sie
-        unsere Leistungen und Kontaktmöglichkeiten.
+        The page you are looking for doesn&apos;t exist. Our home page has all
+        our services and ways to get in touch.
       </p>
       <Link className="button button-dark" href="/">
-        Zur Startseite ↗
+        Back to home ↗
       </Link>
     </main>
   );

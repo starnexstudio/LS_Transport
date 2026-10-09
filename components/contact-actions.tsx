@@ -1,5 +1,5 @@
 import { Mail, MessageCircle, Phone } from "lucide-react";
-import { business } from "@/lib/content";
+import { business, whatsappGreeting } from "@/lib/content";
 export function ContactActions({ compact = false }: { compact?: boolean }) {
   const phone = business.phone.trim();
   const whatsapp = business.whatsapp.trim();
@@ -7,34 +7,34 @@ export function ContactActions({ compact = false }: { compact?: boolean }) {
   return (
     <div
       className={compact ? "direct-contact compact" : "direct-contact"}
-      aria-label="Direkter Kontakt"
+      aria-label="Direct contact"
     >
       {phone && (
         <a
-          aria-label={`L&S anrufen: ${phone}`}
+          aria-label={`Call L&S: ${phone}`}
           className="contact-call"
           href={`tel:${phone.replace(/[^+\d]/g, "")}`}
         >
           <Phone size={18} />
-          <span>{compact ? "Anrufen" : phone}</span>
+          <span>{compact ? "Call" : phone}</span>
         </a>
       )}
       {whatsapp && (
         <a
-          aria-label="L&S auf WhatsApp schreiben (öffnet einen neuen Tab)"
+          aria-label="Message L&S on WhatsApp (opens in a new tab)"
           className="contact-whatsapp"
-          href={`https://wa.me/${whatsapp.replace(/\D/g, "")}?text=${encodeURIComponent("Guten Tag L&S, ich möchte ein Vorhaben anfragen.")}`}
+          href={`https://wa.me/${whatsapp.replace(/\D/g, "")}?text=${encodeURIComponent(whatsappGreeting)}`}
           target="_blank"
           rel="noopener noreferrer"
         >
           <MessageCircle size={18} />
-          <span>WhatsApp schreiben</span>
+          <span>Message on WhatsApp</span>
         </a>
       )}
       {!compact && (
         <a className="contact-mail" href={`mailto:${business.email}`}>
           <Mail size={18} />
-          <span>E-Mail schreiben</span>
+          <span>Send an email</span>
         </a>
       )}
     </div>

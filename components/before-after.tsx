@@ -1,14 +1,11 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import {
-  ArrowRight,
-  ChevronsLeftRight,
-  PackageCheck,
-  Sparkles,
-  Truck,
-} from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, ChevronsLeftRight } from "lucide-react";
 import { asset } from "@/lib/base-path";
+import { pairs as photoPairs } from "@/lib/gallery";
+import { MediaRow } from "@/components/media-row";
 
 type Pair = {
   id: string;
@@ -23,54 +20,58 @@ type Pair = {
 
 // Both photos of a pair must show the same room from the same spot, at the
 // same size, so the slider seam lines up.
-const pairs: Pair[] = [
+const sliderPairs: Pair[] = [
   {
     id: "schlafzimmer",
-    label: "Schlafzimmer",
-    title: "Kartons verladen, Raum frei",
+    label: "Bedroom",
+    title: "Boxes loaded, room cleared",
     width: 1600,
     height: 900,
     before: {
       src: "/images/vorher.jpg",
-      alt: "Schlafzimmer voller gestapelter Umzugskartons vor dem Abtransport",
+      alt: "Bedroom full of stacked moving boxes before removal",
     },
     after: {
       src: "/images/nachher.jpg",
-      alt: "Dasselbe Schlafzimmer nach dem Abtransport der Umzugskartons",
+      alt: "The same bedroom after the moving boxes were removed",
     },
   },
   {
     id: "wohnbereich",
-    label: "Wohn- & Essbereich",
-    title: "Kartons raus, Wohnraum zurück",
+    label: "Living & dining area",
+    title: "Boxes out, living space back",
     width: 750,
     height: 1000,
     before: {
       src: "/images/vorher-2.jpg",
-      alt: "Wohn- und Essbereich voller Umzugs- und Versandkartons",
+      alt: "Living and dining area full of moving and shipping boxes",
     },
     after: {
       src: "/images/nachher-2.jpg",
-      alt: "Derselbe Wohn- und Essbereich ohne Kartons, der Boden ist wieder frei",
+      alt: "The same living and dining area without the boxes, the floor clear again",
     },
   },
 ];
 
-const highlights = [
+// Supplied before/after pairs, each linked to its service page.
+const pairRows = [
   {
-    Icon: PackageCheck,
-    title: "Geschützt verpackt",
-    text: "Möbel sicher für den Transport vorbereitet",
+    pair: photoPairs.clearance,
+    label: "Clearance",
+    title: "From cluttered to cleared",
+    href: "/services/clearance",
   },
   {
-    Icon: Truck,
-    title: "Abgebaut & abtransportiert",
-    text: "Transport, Lieferung oder Entsorgung",
+    pair: photoPairs.bedroom,
+    label: "Furniture removal",
+    title: "Furniture out, room empty",
+    href: "/services/furniture-transport",
   },
   {
-    Icon: Sparkles,
-    title: "Besenrein übergeben",
-    text: "Auf Wunsch mit Reinigung im Anschluss",
+    pair: photoPairs.bathroom,
+    label: "Dismantling",
+    title: "Tiles and fittings removed",
+    href: "/services/dismantling",
   },
 ];
 
@@ -126,13 +127,13 @@ function CompareSlider({ pair }: { pair: Pair }) {
         className={`compare-tag compare-tag-before${hideBefore ? " is-hidden" : ""}`}
         aria-hidden="true"
       >
-        Vorher
+        Before
       </span>
       <span
         className={`compare-tag compare-tag-after${hideAfter ? " is-hidden" : ""}`}
         aria-hidden="true"
       >
-        Nachher
+        After
       </span>
       <span className="compare-divider" aria-hidden="true">
         <span className="compare-handle">
@@ -140,7 +141,7 @@ function CompareSlider({ pair }: { pair: Pair }) {
         </span>
       </span>
       <span className="compare-hint" aria-hidden="true">
-        Ziehen zum Vergleichen
+        Drag to compare
       </span>
       <input
         type="range"
@@ -148,8 +149,8 @@ function CompareSlider({ pair }: { pair: Pair }) {
         max={100}
         step={1}
         value={position}
-        aria-label={`Vorher-Nachher-Vergleich ${pair.label}: Regler nach links oder rechts bewegen`}
-        aria-valuetext={`${position} % Vorher sichtbar`}
+        aria-label={`Before-and-after comparison, ${pair.label}: move the slider left or right`}
+        aria-valuetext={`${position}% of the before photo visible`}
         onChange={(event) => {
           setPosition(Number(event.target.value));
           setTouched(true);
@@ -164,27 +165,42 @@ export function BeforeAfter() {
     <section className="section before-after" id="vorher-nachher">
       <div className="section-top">
         <div>
-          <span className="eyebrow">VORHER & NACHHER</span>
+          <span className="eyebrow">BEFORE & AFTER</span>
           <h2>
-            Voll gestellt.
+            Packed full.
             <br />
-            Frei geräumt.
+            Cleared out.
           </h2>
         </div>
-        <p>Ziehen Sie den Regler und sehen Sie den Unterschied.</p>
+        <p>See the difference, room by room.</p>
       </div>
+      <div className="pair-rows">
+        {pairRows.map(({ pair, label, title, href }) => (
+          <div key={label} className="pair-row">
+            <MediaRow items={[{ pair }]} />
+            <div className="pair-row-text">
+              <span className="eyebrow">{label.toUpperCase()}</span>
+              <h3>{title}</h3>
+              <Link className="text-link" href={href}>
+                About this service <ArrowRight size={18} />
+              </Link>
+            </div>
+          </div>
+        ))}
+      </div>
+      <h3 className="slider-heading">Drag to compare</h3>
       {/* Column widths follow each photo's proportions, so all frames share one height. */}
       <div
         className="before-after-gallery"
         style={
           {
-            "--columns": pairs
+            "--columns": sliderPairs
               .map((pair) => `minmax(0, ${pair.width / pair.height}fr)`)
               .join(" "),
           } as React.CSSProperties
         }
       >
-        {pairs.map((pair) => (
+        {sliderPairs.map((pair) => (
           <figure
             key={pair.id}
             className={
@@ -202,21 +218,8 @@ export function BeforeAfter() {
         ))}
       </div>
       <div className="before-after-footer">
-        <ul>
-          {highlights.map(({ Icon, title, text }) => (
-            <li key={title}>
-              <span className="before-after-icon">
-                <Icon size={19} />
-              </span>
-              <span>
-                <strong>{title}</strong>
-                {text}
-              </span>
-            </li>
-          ))}
-        </ul>
         <a href="#anfrage" className="button button-orange before-after-cta">
-          Ihr Vorhaben anfragen <ArrowRight size={18} />
+          Request a quote <ArrowRight size={18} />
         </a>
       </div>
     </section>

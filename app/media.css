@@ -1,0 +1,98 @@
+/* Photo rows: shared height, natural proportions, stacked on mobile. */
+.media-row {
+  display: grid;
+  grid-template-columns: var(--columns);
+  gap: 12px;
+  width: 100%;
+  max-width: var(--max-width);
+}
+.media-photo {
+  position: relative;
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 16px;
+  background: #e6e7df;
+}
+.media-photo img {
+  object-fit: cover;
+}
+.media-caption {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  right: 14px;
+  width: fit-content;
+  padding: 7px 13px;
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--ink);
+  background: var(--paper);
+}
+
+/* Before/after rows on the home page: photos plus a short label. */
+.pair-rows {
+  display: grid;
+  gap: 56px;
+}
+.pair-row {
+  display: flex;
+  align-items: center;
+  gap: 48px;
+}
+.pair-row > .media-row {
+  flex: 1 1 0;
+  min-width: 0;
+}
+.pair-row-text {
+  flex: 0 0 280px;
+}
+.pair-row-text .eyebrow {
+  color: #a74909;
+}
+.pair-row-text h3 {
+  margin: 14px 0 20px;
+  font-family: var(--font-display), var(--font-manrope), Arial, sans-serif;
+  font-size: clamp(24px, 2vw, 30px);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+.slider-heading {
+  margin: 72px 0 24px;
+  font-family: var(--font-display), var(--font-manrope), Arial, sans-serif;
+  font-size: clamp(24px, 2vw, 30px);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+/* Photo block on the service pages */
+.service-visual {
+  padding-top: 0;
+}
+
+@media (max-width: 960px) {
+  .pair-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 20px;
+  }
+  .pair-row-text {
+    flex: none;
+    order: -1;
+  }
+  .pair-row-text h3 {
+    margin-bottom: 0;
+  }
+}
+@media (max-width: 760px) {
+  .media-row {
+    grid-template-columns: 1fr;
+    max-width: none;
+  }
+  .media-photo {
+    border-radius: 14px;
+  }
+  .pair-rows {
+    gap: 48px;
+  }
+}

@@ -5,8 +5,6 @@ import { usePathname } from "next/navigation";
 
 const revealSelectors = [
   ".section-top",
-  ".service-list",
-  ".service-detail",
   ".process-intro",
   ".process-steps li",
   ".photo-example-intro",

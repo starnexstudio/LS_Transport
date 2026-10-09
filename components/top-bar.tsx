@@ -1,5 +1,5 @@
 import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";
-import { business } from "@/lib/content";
+import { business, whatsappGreeting } from "@/lib/content";
 
 // Slim utility bar above the header: availability left, direct contact right.
 export function TopBar() {
@@ -11,13 +11,13 @@ export function TopBar() {
         <li>
           <span className="topbar-live" aria-hidden="true" />
           <span>
-            <strong>24 h</strong> erreichbar
+            Available <strong>24 hours</strong>
           </span>
         </li>
         <li className="topbar-region">
           <MapPin size={15} aria-hidden="true" />
           <span>
-            <strong>Deutschlandweit</strong> nach Absprache
+            <strong>Across Germany</strong> by arrangement
           </span>
         </li>
       </ul>
@@ -33,10 +33,10 @@ export function TopBar() {
         {whatsapp && (
           <li className="topbar-whatsapp">
             <a
-              href={`https://wa.me/${whatsapp.replace(/\D/g, "")}?text=${encodeURIComponent("Guten Tag L&S, ich möchte ein Vorhaben anfragen.")}`}
+              href={`https://wa.me/${whatsapp.replace(/\D/g, "")}?text=${encodeURIComponent(whatsappGreeting)}`}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="WhatsApp (öffnet einen neuen Tab)"
+              aria-label="WhatsApp (opens in a new tab)"
             >
               <MessageCircle size={15} aria-hidden="true" />
               <span>WhatsApp</span>

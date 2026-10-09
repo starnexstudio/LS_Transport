@@ -43,14 +43,11 @@ export function Hero() {
             &amp; Dismantling.
             <span className="hero-accent">Done right.</span>
           </h1>
-          {/* German wording as supplied by the owner. */}
-          <div className="hero-lead" lang="de">
-            <p className="hero-lead-title">
-              Schnell, zuverlässig und stressfrei
-            </p>
+          <div className="hero-lead">
+            <p className="hero-lead-title">Fast, reliable and stress-free</p>
             <p className="hero-lead-text">
-              Wir übernehmen die komplette Räumung – von der Planung bis zur
-              besenreinen Übergabe.
+              We take care of the entire clearance – from planning to a
+              swept-clean handover.
             </p>
           </div>
           <div className="hero-actions">

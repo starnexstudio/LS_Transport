@@ -14,7 +14,7 @@ await page.goto(base, { waitUntil: "networkidle" });
 
 // Before/after sliders: all photos load, and each slider moves by keyboard.
 const sliders = page.locator(".compare");
-assert.equal(await sliders.count(), 5);
+assert.equal(await sliders.count(), 6);
 for (const slider of await sliders.all()) {
   await slider.scrollIntoViewIfNeeded();
   await slider
@@ -79,7 +79,7 @@ await fs.writeFile(
     {
       status: "passed",
       checks: [
-        "Five before/after sliders load and respond to the keyboard",
+        "Six before/after sliders load and respond to the keyboard",
         "Moving photos load",
         "Responsive widths 320–1440",
         "Removed service routes return 404",

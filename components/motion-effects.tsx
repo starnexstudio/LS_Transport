@@ -4,6 +4,8 @@ import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 
 const revealSelectors = [
+  ".hero-services-head",
+  ".hero-service-card",
   ".section-top",
   ".process-intro",
   ".process-steps li",

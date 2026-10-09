@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -13,7 +12,6 @@ import {
 } from "lucide-react";
 import { asset } from "@/lib/base-path";
 import { business, services } from "@/lib/content";
-import { serviceDetails } from "@/lib/service-details";
 
 const serviceIcons = [PackageOpen, Recycle, Hammer, Truck, Sparkles];
 
@@ -84,7 +82,7 @@ export function Hero() {
               const Icon = serviceIcons[index];
               return (
                 <li key={service.title}>
-                  <Link href={`/services/${serviceDetails[index].slug}`}>
+                  <a href="#anfrage">
                     <span className="hero-card-icon">
                       <Icon size={19} />
                     </span>
@@ -93,14 +91,11 @@ export function Hero() {
                       <small>{service.short}</small>
                     </span>
                     <ArrowUpRight size={18} />
-                  </Link>
+                  </a>
                 </li>
               );
             })}
           </ul>
-          <Link className="hero-card-all" href="/services">
-            All services in detail <ArrowRight size={17} />
-          </Link>
         </aside>
       </div>
     </section>

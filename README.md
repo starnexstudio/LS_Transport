@@ -28,6 +28,7 @@ With the development server running and Google Chrome installed:
 ```sh
 node tests/browser-check.mjs
 node tests/accessibility-check.mjs
+node tests/photos-check.mjs
 npm run typecheck
 ```
 
@@ -55,9 +56,9 @@ The form validates locally and prepares an email draft. It never reports that a 
 
 No phone number, street address, certifications, reviews, fixed prices, or project statistics were invented. No analytics, tracking scripts, cookie storage, or remotely embedded maps are used.
 
-## Service pages and direct contact
+## Pages and direct contact
 
-`/services` lists five detailed routes generated from `lib/service-details.ts`. Each route includes scope, preparation, pricing factors, a relevant question, related services, and a preselected inquiry form.
+The site has three pages: the home page, `/legal-notice` and `/privacy`, plus the 404 page. The home page holds everything else: services, before/after sliders (`components/compare-slider.tsx`, photos in `lib/gallery.ts`), FAQ and the inquiry form.
 
 Phone and WhatsApp links are implemented in `components/contact-actions.tsx`. Set `business.phone` and `business.whatsapp` in `lib/content.ts` to the confirmed international numbers. These values deliberately remain empty until supplied by the owner; the corresponding controls stay hidden to avoid publishing fabricated numbers or broken destinations. Call links use `tel:`; WhatsApp links use `wa.me` with a prefilled message (`whatsappGreeting` in `lib/content.ts`) and open only after a visitor clicks. No WhatsApp script is embedded.
 

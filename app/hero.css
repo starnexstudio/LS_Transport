@@ -240,24 +240,6 @@
   opacity: 1;
   color: var(--orange);
 }
-.hero-card-all {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: 16px;
-  padding: 15px 18px;
-  border: 1px solid var(--hero-line);
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: 650;
-  background: #ffffff08;
-}
-.hero-card-all:hover {
-  background: var(--orange);
-  border-color: var(--orange);
-  color: var(--ink);
-}
 
 /* Quick contact – fixed on every page. */
 .floating-contact {

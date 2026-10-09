@@ -29,7 +29,6 @@ export function Footer() {
           © {new Date().getFullYear()} L&S Entrümpelung & Demontagearbeiten
         </span>
         <div>
-          <Link href="/services">All services</Link>
           <Link href="/legal-notice">Legal notice</Link>
           <Link href="/privacy">Privacy</Link>
           <a href="#inhalt">Back to top ↑</a>

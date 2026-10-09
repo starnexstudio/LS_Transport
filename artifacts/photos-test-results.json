@@ -1,0 +1,11 @@
+{
+  "status": "passed",
+  "checks": [
+    "Five before/after sliders load and respond to the keyboard",
+    "Moving photos load",
+    "Responsive widths 320–1440",
+    "Removed service routes return 404",
+    "Accessibility scans of all pages",
+    "No runtime errors"
+  ]
+}

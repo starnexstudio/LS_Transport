@@ -30,8 +30,7 @@ export default function LegalNotice() {
       <p>
         Drag-to-compare sliders on the home page: illustrative images, not L&S
         projects; the after views have been edited. Bedroom photo: Roger
-        Mommaerts / Flickr (CC). Disposal and cleaning photos on the service
-        pages: Wayee Tan, David McElwee and Polina Tankilevitch / Pexels.
+        Mommaerts / Flickr (CC).
       </p>
     </main>
   );

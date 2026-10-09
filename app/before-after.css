@@ -15,21 +15,6 @@
   line-height: 1.45;
   color: var(--muted);
 }
-.before-after-link {
-  display: flex;
-  width: fit-content;
-  align-items: center;
-  gap: 8px;
-  margin-top: 8px;
-  font-size: 14px;
-  font-weight: 650;
-  color: var(--ink);
-  border-bottom: 1px solid currentColor;
-  padding-bottom: 3px;
-}
-.before-after-link:hover {
-  color: #a64b0f;
-}
 .before-after-item figcaption strong {
   display: block;
   font-size: 15px;
@@ -156,6 +141,14 @@
 .compare:has(input:focus-visible) .compare-handle {
   outline: 3px solid var(--orange);
   outline-offset: 4px;
+}
+
+.slider-heading {
+  margin: 72px 0 24px;
+  font-family: var(--font-display), var(--font-manrope), Arial, sans-serif;
+  font-size: clamp(24px, 2vw, 30px);
+  font-weight: 700;
+  letter-spacing: -0.025em;
 }
 
 /* Call to action under the gallery */

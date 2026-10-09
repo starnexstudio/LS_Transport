@@ -34,11 +34,11 @@ export function Header() {
           className={open ? "navigation is-open" : "navigation"}
           aria-label="Main navigation"
         >
-          <Link href="/services" onClick={() => setOpen(false)}>
-            Services
-          </Link>
           <Link href="/#ablauf" onClick={() => setOpen(false)}>
             How it works
+          </Link>
+          <Link href="/#vorher-nachher" onClick={() => setOpen(false)}>
+            Before &amp; after
           </Link>
           <Link href="/#fragen" onClick={() => setOpen(false)}>
             FAQ

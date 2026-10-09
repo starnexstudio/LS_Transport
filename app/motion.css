@@ -117,17 +117,13 @@
       background 220ms,
       color 220ms;
   }
-  .hero-card li a > svg,
-  .hero-card-all svg {
+  .hero-card li a > svg {
     transition:
       opacity 220ms,
       transform 300ms var(--motion-ease);
   }
   .hero-card li a:hover > svg {
     transform: translate(3px, -2px);
-  }
-  .hero-card-all:hover svg {
-    transform: translateX(4px);
   }
   .floating-contact a {
     animation: contact-in 600ms 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) both;
@@ -143,7 +139,6 @@
     animation: entrance-rise 250ms var(--motion-ease);
   }
   .faq-list details[open] > p,
-  .service-planning details[open] > p,
   .draft {
     animation: entrance-rise 300ms var(--motion-ease);
   }
@@ -163,18 +158,8 @@
   }
   .button svg,
   .header-cta svg,
-  .text-link svg,
-  .service-detail-link svg,
-  .service-list button svg,
-  .related-services a svg,
-  .service-overview-list > a > svg {
+  .text-link svg {
     transition: transform 300ms var(--motion-ease);
-  }
-  .service-list button {
-    transition:
-      background 220ms,
-      padding 300ms var(--motion-ease),
-      border-color 220ms;
   }
   .inquiry input,
   .inquiry select,
@@ -200,14 +185,8 @@
     }
     .button:hover svg,
     .header-cta:hover svg,
-    .text-link:hover svg,
-    .service-detail-link:hover svg {
+    .text-link:hover svg {
       transform: translate(3px, -2px);
-    }
-    .service-list button:hover svg,
-    .related-services a:hover svg,
-    .service-overview-list > a:hover > svg {
-      transform: translateX(4px);
     }
     .button:hover {
       box-shadow: 0 6px 16px #24272012;

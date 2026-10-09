@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { pairs as photoPairs } from "@/lib/gallery";
 import { CompareSlider, type SliderPair } from "@/components/compare-slider";
@@ -40,25 +39,22 @@ const sliderPairs: Pair[] = [
   },
 ];
 
-// Supplied before/after pairs, each linked to its service page.
+// Supplied before/after pairs.
 const pairRows = [
   {
     pair: photoPairs.clearance,
     label: "Clearance",
     title: "From cluttered to cleared",
-    href: "/services/clearance",
   },
   {
     pair: photoPairs.bedroom,
     label: "Furniture removal",
     title: "Furniture out, room empty",
-    href: "/services/furniture-transport",
   },
   {
     pair: photoPairs.bathroom,
     label: "Dismantling",
     title: "Tiles and fittings removed",
-    href: "/services/dismantling",
   },
 ];
 
@@ -90,7 +86,7 @@ export function BeforeAfter() {
           } as React.CSSProperties
         }
       >
-        {pairRows.map(({ pair, label, title, href }) => (
+        {pairRows.map(({ pair, label, title }) => (
           <figure key={label} className="before-after-item is-portrait">
             <CompareSlider
               pair={{
@@ -104,9 +100,6 @@ export function BeforeAfter() {
             <figcaption>
               <strong>{label}</strong>
               {title}
-              <Link className="before-after-link" href={href}>
-                About this service <ArrowRight size={16} />
-              </Link>
             </figcaption>
           </figure>
         ))}

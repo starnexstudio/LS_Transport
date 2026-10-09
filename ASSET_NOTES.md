@@ -48,17 +48,10 @@ Supplied in the project folder and exported as WebP (quality 80), without retouc
 
 | File | Source file | Used on |
 |---|---|---|
-| `clearance-before.webp` / `clearance-after.webp` (800 × 1200) | `Before_ Cluttered Room Restoration-2.png`, `Restored view of a cleared room-1.png` | Home page before/after, clearance page |
-| `bedroom-before.webp` / `bedroom-after.webp` (800 × 1067) | `Original bedroom before restoration-1.png`, `Sunlit empty room with parquet floors-2.png` | Home page before/after, furniture transport page, cleaning page (after photo only) |
-| `bathroom-before.webp` / `bathroom-after.webp` (800 × 1067) | `Teal-tiled bathroom before restoration-2.png`, `Exposed Bathroom After Demolition-3.png` | Home page before/after, dismantling page |
-| `bathtub-removal.webp` (1400 × 926) | `Bathroom demolition with tub removal-1.png` | Dismantling page |
+| `clearance-before.webp` / `clearance-after.webp` (800 × 1200) | `Before_ Cluttered Room Restoration-2.png`, `Restored view of a cleared room-1.png` | Home page before/after slider |
+| `bedroom-before.webp` / `bedroom-after.webp` (800 × 1067) | `Original bedroom before restoration-1.png`, `Sunlit empty room with parquet floors-2.png` | Home page before/after slider |
+| `bathroom-before.webp` / `bathroom-after.webp` (800 × 1067) | `Teal-tiled bathroom before restoration-2.png`, `Exposed Bathroom After Demolition-3.png` | Home page before/after slider |
 
 The origin of these files is not recorded. The site labels them only "Before" and "After" and does not call them L&S projects. If any of them are not genuine L&S jobs, add a note that they are example photos.
 
-## Additional Pexels photos (October 2026)
-
-Pexels license: https://www.pexels.com/license/. Free use and modification; attribution is not required but is given in the legal notice.
-
-- `disposal-furniture.webp`: "High angle shot of broken chairs and tables" by Wayee Tan, https://www.pexels.com/photo/high-angle-shot-of-a-broken-chairs-and-tables-9714795/
-- `disposal-recycling.webp`: "Cardboard only dumpster" by David McElwee, https://www.pexels.com/photo/cardboard-only-dumpster-11930707/
-- `cleaning-floor.webp`: "A person cleaning the floor with a mop" by Polina Tankilevitch, https://www.pexels.com/photo/a-person-cleaning-the-floor-with-a-mop-4440568/
+The service pages and their extra photos (bathtub removal; Pexels disposal and cleaning photos) were removed with those pages. The owner's original `Bathroom demolition with tub removal-1.png` is still in the project folder.

@@ -12,11 +12,6 @@ const revealSelectors = [
   ".questions > div",
   ".contact-intro",
   ".inquiry",
-  ".service-page-heading > div",
-  ".service-scope > div",
-  ".service-planning > *",
-  ".related-services",
-  ".service-overview-list > a",
 ];
 
 export function MotionEffects() {

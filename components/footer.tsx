@@ -1,7 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
-import { ContactActions } from "@/components/contact-actions";
 import { asset } from "@/lib/base-path";
 export function Footer() {
   return (
@@ -34,7 +33,6 @@ export function Footer() {
           <a href="#inhalt">Back to top ↑</a>
         </div>
       </div>
-      <ContactActions compact />
     </footer>
   );
 }

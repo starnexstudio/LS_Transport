@@ -1,7 +1,7 @@
 import Image from "next/image";
 import {
   ArrowRight,
-  ArrowUpRight,
+  CircleCheck,
   Hammer,
   PackageOpen,
   Phone,
@@ -74,28 +74,34 @@ export function Hero() {
             ))}
           </ul>
         </div>
-        <aside className="hero-card" aria-label="Our services">
+        <aside className="hero-card" aria-labelledby="hero-card-title">
           <p className="hero-card-label">Our services</p>
-          <p className="hero-card-title">All from one team</p>
-          <ul>
+          <h2 className="hero-card-title" id="hero-card-title">
+            All from one team
+          </h2>
+          <ol className="hero-card-list">
             {services.map((service, index) => {
               const Icon = serviceIcons[index];
               return (
                 <li key={service.title}>
-                  <a href="#anfrage">
-                    <span className="hero-card-icon">
-                      <Icon size={19} />
-                    </span>
-                    <span className="hero-card-text">
-                      <strong>{service.title}</strong>
-                      <small>{service.short}</small>
-                    </span>
-                    <ArrowUpRight size={18} />
-                  </a>
+                  <span className="hero-card-icon" aria-hidden="true">
+                    <Icon size={20} />
+                  </span>
+                  <span className="hero-card-text">
+                    <strong>{service.title}</strong>
+                    <small>{service.short}</small>
+                  </span>
+                  <span className="hero-card-number" aria-hidden="true">
+                    0{index + 1}
+                  </span>
                 </li>
               );
             })}
-          </ul>
+          </ol>
+          <p className="hero-card-note">
+            <CircleCheck size={17} aria-hidden="true" />
+            Combine any of them in one job.
+          </p>
         </aside>
       </div>
     </section>

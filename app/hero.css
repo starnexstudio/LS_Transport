@@ -157,9 +157,9 @@
   border: 1px solid #f78a3c33;
 }
 
-/* Service card */
+/* Service card: a calm overview, not a set of buttons. */
 .hero-card {
-  padding: 30px 26px 26px;
+  padding: 32px 30px 26px;
   border: 1px solid var(--hero-line);
   border-radius: 22px;
   background: linear-gradient(160deg, #1f201dd9 0%, #121311e6 100%);
@@ -167,7 +167,6 @@
   box-shadow: 0 40px 80px -30px #000c;
 }
 .hero-card-label {
-  padding: 0 8px;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.18em;
@@ -175,38 +174,37 @@
   color: var(--orange);
 }
 .hero-card-title {
-  padding: 0 8px;
-  margin-top: 8px;
+  margin: 8px 0 0;
   font-family: var(--font-display), var(--font-manrope), Arial, sans-serif;
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  color: #fff;
 }
-.hero-card ul {
+.hero-card-list {
   list-style: none;
-  margin: 20px 0 0;
+  margin: 22px 0 0;
   padding: 0;
 }
-.hero-card li + li {
-  border-top: 1px solid #ffffff12;
-}
-.hero-card li a {
+.hero-card-list li {
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 13px 8px;
-  border-radius: 12px;
+  padding: 14px 0;
+}
+.hero-card-list li + li {
+  border-top: 1px solid #ffffff12;
 }
 .hero-card-icon {
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   flex-shrink: 0;
   display: grid;
   place-items: center;
-  border-radius: 11px;
+  border-radius: 50%;
   color: var(--orange);
-  background: #f78a3c17;
+  border: 1px solid #f78a3c4d;
 }
 .hero-card-text {
   min-width: 0;
@@ -224,20 +222,29 @@
   line-height: 1.4;
   color: #9fa497;
 }
-.hero-card li a > svg {
+.hero-card-number {
   margin-left: auto;
   flex-shrink: 0;
-  opacity: 0.45;
+  font-family: var(--font-display), var(--font-manrope), Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #6f7468;
 }
-.hero-card li a:hover {
-  background: #ffffff0b;
+.hero-card-note {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #e4e6df;
+  background: #f78a3c14;
 }
-.hero-card li a:hover .hero-card-icon {
-  background: var(--orange);
-  color: var(--ink);
-}
-.hero-card li a:hover > svg {
-  opacity: 1;
+.hero-card-note svg {
+  flex-shrink: 0;
   color: var(--orange);
 }
 
@@ -354,15 +361,15 @@
     height: 16px;
   }
   .hero-card {
-    padding: 24px 14px 16px;
+    padding: 24px 18px 18px;
     border-radius: 18px;
   }
   .hero-card-title {
     font-size: 23px;
   }
-  .hero-card li a {
+  .hero-card-list li {
     gap: 14px;
-    padding: 12px 8px;
+    padding: 12px 0;
   }
   .floating-contact {
     right: 14px;

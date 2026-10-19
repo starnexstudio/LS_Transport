@@ -60,9 +60,10 @@
     transform: translateY(0) scale(1);
   }
 }
-/* Hero room: each track from the Figma timeline. Per-piece values and
-   timing come from custom properties set in hero-room.tsx. */
-@keyframes room-piece-out {
+/* Hero: tracks named "scrub-" are played by scroll position (hero-stage.tsx),
+   all on one 4.6s timeline. The room tracks are the Figma ones; per-piece
+   values come from custom properties set in hero-room.tsx. */
+@keyframes scrub-piece-out {
   from {
     translate: 0 0;
   }
@@ -70,7 +71,7 @@
     translate: calc(var(--dx) * var(--u)) calc(var(--dy) * var(--u));
   }
 }
-@keyframes room-piece-step {
+@keyframes scrub-piece-step {
   from {
     translate: 0 0;
   }
@@ -78,7 +79,7 @@
     translate: calc(var(--sx) * var(--u)) calc(var(--sy) * var(--u));
   }
 }
-@keyframes room-piece-out-from-step {
+@keyframes scrub-piece-out-from-step {
   from {
     translate: calc(var(--sx) * var(--u)) calc(var(--sy) * var(--u));
   }
@@ -86,7 +87,7 @@
     translate: calc(var(--dx) * var(--u)) calc(var(--dy) * var(--u));
   }
 }
-@keyframes room-piece-lift {
+@keyframes scrub-piece-lift {
   from {
     translate: 0 0;
     rotate: 0rad;
@@ -96,7 +97,7 @@
     rotate: var(--tilt);
   }
 }
-@keyframes room-piece-carry {
+@keyframes scrub-piece-carry {
   from {
     rotate: var(--tilt);
   }
@@ -104,7 +105,7 @@
     rotate: var(--tilt-rest);
   }
 }
-@keyframes room-shadow-lift {
+@keyframes scrub-shadow-lift {
   from {
     opacity: 1;
     scale: 1;
@@ -114,7 +115,7 @@
     scale: 0.9;
   }
 }
-@keyframes room-shadow-thin {
+@keyframes scrub-shadow-thin {
   from {
     opacity: 0.62;
   }
@@ -122,7 +123,7 @@
     opacity: 0.5;
   }
 }
-@keyframes room-shadow-out {
+@keyframes scrub-shadow-out {
   from {
     opacity: 0.5;
   }
@@ -130,33 +131,137 @@
     opacity: 0;
   }
 }
+@keyframes scrub-word {
+  from {
+    opacity: 0.34;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes scrub-grow-x {
+  from {
+    scale: 0 1;
+  }
+  to {
+    scale: 1 1;
+  }
+}
+@keyframes scrub-grow-y {
+  from {
+    scale: 1 0;
+  }
+  to {
+    scale: 1 1;
+  }
+}
+@keyframes scrub-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@keyframes hero-word-rise {
+  from {
+    translate: 0 108%;
+  }
+  to {
+    translate: 0 0;
+  }
+}
+@keyframes hero-room-in {
+  from {
+    opacity: 0;
+    translate: 0 36px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+/* Scroll hint on the rail; it shrinks in and out so its fade stays free for
+   scrub-fade-out. */
+@keyframes hero-cue {
+  0% {
+    translate: 0 0;
+    scale: 0;
+  }
+  20% {
+    scale: 1;
+  }
+  80% {
+    scale: 1;
+  }
+  100% {
+    translate: 0 114px;
+    scale: 0;
+  }
+}
 @media (prefers-reduced-motion: no-preference) {
-  /* Hero room: the clearing plays once, then holds the empty room. An
-     animation later in the list takes a property over from earlier ones
-     once it starts, which chains the segments of a track. */
-  .hero-room.is-playing .hero-piece {
-    animation: room-piece-out calc(var(--t5) - var(--t4)) var(--t4)
-      var(--ease, cubic-bezier(0.5, 0, 0.3, 1)) both;
+  /* Hero, on load: the headline rises word by word, the rest settles in. */
+  .hero-label {
+    animation: entrance-rise 700ms 80ms var(--motion-ease) both;
   }
-  .hero-room.is-playing .hero-piece[data-step] {
-    animation:
-      room-piece-step calc(var(--ts) - var(--t4)) var(--t4)
-        cubic-bezier(0.45, 0, 0.4, 1) both,
-      room-piece-out-from-step calc(var(--t5) - var(--ts)) var(--ts)
-        var(--ease) forwards;
+  .hero-word > span {
+    animation: hero-word-rise 1000ms calc(140ms + var(--i) * 85ms)
+      var(--motion-ease) both;
   }
-  .hero-room.is-playing .hero-piece-image {
-    animation:
-      room-piece-lift calc(var(--t1) - var(--t0)) var(--t0) ease-out both,
-      room-piece-carry calc(var(--t5) - var(--t1)) var(--t1) ease-in-out
-        forwards;
+  .hero-text {
+    animation: entrance-rise 800ms 520ms var(--motion-ease) both;
   }
-  .hero-room.is-playing .hero-piece-shadow {
+  .hero-stage {
+    animation: hero-room-in 1200ms 260ms var(--motion-ease) both;
+  }
+  .hero-actions,
+  .hero-note {
+    animation: entrance-rise 800ms 680ms var(--motion-ease) both;
+  }
+  /* Hero, on scroll. An animation later in a list takes a property over from
+     earlier ones once it starts, which chains the segments of one track. */
+  .hero-piece {
+    animation: scrub-piece-out calc(var(--t5) - var(--t4)) var(--t4)
+      var(--ease, cubic-bezier(0.5, 0, 0.3, 1)) both paused;
+  }
+  .hero-piece[data-step] {
     animation:
-      room-shadow-lift calc(var(--t1) - var(--t0)) var(--t0) ease-out both,
-      room-shadow-thin calc(var(--t2) - var(--t1)) var(--t1) ease-in-out
-        forwards,
-      room-shadow-out calc(var(--t3) - var(--t2)) var(--t2) ease-in forwards;
+      scrub-piece-step calc(var(--ts) - var(--t4)) var(--t4)
+        cubic-bezier(0.45, 0, 0.4, 1) both paused,
+      scrub-piece-out-from-step calc(var(--t5) - var(--ts)) var(--ts)
+        var(--ease) forwards paused;
+  }
+  .hero-piece-image {
+    animation:
+      scrub-piece-lift calc(var(--t1) - var(--t0)) var(--t0) ease-out both
+        paused,
+      scrub-piece-carry calc(var(--t5) - var(--t1)) var(--t1) ease-in-out
+        forwards paused;
+  }
+  .hero-piece-shadow {
+    animation:
+      scrub-shadow-lift calc(var(--t1) - var(--t0)) var(--t0) ease-out both
+        paused,
+      scrub-shadow-thin calc(var(--t2) - var(--t1)) var(--t1) ease-in-out
+        forwards paused,
+      scrub-shadow-out calc(var(--t3) - var(--t2)) var(--t2) ease-in forwards
+        paused;
+  }
+  /* The sentence lights up word by word while the room empties. */
+  .hero-text > span {
+    animation: scrub-word 400ms calc(450ms + var(--i) * 300ms) linear both
+      paused;
+  }
+  .hero-word-accent::after {
+    animation: scrub-grow-x 400ms 4200ms var(--motion-ease) both paused;
+  }
+  .hero-progress > span {
+    animation: scrub-grow-y 4600ms linear both paused;
+  }
+  .hero-progress::before {
+    animation:
+      hero-cue 1800ms 1400ms ease-in-out infinite both,
+      scrub-fade-out 400ms linear both paused;
   }
   .floating-contact a {
     animation: contact-in 600ms 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) both;

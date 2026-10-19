@@ -1,49 +1,53 @@
-/* Teal hero: steady copy beside a cutaway room that is cleared piece by piece.
-   Everything inside the room is measured in Figma desktop units: the room
-   artwork is 872 units wide and --u is one unit at the current size. */
+/* Hero: a pinned stage. The copy frames a centred cutaway room and scrolling
+   clears the room piece by piece (hero-stage.tsx). Inside the room every
+   length is in Figma units: the artwork is 872 units wide, --u is one unit. */
 .hero {
+  --header: 104px;
+  --gutter: max(clamp(40px, 4.444vw, 64px), calc((100% - 1440px) / 2 + 64px));
   position: relative;
   z-index: 1;
-  /* Furniture leaving the room must never widen the page. */
-  overflow-x: hidden;
-  overflow-x: clip;
+  /* One screen of stage plus the scroll that drives the clearing. */
+  height: calc(100vh + 150vh);
+  height: calc(100svh + 150vh);
   color: var(--off-white);
   background: var(--teal);
 }
-.hero-inner {
-  --copy-width: clamp(360px, 29.86vw, 430px);
-  display: grid;
-  grid-template-columns: minmax(0, var(--copy-width)) minmax(0, 1fr);
-  grid-template-rows: auto auto auto 1fr;
-  grid-template-areas:
-    "copy scene"
-    "actions scene"
-    "note scene"
-    ". scene";
-  column-gap: 4px;
-  /* Copy lines up with a centred 1440px frame; the scene runs to the edge. */
-  padding-left: max(
-    clamp(48px, 6.667vw, 96px),
-    calc((100% - 1440px) / 2 + 96px)
-  );
+.hero-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  min-height: 600px;
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--header);
+  /* Furniture leaving the room never widens the page. */
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 46% 52% at 50% 66%, #ffffff17, #ffffff00 72%),
+    radial-gradient(ellipse 120% 90% at 50% 0%, #00000000 55%, #00000026),
+    var(--teal);
 }
 
 /* Copy */
-.hero-copy {
-  grid-area: copy;
-  padding-top: 86px;
+.hero-intro {
+  position: relative;
+  z-index: 2;
+  padding: 22px var(--gutter) 0;
+  text-align: center;
 }
 .hero-label {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   font-size: 12px;
   font-weight: 700;
   line-height: normal;
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
-.hero-label::before {
+.hero-label::before,
+.hero-label::after {
   content: "";
   width: 28px;
   height: 3px;
@@ -51,30 +55,137 @@
   background: var(--orange);
 }
 .hero h1 {
-  margin: 26px 0 0;
-  font-size: clamp(52px, 4.72vw, 68px);
+  margin: 18px 0 0;
+  font-size: clamp(38px, min(5.6vw, 9.4vh), 84px);
   font-weight: 600;
   font-stretch: 100%;
   line-height: 1.02;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.03em;
   color: #fff;
 }
-.hero-break-2 {
+/* Each word sits in its own mask so it can rise into view. */
+.hero-word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding-bottom: 0.1em;
+  margin-bottom: -0.1em;
+}
+.hero h1 > .hero-word {
+  color: inherit;
+}
+.hero-word > span {
+  display: inline-block;
+}
+.hero-word-accent {
+  position: relative;
+}
+.hero-word-accent::after {
+  content: "";
+  position: absolute;
+  left: 0.02em;
+  right: 0.14em;
+  bottom: 0.04em;
+  height: 0.07em;
+  background: var(--orange);
+  transform-origin: left;
+}
+.hero-break-mobile,
+.hero-break-tablet {
   display: none;
 }
 .hero-text {
-  margin-top: 24px;
+  max-width: 31em;
+  margin: 16px auto 0;
   font-size: 18px;
   line-height: 1.56;
-  text-wrap: pretty;
+  text-wrap: balance;
 }
+
+/* Scene: fills the space below the copy; the room sits centred on it. */
+.hero-scene {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 0;
+  min-height: 0;
+  container-type: size;
+}
+.hero-stage {
+  /* Lifted clear of the actions that flank its base. */
+  --room: min(76cqw, (100cqh - 76px) * 872 / 678);
+  --u: calc(100cqw / 872);
+  position: absolute;
+  left: calc(50% - var(--room) / 2);
+  bottom: 64px;
+  width: var(--room);
+  aspect-ratio: 872 / 678;
+  container-type: inline-size;
+}
+.hero-room {
+  position: absolute;
+  inset: 0;
+}
+.hero-room img {
+  position: absolute;
+  display: block;
+  max-width: none;
+}
+.hero-room-shadow {
+  left: calc(39.76 * var(--u));
+  top: calc(553.08 * var(--u));
+  width: calc(809.92 * var(--u));
+  height: calc(141.36 * var(--u));
+}
+.hero-room .hero-room-empty {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+/* Furniture layer, wider than the room so pieces can travel out of it; they
+   fade between the room's open right side and the end of their exit. */
+.hero-pieces {
+  --fade: linear-gradient(
+    to right,
+    #000 calc(866 * var(--u)),
+    #0000 calc(932 * var(--u))
+  );
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: calc(1000 * var(--u));
+  height: calc(820 * var(--u));
+  -webkit-mask-image: var(--fade);
+  mask-image: var(--fade);
+}
+.hero-piece {
+  position: absolute;
+  left: calc(var(--x) * var(--u));
+  top: calc(var(--y) * var(--u));
+  width: calc(var(--w) * var(--u));
+  height: calc(var(--h) * var(--u));
+}
+.hero-room .hero-piece-image {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* Each contact-shadow SVG carries a 7-unit blur margin around its ellipse. */
+.hero-piece-shadow {
+  left: calc((var(--cx) - 7) * var(--u));
+  top: calc((var(--cy) - 7) * var(--u));
+  width: calc((var(--cw) + 14) * var(--u));
+  height: calc((var(--ch) + 14) * var(--u));
+}
+
+/* Actions and statement flank the room's base. */
 .hero-actions {
-  grid-area: actions;
+  position: absolute;
+  z-index: 2;
+  left: var(--gutter);
+  bottom: 40px;
   display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
   gap: 10px;
-  margin-top: 36px;
 }
 .hero-button {
   display: inline-flex;
@@ -108,13 +219,13 @@
   background: #ffffff14;
 }
 .hero-note {
-  grid-area: note;
+  position: absolute;
+  z-index: 2;
+  right: var(--gutter);
+  bottom: 58px;
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-top: 28px;
-  /* Keeps the copy off the hero's lower edge where the scene is shorter. */
-  padding-bottom: 48px;
   font-size: 15px;
   font-weight: 600;
   line-height: normal;
@@ -126,269 +237,206 @@
   border-radius: 50%;
   background: var(--orange);
 }
-
-/* Scene: a clipping box with the room anchored to its right edge, close
-   enough that every piece has fully left the box when its exit ends. */
-.hero-scene {
-  grid-area: scene;
-  position: relative;
-  overflow: hidden;
-  overflow: clip;
-  container-type: inline-size;
+/* Scroll rail: fills as the room is cleared; a dot hints at scrolling. */
+.hero-progress {
+  position: absolute;
+  z-index: 2;
+  right: var(--gutter);
+  top: 50%;
+  width: 2px;
+  height: 120px;
+  margin-top: -60px;
+  border-radius: 2px;
+  background: #ffffff2e;
 }
-.hero-stage {
-  --room: min(872px, 100cqw * 872 / 910);
-  --u: calc(100cqw / 872);
-  position: relative;
-  container-type: inline-size;
-  width: var(--room);
-  aspect-ratio: 872 / 678;
-  margin: calc(var(--room) * 70 / 872) calc(var(--room) * 38 / 872)
-    calc(var(--room) * 48 / 872) auto;
-}
-.hero-room {
+.hero-progress > span {
   position: absolute;
   inset: 0;
+  border-radius: inherit;
+  background: var(--orange);
+  transform-origin: top;
 }
-.hero-room img {
+.hero-progress::before {
+  content: "";
   position: absolute;
-  display: block;
-  max-width: none;
-}
-.hero-room-shadow {
-  left: calc(39.76 * var(--u));
-  top: calc(553.08 * var(--u));
-  width: calc(809.92 * var(--u));
-  height: calc(141.36 * var(--u));
-}
-.hero-room .hero-room-empty {
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-.hero-piece {
-  position: absolute;
-  left: calc(var(--x) * var(--u));
-  top: calc(var(--y) * var(--u));
-  width: calc(var(--w) * var(--u));
-  height: calc(var(--h) * var(--u));
-}
-.hero-room .hero-piece-image {
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-/* Each contact-shadow SVG carries a 7-unit blur margin around its ellipse. */
-.hero-piece-shadow {
-  left: calc((var(--cx) - 7) * var(--u));
-  top: calc((var(--cy) - 7) * var(--u));
-  width: calc((var(--cw) + 14) * var(--u));
-  height: calc((var(--ch) + 14) * var(--u));
-}
-.hero-replay {
-  position: absolute;
-  left: calc(30 * var(--u));
-  top: calc(648 * var(--u));
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 9px 16px 9px 14px;
-  border: 1px solid #fff;
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 600;
-  line-height: normal;
-  white-space: nowrap;
-  color: #fff;
-  background: var(--teal-ink);
-}
-.hero-replay:hover {
-  background: var(--teal-deep);
-}
-.hero-replay svg {
-  flex-shrink: 0;
-}
-/* Reduced motion: the empty room straight away, nothing to replay. */
-@media (prefers-reduced-motion: reduce) {
-  .hero-piece,
-  .hero-replay {
-    display: none;
-  }
+  left: -2px;
+  top: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #fff;
 }
 
-/* Tablet: copy and actions above a full-bleed scene. */
-@media (max-width: 1023px) {
-  .hero-inner {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: none;
-    grid-template-areas:
-      "copy"
-      "actions"
-      "scene"
-      "note";
-    padding-left: 0;
-  }
-  .hero-copy,
+/* Narrower or shorter desktops: actions and statement move under the room so
+   they never cover it. */
+@media (min-width: 1024px) and (max-width: 1279px),
+  (min-width: 1024px) and (max-height: 800px) {
   .hero-actions,
   .hero-note {
-    padding-inline: 48px;
+    position: static;
+    justify-content: center;
   }
-  .hero-copy {
-    padding-top: 36px;
+  .hero-actions {
+    padding-top: 4px;
+  }
+  .hero-note {
+    padding: 16px 0 28px;
+  }
+  .hero-stage {
+    --room: min(76cqw, (100cqh - 12px) * 872 / 718);
+    bottom: calc(var(--room) * 40 / 872);
+  }
+}
+
+/* Tablet: copy above, room in the middle, actions below it. */
+@media (max-width: 1023px) {
+  .hero {
+    --header: 92px;
+    height: calc(100vh + 130vh);
+    height: calc(100svh + 130vh);
+  }
+  .hero-intro {
+    padding: 20px 48px 0;
   }
   .hero-label {
     gap: 10px;
     letter-spacing: 0.12em;
   }
-  .hero-label::before {
+  .hero-label::before,
+  .hero-label::after {
     width: 22px;
   }
   .hero h1 {
-    margin-top: 20px;
-    font-size: 60px;
+    margin-top: 16px;
+    font-size: clamp(38px, min(7.8vw, 6.4vh), 60px);
     line-height: 1.03;
   }
-  .hero-break-1,
-  .hero-break-3 {
-    display: none;
-  }
-  .hero-break-2 {
+  .hero-break-tablet {
     display: inline;
   }
   .hero-text {
-    max-width: 520px;
-    margin-top: 18px;
+    max-width: 30em;
+    margin-top: 14px;
+    font-size: 17px;
     line-height: 1.55;
+  }
+  .hero-stage {
+    --room: min(88cqw, (100cqh - 8px) * 872 / 718);
+    bottom: calc(var(--room) * 40 / 872);
+  }
+  .hero-actions,
+  .hero-note {
+    position: static;
+    justify-content: center;
   }
   .hero-actions {
     gap: 12px;
-    margin-top: 28px;
+    padding: 4px 48px 0;
   }
-  .hero-button-primary {
-    padding: 0 20px;
-  }
+  .hero-button-primary,
   .hero-button-outline {
-    height: 52px;
     padding: 0 20px;
-  }
-  .hero-scene {
-    margin-top: 8px;
-  }
-  .hero-stage {
-    --room: min(800px, 90.83cqw);
-    margin: calc(var(--room) * 20 / 872) 5.39cqw calc(var(--room) * 49.5 / 872)
-      auto;
-  }
-  .hero-replay {
-    top: calc(647.5 * var(--u));
-    gap: 7px;
-    padding: 8px 14px 8px 12px;
-  }
-  .hero-replay svg {
-    width: 14px;
-    height: 14px;
   }
   .hero-note {
-    margin-top: 4px;
-    padding-bottom: 48px;
+    padding: 18px 48px 32px;
+  }
+  .hero-progress {
+    right: 24px;
   }
 }
 
-/* Mobile: headline above the scene, actions below it. */
+/* Mobile: compact copy, a full-width room, stacked actions. */
 @media (max-width: 760px) {
-  .hero-inner {
-    grid-template-areas:
-      "copy"
-      "scene"
-      "actions"
-      "note";
+  .hero {
+    --header: 84px;
+    height: calc(100vh + 110vh);
+    height: calc(100svh + 110vh);
   }
-  .hero-copy,
-  .hero-actions,
-  .hero-note {
-    padding-inline: 24px;
+  .hero-sticky {
+    min-height: 560px;
   }
-  .hero-copy {
-    padding-top: 16px;
+  .hero-intro {
+    padding: 10px 24px 0;
   }
   .hero-label {
     font-size: 11px;
   }
-  .hero h1 {
-    margin-top: 14px;
-    font-size: 40px;
-  }
-  .hero-break-1 {
-    display: inline;
-  }
-  .hero-break-2 {
+  .hero-label::after {
     display: none;
   }
-  .hero-text {
+  .hero h1 {
     margin-top: 12px;
-    font-size: 16px;
+    font-size: clamp(32px, min(10.3vw, 6vh), 40px);
   }
-  .hero-scene {
+  .hero-break-tablet {
+    display: none;
+  }
+  .hero-break-mobile {
+    display: inline;
+  }
+  .hero-text {
     margin-top: 10px;
+    font-size: 15.5px;
+    line-height: 1.5;
   }
   .hero-stage {
-    --room: 96.2cqw;
-    margin: calc(var(--room) * 23 / 872) auto calc(var(--room) * 54 / 872)
-      1.5cqw;
-  }
-  /* Sits just inside the scene's lower edge, as in the mobile frames. */
-  .hero-replay {
-    left: calc(32.6 * var(--u));
-    top: auto;
-    bottom: calc(2px - 54 * var(--u));
+    --room: min(96cqw, (100cqh - 4px) * 872 / 702);
+    bottom: calc(var(--room) * 24 / 872);
   }
   .hero-actions {
     flex-direction: column;
-    align-items: stretch;
-    margin-top: 12px;
+    gap: 10px;
+    padding: 0 24px;
   }
   .hero-button {
     width: 100%;
-    height: 54px;
-  }
-  .hero-button-outline {
-    height: 50px;
-  }
-  .hero-note {
-    margin-top: 18px;
-    padding-bottom: 32px;
-    font-size: 14px;
-  }
-}
-@media (max-width: 374px) {
-  .hero-copy,
-  .hero-actions,
-  .hero-note {
-    padding-inline: 20px;
-  }
-  .hero-copy {
-    padding-top: 14px;
-  }
-  .hero-label {
-    font-size: 10.5px;
-  }
-  .hero h1 {
-    margin-top: 12px;
-    font-size: 37px;
-  }
-  .hero-text {
-    font-size: 15.5px;
-  }
-  .hero-button {
     height: 52px;
-    font-size: 15.5px;
   }
   .hero-button-outline {
     height: 48px;
   }
   .hero-note {
-    padding-bottom: 30px;
+    padding: 14px 24px 18px;
+    font-size: 14px;
+  }
+  .hero-progress {
+    display: none;
+  }
+}
+@media (max-width: 760px) and (max-height: 720px) {
+  .hero-note {
+    display: none;
+  }
+  .hero-actions {
+    padding-bottom: 16px;
+  }
+}
+@media (max-width: 374px) {
+  .hero-intro {
+    padding-inline: 20px;
+  }
+  .hero-label {
+    font-size: 10.5px;
+  }
+  .hero-actions {
+    padding-inline: 20px;
+  }
+  .hero-note {
+    padding-inline: 20px;
+  }
+}
+
+/* Reduced motion: no pinning, the empty room straight away. */
+@media (prefers-reduced-motion: reduce) {
+  .hero {
+    height: auto;
+  }
+  .hero-sticky {
+    position: relative;
+  }
+  .hero-piece,
+  .hero-progress {
+    display: none;
   }
 }
 

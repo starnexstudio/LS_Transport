@@ -6,18 +6,18 @@ import { CompareSlider } from "@/components/compare-slider";
 const pairRows = [
   {
     pair: photoPairs.clearance,
-    label: "Clearance",
-    title: "From cluttered to cleared",
+    label: "Entrümpelung",
+    title: "Von vollgestellt zu geräumt",
   },
   {
     pair: photoPairs.bedroom,
-    label: "Furniture removal",
-    title: "Furniture out, room empty",
+    label: "Möbelräumung",
+    title: "Möbel raus, Raum leer",
   },
   {
     pair: photoPairs.bathroom,
-    label: "Dismantling",
-    title: "Tiles and fittings removed",
+    label: "Demontage",
+    title: "Fliesen und Armaturen entfernt",
   },
 ];
 
@@ -26,14 +26,14 @@ export function BeforeAfter() {
     <section className="section before-after" id="vorher-nachher">
       <div className="section-top">
         <div>
-          <span className="eyebrow">BEFORE & AFTER</span>
+          <span className="eyebrow">VORHER & NACHHER</span>
           <h2>
-            Packed full.
+            Randvoll.
             <br />
-            Cleared out.
+            Ausgeräumt.
           </h2>
         </div>
-        <p>Drag the slider to see the difference.</p>
+        <p>Ziehen Sie den Regler, um den Unterschied zu sehen.</p>
       </div>
       {/* Column widths follow each photo's proportions, so all sliders share one height. */}
       <div
@@ -69,7 +69,7 @@ export function BeforeAfter() {
       </div>
       <div className="before-after-footer">
         <a href="#anfrage" className="button button-orange before-after-cta">
-          Request a quote <ArrowRight size={18} />
+          Unverbindlich anfragen <ArrowRight size={18} />
         </a>
       </div>
     </section>

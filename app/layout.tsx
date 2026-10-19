@@ -19,16 +19,16 @@ const archivo = Archivo({
   display: "swap",
 });
 export const metadata: Metadata = {
-  title: "L&S | Clearance & Dismantling",
+  title: "L&S | Entrümpelung & Demontage",
   description:
-    "Room for something new. Clearance, professional disposal, dismantling, furniture transport and cleaning. Across Germany by arrangement. Request a quote today.",
+    "Platz für Neues. Entrümpelung, fachgerechte Entsorgung, Demontage, Möbeltransport und Reinigung. Deutschlandweit nach Absprache. Jetzt unverbindlich anfragen.",
   robots: { index: false, follow: false },
 };
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="de">
       <body className={`${manrope.variable} ${archivo.variable}`}>
         {children}
         <FloatingContact />

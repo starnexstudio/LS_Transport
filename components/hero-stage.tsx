@@ -93,12 +93,7 @@ export function HeroStage({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <section
-      ref={section}
-      className="hero"
-      aria-labelledby="hero-title"
-      lang="de"
-    >
+    <section ref={section} className="hero" aria-labelledby="hero-title">
       <div className="hero-sticky">{children}</div>
     </section>
   );

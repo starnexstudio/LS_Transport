@@ -8,31 +8,31 @@ import { PhotoExample } from "@/components/photo-example";
 import { BeforeAfter } from "@/components/before-after";
 const faqs = [
   [
-    "How much will my job cost?",
-    "The price depends on the scope and the work involved. Briefly describe your job and you'll receive an individual quote.",
+    "Was kostet mein Auftrag?",
+    "Der Preis hängt vom Umfang und vom Aufwand ab. Beschreiben Sie Ihren Auftrag kurz, und Sie erhalten ein individuelles Angebot.",
   ],
   [
-    "Which areas does L&S cover?",
-    "All of Germany, by arrangement. Just tell us the postcode and town.",
+    "In welchen Regionen ist L&S tätig?",
+    "Deutschlandweit nach Absprache. Nennen Sie uns einfach Postleitzahl und Ort.",
   ],
   [
-    "Can I combine several services?",
-    "Yes – for example clearance, disposal and cleaning in one job.",
+    "Kann ich mehrere Leistungen kombinieren?",
+    "Ja – zum Beispiel Entrümpelung, Entsorgung und Reinigung in einem Auftrag.",
   ],
   [
-    "Which details help with my request?",
-    "The service, location, approximate amount, floor and preferred date. Photos are especially helpful.",
+    "Welche Angaben helfen bei meiner Anfrage?",
+    "Leistung, Ort, ungefähre Menge, Stockwerk und Wunschtermin. Fotos helfen besonders.",
   ],
   [
-    "When can I reach you?",
-    "Around the clock. We arrange the date for the job with you personally.",
+    "Wann sind Sie erreichbar?",
+    "Rund um die Uhr. Den Termin für den Auftrag stimmen wir persönlich mit Ihnen ab.",
   ],
 ];
 export default function Home() {
   return (
     <>
       <a href="#inhalt" className="skip-link">
-        Skip to content
+        Zum Inhalt springen
       </a>
       <Header />
       <main id="inhalt">
@@ -40,15 +40,15 @@ export default function Home() {
         <ServicesOverview />
         <section className="process section" id="ablauf">
           <div className="process-intro">
-            <span className="eyebrow">01 / A CLEAR PROCESS</span>
+            <span className="eyebrow">01 / KLARER ABLAUF</span>
             <h2>
-              A good start:
+              Ein guter Start:
               <br />
-              <span>a clear conversation.</span>
+              <span>ein klares Gespräch.</span>
             </h2>
-            <p>Three steps – no surprises.</p>
+            <p>Drei Schritte – keine Überraschungen.</p>
             <a href="#anfrage" className="text-link">
-              Let&apos;s get started <ArrowUpRight size={18} />
+              Jetzt starten <ArrowUpRight size={18} />
             </a>
             <div className="process-wordmark" aria-hidden="true">
               L<span>&</span>S<span className="wordmark-dot">.</span>
@@ -58,22 +58,24 @@ export default function Home() {
             <li>
               <span>01</span>
               <div>
-                <h3>You tell us. We listen.</h3>
-                <p>Briefly describe what needs doing – photos are welcome.</p>
+                <h3>Sie erzählen. Wir hören zu.</h3>
+                <p>
+                  Beschreiben Sie kurz, was zu tun ist – Fotos sind willkommen.
+                </p>
               </div>
             </li>
             <li>
               <span>02</span>
               <div>
-                <h3>We clarify the details.</h3>
-                <p>Scope, date and price – firmly agreed.</p>
+                <h3>Wir klären die Details.</h3>
+                <p>Umfang, Termin und Preis – fest vereinbart.</p>
               </div>
             </li>
             <li>
               <span>03</span>
               <div>
-                <h3>We get to work.</h3>
-                <p>On time for the appointment. Handed over swept clean.</p>
+                <h3>Wir packen an.</h3>
+                <p>Pünktlich zum Termin. Besenrein übergeben.</p>
               </div>
             </li>
           </ol>
@@ -82,17 +84,18 @@ export default function Home() {
         <PhotoExample />
         <section className="questions section" id="fragen">
           <div>
-            <span className="eyebrow">02 / GOOD TO KNOW</span>
+            <span className="eyebrow">02 / GUT ZU WISSEN</span>
             <h2>
-              Still have
-              <br />a question?
+              Noch eine
+              <br />
+              Frage?
             </h2>
-            <p>We&apos;ll clarify everything else with you personally.</p>
+            <p>Alles Weitere klären wir gern persönlich mit Ihnen.</p>
             <a
               className="text-link"
               href="mailto:Info@entruempelung-demontage.de"
             >
-              Write to us <ArrowUpRight size={18} />
+              Schreiben Sie uns <ArrowUpRight size={18} />
             </a>
           </div>
           <div className="faq-list">
@@ -111,13 +114,13 @@ export default function Home() {
         </section>
         <section className="contact section" id="anfrage">
           <div className="contact-intro">
-            <span className="eyebrow">03 / YOUR NEXT STEP</span>
+            <span className="eyebrow">03 / IHR NÄCHSTER SCHRITT</span>
             <h2>
-              What can we
+              Was dürfen wir
               <br />
-              take on for you?
+              für Sie übernehmen?
             </h2>
-            <p>Describe it briefly – we&apos;ll get back to you.</p>
+            <p>Beschreiben Sie es kurz – wir melden uns bei Ihnen.</p>
             <a
               className="contact-email"
               href="mailto:Info@entruempelung-demontage.de"
@@ -128,9 +131,9 @@ export default function Home() {
             <div className="contact-note">
               <span className="status-dot" />
               <span>
-                Available 24 hours a day
+                Rund um die Uhr erreichbar
                 <br />
-                <small>Germany – service area by arrangement</small>
+                <small>Deutschland – Einsatzgebiet nach Absprache</small>
               </span>
             </div>
           </div>

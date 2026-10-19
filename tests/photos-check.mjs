@@ -14,7 +14,7 @@ await page.goto(base, { waitUntil: "networkidle" });
 
 // Before/after sliders: all photos load, and each slider moves by keyboard.
 const sliders = page.locator(".compare");
-assert.equal(await sliders.count(), 6);
+assert.equal(await sliders.count(), 3);
 for (const slider of await sliders.all()) {
   await slider.scrollIntoViewIfNeeded();
   await slider
@@ -57,7 +57,7 @@ for (const route of ["/services/", "/services/clearance/"]) {
 
 // Accessibility on every remaining page.
 await page.setViewportSize({ width: 1440, height: 1000 });
-for (const route of ["/", "/legal-notice/", "/privacy/"]) {
+for (const route of ["/", "/impressum/", "/datenschutz/"]) {
   await page.goto(base + route, { waitUntil: "networkidle" });
   const result = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
@@ -79,7 +79,7 @@ await fs.writeFile(
     {
       status: "passed",
       checks: [
-        "Six before/after sliders load and respond to the keyboard",
+        "Three before/after sliders load and respond to the keyboard",
         "Moving photos load",
         "Responsive widths 320–1440",
         "Removed service routes return 404",

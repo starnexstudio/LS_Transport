@@ -12,9 +12,10 @@ page.on("pageerror", (error) => errors.push(error.message));
 await page.goto("http://localhost:3000");
 assert.equal(
   await page
-    .locator(".hero-copy h1")
+    .locator(".hero-word > span")
+    .first()
     .evaluate((el) => getComputedStyle(el).animationName),
-  "entrance-rise",
+  "hero-word-rise",
 );
 await page.emulateMedia({ reducedMotion: "reduce" });
 await page.waitForFunction(
@@ -24,7 +25,8 @@ await page.waitForFunction(
 );
 assert.equal(
   await page
-    .locator(".hero-copy h1")
+    .locator(".hero-word > span")
+    .first()
     .evaluate((el) => getComputedStyle(el).animationName),
   "none",
 );
@@ -37,11 +39,11 @@ for (const width of [1440, 390, 320]) {
   );
 }
 await page.setViewportSize({ width: 390, height: 844 });
-await page.getByRole("button", { name: "Open menu" }).click();
-await page.getByRole("button", { name: "Close menu" }).press("Escape");
+await page.getByRole("button", { name: "Menü öffnen" }).click();
+await page.getByRole("button", { name: "Menü schließen" }).press("Escape");
 assert.equal(
   await page
-    .getByRole("button", { name: "Open menu" })
+    .getByRole("button", { name: "Menü öffnen" })
     .getAttribute("aria-expanded"),
   "false",
 );

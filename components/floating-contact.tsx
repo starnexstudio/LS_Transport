@@ -31,7 +31,7 @@ export function FloatingContact() {
         <a
           className="floating-call"
           href={`tel:${phone.replace(/[^+\d]/g, "")}`}
-          aria-label={`Call L&S: ${phone}`}
+          aria-label={`L&S anrufen: ${phone}`}
         >
           <Phone size={24} />
         </a>
@@ -42,7 +42,7 @@ export function FloatingContact() {
           href={`https://wa.me/${whatsapp.replace(/\D/g, "")}?text=${encodeURIComponent(whatsappGreeting)}`}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="Message L&S on WhatsApp (opens in a new tab)"
+          aria-label="L&S per WhatsApp schreiben (öffnet in neuem Tab)"
         >
           <MessageCircle size={24} />
         </a>

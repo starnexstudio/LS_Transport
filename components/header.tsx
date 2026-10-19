@@ -2,66 +2,90 @@
 import { useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight, Menu, X } from "lucide-react";
-import { TopBar } from "@/components/top-bar";
+import { Phone, X } from "lucide-react";
 import { asset } from "@/lib/base-path";
+import { business } from "@/lib/content";
+
+const links = [
+  ["/#leistungen", "Leistungen"],
+  ["/#ablauf", "Ablauf"],
+  ["/#vorher-nachher", "Vorher & Nachher"],
+  ["/#fragen", "Fragen"],
+];
+
 export function Header() {
   const [open, setOpen] = useState(false);
   const menuButton = useRef<HTMLButtonElement>(null);
+  const phone = business.phone.trim();
   return (
-    <>
-      <TopBar />
-      <header
-        className="header"
-        onKeyDown={(event) => {
-          if (event.key === "Escape" && open) {
-            setOpen(false);
-            menuButton.current?.focus();
-          }
-        }}
+    <header
+      className="header"
+      lang="de"
+      onKeyDown={(event) => {
+        if (event.key === "Escape" && open) {
+          setOpen(false);
+          menuButton.current?.focus();
+        }
+      }}
+    >
+      <Link className="brand" href="/" aria-label="L&S – zur Startseite">
+        <Image
+          src={asset("/images/ls-logo.webp")}
+          alt="L&S Entrümpelung & Demontagearbeiten"
+          width={897}
+          height={570}
+          loading="eager"
+          fetchPriority="high"
+        />
+      </Link>
+      <nav
+        id="main-navigation"
+        className={open ? "navigation is-open" : "navigation"}
+        aria-label="Hauptnavigation"
       >
-        <Link className="brand" href="/" aria-label="L&S – back to home">
-          <Image
-            src={asset("/images/ls-logo.webp")}
-            alt="L&S Entrümpelung & Demontagearbeiten"
-            width={897}
-            height={570}
-            priority
-          />
-        </Link>
-        <nav
-          id="main-navigation"
-          className={open ? "navigation is-open" : "navigation"}
-          aria-label="Main navigation"
-        >
-          <Link href="/#ablauf" onClick={() => setOpen(false)}>
-            How it works
+        {links.map(([href, label]) => (
+          <Link key={href} href={href} onClick={() => setOpen(false)}>
+            {label}
           </Link>
-          <Link href="/#vorher-nachher" onClick={() => setOpen(false)}>
-            Before &amp; after
-          </Link>
-          <Link href="/#fragen" onClick={() => setOpen(false)}>
-            FAQ
-          </Link>
-          <Link
-            href="/#anfrage"
-            className="header-cta"
-            onClick={() => setOpen(false)}
+        ))}
+      </nav>
+      <div className="header-actions">
+        {phone && (
+          <a
+            className="header-call"
+            href={`tel:${phone.replace(/[^+\d]/g, "")}`}
+            aria-label={`Anrufen: ${phone}`}
           >
-            Request a quote <ArrowUpRight size={17} />
-          </Link>
-        </nav>
+            <Phone
+              size={16}
+              strokeWidth={1.5}
+              absoluteStrokeWidth
+              aria-hidden="true"
+            />
+            {phone}
+          </a>
+        )}
         <button
           ref={menuButton}
           className="menu-toggle"
-          aria-label={open ? "Close menu" : "Open menu"}
+          aria-label={open ? "Menü schließen" : "Menü öffnen"}
           aria-expanded={open}
           aria-controls="main-navigation"
           onClick={() => setOpen(!open)}
         >
-          {open ? <X /> : <Menu />}
+          {open ? (
+            <X size={22} aria-hidden="true" />
+          ) : (
+            // Figma's menu glyph (shorter last line) has no lucide equivalent.
+            <img
+              src={asset("/images/hero-room/icon-menu.svg")}
+              alt=""
+              width={22}
+              height={22}
+            />
+          )}
         </button>
-      </header>
-    </>
+      </div>
+    </header>
   );
 }

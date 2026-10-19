@@ -1,3 +1,4 @@
+import { Fragment, type CSSProperties } from "react";
 import {
   ArrowRight,
   CircleCheck,
@@ -9,63 +10,88 @@ import {
   Truck,
 } from "lucide-react";
 import { HeroRoom } from "@/components/hero-room";
+import { HeroStage } from "@/components/hero-stage";
 import { business, services } from "@/lib/content";
 
 const serviceIcons = [PackageOpen, Recycle, Hammer, Truck, Sparkles];
 
-// Copy stays still while the room beside it is cleared. The headline breaks
-// differently per layout, so the line breaks are switched in hero.css.
+const copy =
+  "Wir übernehmen die komplette Räumung – von der Planung bis zur besenreinen Übergabe.";
+
+const order = (i: number) => ({ "--i": i }) as CSSProperties;
+
+// A pinned stage: the headline rises in on load, then scrolling clears the
+// room while the supporting sentence lights up word by word. When the room is
+// empty, "Neues." is underlined. The calls to action are there from the start.
 export function Hero() {
   const phone = business.phone.trim();
   return (
-    <section className="hero" aria-labelledby="hero-title" lang="de">
-      <div className="hero-inner">
-        <div className="hero-copy">
-          <p className="hero-label">Entrümpelung · Demontage · Transport</p>
-          <h1 id="hero-title">
-            Wir machen
-            <br className="hero-break-1" /> Platz
-            <br className="hero-break-2" /> für
-            <br className="hero-break-3" /> Neues.
-          </h1>
-          <p className="hero-text">
-            Wir übernehmen die komplette Räumung – von der Planung bis zur
-            besenreinen Übergabe.
-          </p>
-        </div>
-        <div className="hero-actions">
-          <a href="#anfrage" className="hero-button hero-button-primary">
-            Unverbindlich anfragen
-            <ArrowRight
-              size={18}
-              strokeWidth={1.8333}
+    <HeroStage>
+      <div className="hero-intro">
+        <p className="hero-label">Entrümpelung · Demontage · Transport</p>
+        <h1 id="hero-title" className="hero-title">
+          <span className="hero-word" style={order(0)}>
+            <span>Wir</span>
+          </span>{" "}
+          <span className="hero-word" style={order(1)}>
+            <span>machen</span>
+          </span>
+          <br className="hero-break-mobile" />{" "}
+          <span className="hero-word" style={order(2)}>
+            <span>Platz</span>
+          </span>
+          <br className="hero-break-tablet" />{" "}
+          <span className="hero-word" style={order(3)}>
+            <span>für</span>
+          </span>{" "}
+          <span className="hero-word hero-word-accent" style={order(4)}>
+            <span>Neues.</span>
+          </span>
+        </h1>
+        <p className="hero-text">
+          {copy.split(" ").map((word, i) => (
+            <Fragment key={i}>
+              {i > 0 && " "}
+              <span style={order(i)}>{word}</span>
+            </Fragment>
+          ))}
+        </p>
+      </div>
+      <HeroRoom />
+      <div className="hero-actions">
+        <a href="#anfrage" className="hero-button hero-button-primary">
+          Unverbindlich anfragen
+          <ArrowRight
+            size={18}
+            strokeWidth={1.8333}
+            absoluteStrokeWidth
+            aria-hidden="true"
+          />
+        </a>
+        {phone && (
+          <a
+            className="hero-button hero-button-outline"
+            href={`tel:${phone.replace(/[^+\d]/g, "")}`}
+            aria-label={`Jetzt anrufen: ${phone}`}
+          >
+            <Phone
+              size={17}
+              strokeWidth={1.5}
               absoluteStrokeWidth
               aria-hidden="true"
             />
+            Jetzt anrufen
           </a>
-          {phone && (
-            <a
-              className="hero-button hero-button-outline"
-              href={`tel:${phone.replace(/[^+\d]/g, "")}`}
-              aria-label={`Jetzt anrufen: ${phone}`}
-            >
-              <Phone
-                size={17}
-                strokeWidth={1.5}
-                absoluteStrokeWidth
-                aria-hidden="true"
-              />
-              Jetzt anrufen
-            </a>
-          )}
-        </div>
-        <HeroRoom />
-        <p className="hero-note">
-          <span aria-hidden="true" />
-          Schnell, zuverlässig und stressfrei.
-        </p>
+        )}
       </div>
-    </section>
+      <p className="hero-note">
+        <span aria-hidden="true" />
+        Schnell, zuverlässig und stressfrei.
+      </p>
+      <div className="hero-progress" aria-hidden="true">
+        <span />
+      </div>
+    </HeroStage>
   );
 }
 

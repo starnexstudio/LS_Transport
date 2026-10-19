@@ -1,7 +1,5 @@
-"use client";
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import type { CSSProperties } from "react";
 import Image from "next/image";
-import { RotateCcw } from "lucide-react";
 import { asset } from "@/lib/base-path";
 
 const dir = "/images/hero-room";
@@ -153,47 +151,15 @@ function pieceStyle(piece: Piece) {
   return style as CSSProperties;
 }
 
-// The cutaway room is cleared object by object once, then holds the empty
-// room. Under reduced motion the CSS shows the empty room straight away.
+// The cutaway room. Every piece carries its Figma track as custom properties;
+// HeroStage scrubs the resulting animations with the scroll position. Pieces
+// fade out as they pass the room's open right side.
 export function HeroRoom() {
-  const room = useRef<HTMLDivElement>(null);
-  const [playing, setPlaying] = useState(false);
-
-  // Start only once every layer has loaded, so the sequence never plays
-  // against half-loaded furniture.
-  useEffect(() => {
-    let cancelled = false;
-    const images = Array.from(room.current?.querySelectorAll("img") ?? []);
-    const loaded = images.map(
-      (image) =>
-        new Promise<void>((resolve) => {
-          if (image.complete) return resolve();
-          image.addEventListener("load", () => resolve(), { once: true });
-          image.addEventListener("error", () => resolve(), { once: true });
-        }),
-    );
-    Promise.all(loaded).then(() => {
-      if (!cancelled) setPlaying(true);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  function replay() {
-    room.current?.getAnimations({ subtree: true }).forEach((animation) => {
-      animation.currentTime = 0;
-      animation.play();
-    });
-    setPlaying(true);
-  }
-
   return (
     <div className="hero-scene">
       <div className="hero-stage">
         <div
-          ref={room}
-          className={playing ? "hero-room is-playing" : "hero-room"}
+          className="hero-room"
           role="img"
           aria-label="Ein möblierter Raum wird Stück für Stück geräumt, bis er leer ist."
         >
@@ -213,38 +179,31 @@ export function HeroRoom() {
             loading="eager"
             fetchPriority="high"
           />
-          {pieces.map((piece) => (
-            <div
-              key={piece.name}
-              className="hero-piece"
-              data-step={piece.step ? "" : undefined}
-              style={pieceStyle(piece)}
-            >
-              <img
-                className="hero-piece-shadow"
-                src={asset(`${dir}/shadow-${piece.name}.svg`)}
-                alt=""
-              />
-              <Image
-                className="hero-piece-image"
-                src={asset(piece.image.src)}
-                alt=""
-                width={piece.image.width}
-                height={piece.image.height}
-                loading="eager"
-              />
-            </div>
-          ))}
+          <div className="hero-pieces">
+            {pieces.map((piece) => (
+              <div
+                key={piece.name}
+                className="hero-piece"
+                data-step={piece.step ? "" : undefined}
+                style={pieceStyle(piece)}
+              >
+                <img
+                  className="hero-piece-shadow"
+                  src={asset(`${dir}/shadow-${piece.name}.svg`)}
+                  alt=""
+                />
+                <Image
+                  className="hero-piece-image"
+                  src={asset(piece.image.src)}
+                  alt=""
+                  width={piece.image.width}
+                  height={piece.image.height}
+                  loading="eager"
+                />
+              </div>
+            ))}
+          </div>
         </div>
-        <button type="button" className="hero-replay" onClick={replay}>
-          <RotateCcw
-            size={15}
-            strokeWidth={1.4667}
-            absoluteStrokeWidth
-            aria-hidden="true"
-          />
-          Erneut ansehen
-        </button>
       </div>
     </div>
   );

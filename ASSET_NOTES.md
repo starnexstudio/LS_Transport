@@ -20,6 +20,8 @@
 - The TV screen was blurred in both images because the before photo showed personal streaming-profile names.
 - Both images were cropped to the same 3:4 area. The crop removes warp edges and a stray object in the bottom-left corner. They were exported at 750 × 1000.
 
+`public/images/hero-room/` holds the hero's cutaway room, exported from the Figma file (BpwhS8xqHLkMte8zwimTER, Assets section): the empty room (872 × 678, the largest size Figma has) and seven furniture cutouts (Figma AI generated, background removed), converted to WebP with alpha at twice their largest on-screen size. The boxes share `box-large.webp`. The ground and contact shadows (`*.svg`) and the menu icon are Figma vector exports. All are illustrative, not company photographs.
+
 ## Generation prompt
 
 Use case: photorealistic-natural. Asset type: editorial hero photograph for a German clearance and furniture dismantling business website. Wide landscape 1536x1024. View through a broad doorway into a bright, freshly emptied European apartment with warm oak parquet, off-white plaster walls, high ceilings and generous windows at right. Foreground right: three tidy cardboard moving boxes with no text, a folded charcoal moving blanket on one box, and a small cordless drill. Left foreground: partial doorframe. A disassembled simple wooden shelving panel leans neatly against the far wall. Calm, credible architectural photography, natural late morning light casting precise geometric shadows, understated warm neutral palette, authentic lived-in material textures. Beautiful spacious composition, no people, no brands, no text, no watermark. Not a luxury showroom, not a construction ruin. This is an illustrative scene, not a documented company project.

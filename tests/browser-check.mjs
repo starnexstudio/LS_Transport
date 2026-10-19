@@ -20,14 +20,14 @@ for (const width of [1440, 1024, 768, 390, 320]) {
 }
 await page.setViewportSize({ width: 390, height: 844 });
 await page.screenshot({ path: "artifacts/mobile.png", fullPage: true });
-await page.getByRole("button", { name: "Open menu" }).click();
+await page.getByRole("button", { name: "Menü öffnen" }).click();
 await page
   .getByRole("navigation")
-  .getByRole("link", { name: "How it works", exact: true })
+  .getByRole("link", { name: "Ablauf", exact: true })
   .click();
 assert.equal(
   await page
-    .getByRole("button", { name: "Open menu" })
+    .getByRole("button", { name: "Menü öffnen" })
     .getAttribute("aria-expanded"),
   "false",
 );
@@ -68,7 +68,7 @@ assert.ok(
 );
 assert.ok(
   await page
-    .locator(".hero-visual img")
+    .locator(".hero-room-empty")
     .evaluate((image) => image.complete && image.naturalWidth > 0),
 );
 for (const route of ["legal-notice", "privacy"]) {

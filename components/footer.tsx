@@ -10,8 +10,8 @@ export function Footer() {
           <Image
             src={asset("/images/ls-logo.webp")}
             alt="L&S Entrümpelung & Demontagearbeiten"
-            width={520}
-            height={328}
+            width={897}
+            height={570}
           />
         </Link>
         <p>

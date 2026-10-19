@@ -1,10 +1,19 @@
 @import "tailwindcss";
 :root {
-  --ink: #242720;
-  --muted: #6a6c63;
-  --paper: #f7f7f2;
-  --line: #dedfd5;
-  --orange: #f78a3c;
+  /* Brand palette sampled from the L&S logo artwork. */
+  --teal: #00757f;
+  --teal-deep: #005b63;
+  --teal-ink: #00434a;
+  --teal-pale: #dcf1f2;
+  --mist: #e7f1f1;
+  --orange: #fc561a;
+  --orange-hover: #ff6d36;
+  /* Orange dark enough for text and outlines on light surfaces (5:1+). */
+  --orange-deep: #b8390b;
+  --ink: #132a2e;
+  --muted: #4c6266;
+  --paper: #f6f9f9;
+  --line: #d4e1e2;
   --font-sans: var(--font-manrope);
 }
 * {
@@ -12,7 +21,7 @@
 }
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 105px;
+  scroll-padding-top: 24px;
 }
 body {
   margin: 0;
@@ -62,11 +71,11 @@ input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
 [tabindex]:focus-visible {
-  outline: 3px solid #b84d0c;
+  outline: 3px solid var(--orange-deep);
   outline-offset: 5px;
 }
 ::selection {
-  background: #fac295;
+  background: #fec8b3;
 }
 h1,
 h2,
@@ -95,11 +104,11 @@ h2 {
   gap: 24px;
   height: 42px;
   padding: 0 5.2%;
-  background: #0c0d0b;
+  background: var(--teal-ink);
   border-bottom: 1px solid #ffffff0d;
   font-size: 13px;
   line-height: 1;
-  color: #a3a79b;
+  color: #cfe6e7;
 }
 .topbar::before {
   /* Hairline brand accent that fades out across the bar. */
@@ -107,7 +116,7 @@ h2 {
   position: absolute;
   inset: 0 0 auto;
   height: 2px;
-  background: linear-gradient(90deg, var(--orange) 0%, #f78a3c00 55%);
+  background: linear-gradient(90deg, var(--orange) 0%, #fc561a00 55%);
 }
 .topbar ul {
   list-style: none;
@@ -129,7 +138,7 @@ h2 {
 }
 .topbar strong {
   font-weight: 700;
-  color: #eceee7;
+  color: #fff;
 }
 .topbar svg {
   flex-shrink: 0;
@@ -142,7 +151,7 @@ h2 {
   padding: 6px 0;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
-  color: #d9dbd3;
+  color: #e6f2f2;
 }
 .topbar-contact a:hover {
   color: #fff;
@@ -178,21 +187,26 @@ h2 {
 }
 /* Dark, low-glare header that suits the logo and flows into the hero. */
 .header {
-  --header-text: #c9ccc3;
-  --header-line: #ffffff1f;
-  height: 96px;
+  --header-text: #e6f2f2;
+  --header-line: #ffffff59;
+  height: 116px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 5.2%;
   border-bottom: 1px solid #ffffff12;
-  background: #141513;
+  background: var(--teal);
   color: #f1f2ec;
   position: relative;
   z-index: 20;
 }
-.header :focus-visible {
-  outline-color: var(--orange);
+/* Teal and dark surfaces: white focus rings stay visible. */
+.topbar :focus-visible,
+.header :focus-visible,
+.hero :focus-visible,
+.process :focus-visible,
+.footer :focus-visible {
+  outline-color: #fff;
 }
 .brand {
   display: flex;
@@ -200,7 +214,7 @@ h2 {
 }
 .brand img {
   width: auto;
-  height: 76px;
+  height: 92px;
   object-fit: contain;
 }
 .navigation {
@@ -223,9 +237,14 @@ h2 {
   border-radius: 10px;
   color: #fff;
 }
-.header-cta:hover {
+.header-cta {
   background: var(--orange);
   border-color: var(--orange);
+  color: var(--ink);
+}
+.header-cta:hover {
+  background: var(--orange-hover);
+  border-color: var(--orange-hover);
   color: var(--ink);
 }
 .menu-toggle {
@@ -246,7 +265,7 @@ h1 {
   margin: 30px 0 23px;
 }
 h1 > span {
-  color: #7b7e72;
+  color: var(--muted);
 }
 .button {
   padding: 17px 23px;
@@ -259,25 +278,33 @@ h1 > span {
   border: 0;
   min-height: 54px;
 }
+.button-orange {
+  background: var(--orange);
+  color: var(--ink);
+}
+.button-orange:hover {
+  background: var(--orange-hover);
+  transform: translateY(-2px);
+}
 .button-dark {
-  background: var(--ink);
+  background: var(--teal-ink);
   color: white;
 }
 .button-dark:hover {
-  background: #414837;
+  background: var(--teal-deep);
   transform: translateY(-2px);
 }
 .status-dot {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #758c5d;
+  background: var(--teal);
   display: inline-block;
   flex-shrink: 0;
 }
 .divider {
   margin: 0 3px;
-  color: #c3c5b9;
+  color: var(--line);
 }
 .section {
   padding: 93px 7.5%;
@@ -312,10 +339,10 @@ h2 {
   background: transparent;
 }
 .text-link:hover {
-  color: #a64b0f;
+  color: var(--orange-deep);
 }
 .process {
-  background: var(--ink);
+  background: var(--teal-deep);
   color: var(--paper);
   margin: 0 3%;
   padding: 68px 4.8%;
@@ -325,22 +352,22 @@ h2 {
   overflow: hidden;
 }
 .process .eyebrow {
-  color: #b8beac;
+  color: var(--teal-pale);
 }
 .process h2 {
   font-size: 40px;
 }
 .process h2 > span {
-  color: #b4b9a9;
+  color: var(--teal-pale);
 }
 .process-intro > p {
   font-size: 14px;
-  color: #bbc0b1;
+  color: #d6ebec;
   max-width: 340px;
   margin: 23px 0;
 }
 .process .text-link {
-  color: #f5a064;
+  color: #ffc4ad;
 }
 .process-wordmark {
   font-size: 95px;
@@ -348,7 +375,7 @@ h2 {
   line-height: 1;
   letter-spacing: -0.08em;
   margin-top: 43px;
-  color: #808a75;
+  color: #2f8d95;
 }
 .process-wordmark > span {
   font-weight: 400;
@@ -365,14 +392,14 @@ h2 {
   display: flex;
   gap: 25px;
   padding: 29px 0;
-  border-bottom: 1px solid #4d5247;
+  border-bottom: 1px solid #ffffff2e;
 }
 .process-steps li:first-child {
   padding-top: 0;
 }
 .process-steps li > span {
   font-size: 12px;
-  color: #f5a064;
+  color: #ffc4ad;
   padding-top: 4px;
 }
 .process-steps h3 {
@@ -382,7 +409,7 @@ h2 {
 .process-steps p {
   font-size: 13px;
   line-height: 1.85;
-  color: #bbc0b1;
+  color: #d6ebec;
   margin-top: 12px;
   max-width: 380px;
 }
@@ -423,7 +450,7 @@ h2 {
   font-size: 24px;
   font-weight: 400;
   line-height: 1;
-  color: #757b6a;
+  color: var(--teal);
 }
 .faq-list details[open] .faq-plus {
   transform: rotate(45deg);
@@ -435,7 +462,7 @@ h2 {
   line-height: 1.9;
 }
 .contact {
-  background: #eceee3;
+  background: var(--mist);
   border-top: 1px solid var(--line);
   display: grid;
   grid-template-columns: 1fr 1.1fr;
@@ -501,9 +528,9 @@ h2 {
 .inquiry select,
 .inquiry textarea {
   width: 100%;
-  border: 1px solid #cdd0c3;
+  border: 1px solid #b9cdcf;
   border-radius: 0;
-  background: #f7f8f2;
+  background: #fff;
   padding: 12px;
   font-size: 12px;
   color: var(--ink);
@@ -514,7 +541,7 @@ h2 {
 }
 .inquiry input::placeholder,
 .inquiry textarea::placeholder {
-  color: #777c6e;
+  color: #5f7377;
 }
 .form-grid {
   display: grid;
@@ -524,7 +551,7 @@ h2 {
 .form-hint {
   font-size: 11px;
   line-height: 1.8;
-  color: #626957;
+  color: var(--muted);
   margin: 16px 0 19px;
 }
 .inquiry > .button {
@@ -533,7 +560,7 @@ h2 {
   color: var(--ink);
 }
 .inquiry > .button:hover {
-  background: #f69a59;
+  background: var(--orange-hover);
 }
 .error {
   font-size: 12px;
@@ -548,7 +575,7 @@ h2 {
   padding: 20px;
   background: #fff;
   margin-top: 20px;
-  border: 1px solid #bcc5ad;
+  border: 1px solid var(--line);
 }
 .draft h3 {
   font-size: 17px;
@@ -573,7 +600,7 @@ h2 {
   margin-top: 10px;
 }
 .footer {
-  background: var(--ink);
+  background: var(--teal-ink);
   color: var(--paper);
   padding: 40px 7.5% 22px;
 }
@@ -586,8 +613,8 @@ h2 {
 }
 .footer-top img {
   object-fit: contain;
-  width: 120px;
-  height: 80px;
+  width: 140px;
+  height: auto;
 }
 .footer-top p {
   font-size: 27px;
@@ -596,7 +623,7 @@ h2 {
   font-weight: 550;
 }
 .footer-top p span {
-  color: #aeb6a1;
+  color: var(--teal-pale);
 }
 .footer-top > a:last-child {
   display: flex;
@@ -605,13 +632,13 @@ h2 {
   font-size: 13px;
 }
 .footer-bottom {
-  border-top: 1px solid #454c3d;
+  border-top: 1px solid #ffffff2e;
   padding-top: 22px;
   display: flex;
   justify-content: space-between;
   gap: 20px;
   font-size: 10px;
-  color: #b7bcae;
+  color: #cfe6e7;
 }
 .footer-bottom > div {
   display: flex;
@@ -652,7 +679,7 @@ h2 {
 .legal-note {
   border-left: 3px solid var(--orange);
   padding: 15px 20px;
-  background: #eeefe7;
+  background: var(--mist);
 }
 @media (min-width: 1600px) {
   body {
@@ -693,11 +720,11 @@ h2 {
     scroll-padding-top: 25px;
   }
   .header {
-    height: 80px;
+    height: 88px;
     padding: 0 5%;
   }
   .brand img {
-    height: 60px;
+    height: 68px;
   }
   .menu-toggle {
     display: flex;
@@ -715,8 +742,8 @@ h2 {
     position: absolute;
     left: 0;
     right: 0;
-    top: 79px;
-    background: #141513;
+    top: 87px;
+    background: var(--teal-deep);
     padding: 16px 5% 24px;
     border-bottom: 1px solid #ffffff12;
     box-shadow: 0 24px 40px -12px #0009;
@@ -783,7 +810,7 @@ h2 {
   }
   .process-steps li:first-child {
     padding-top: 25px;
-    border-top: 1px solid #4d5247;
+    border-top: 1px solid #ffffff2e;
   }
   .process-steps h3 {
     font-size: 19px;
@@ -963,12 +990,12 @@ h2 {
 }
 .photo-example-intro > p {
   max-width: 470px;
-  color: #626957;
+  color: var(--muted);
   font-size: 16px;
 }
 .photo-example figure {
   margin: 0;
-  background: #eeefe7;
+  background: var(--mist);
   padding: 24px;
 }
 .photo-example img {
@@ -983,7 +1010,7 @@ h2 {
   margin: 18px auto 0;
   font-size: 13px;
   line-height: 1.9;
-  color: #626957;
+  color: var(--muted);
 }
 .photo-example figcaption a {
   text-decoration: underline;
@@ -1058,7 +1085,7 @@ h2 {
   position: relative;
   aspect-ratio: 1.35;
   overflow: hidden;
-  background: #eeefe7;
+  background: var(--mist);
 }
 .moving-photo img {
   object-fit: cover;

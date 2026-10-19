@@ -1,6 +1,6 @@
 # Image provenance
 
-`public/images/ls-logo.webp` is the owner-supplied logo (`logo.png`, with the truck and the "Schnell | Zuverlässig | Sauber" tagline). It was only trimmed to its visible edges and resized to 520 px wide WebP for fast loading; the artwork itself is unchanged.
+`public/images/ls-logo.webp` is the owner-supplied logo on a flat teal background (#00757F). The teal was removed by colour-to-alpha unmixing (no CSS tricks), keeping the white lettering, orange details and dark outlines. It was trimmed to its visible edges with 4 px of padding and exported as 897 × 570 WebP. Because the lettering is white, the logo must sit on teal or other dark surfaces.
 
 `public/images/cleared-room.webp` was generated with the built-in Imagegen tool and converted to WebP for efficient delivery. It is an illustrative scene, not a company project photograph. The website labels it accordingly.
 

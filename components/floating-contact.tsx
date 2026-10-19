@@ -1,12 +1,32 @@
+"use client";
+import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { MessageCircle, Phone } from "lucide-react";
 import { business, whatsappGreeting } from "@/lib/content";
 
-// Always-visible quick contact on every page.
+// Always-visible quick contact on every page. While the hero's own call and
+// inquiry buttons are on screen it steps aside, so the two never overlap.
 export function FloatingContact() {
   const phone = business.phone.trim();
   const whatsapp = business.whatsapp.trim();
+  const [hidden, setHidden] = useState(false);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    const actions = document.querySelector(".hero-actions");
+    if (!actions || !("IntersectionObserver" in window)) return;
+    const observer = new IntersectionObserver(([entry]) =>
+      setHidden(entry.isIntersecting),
+    );
+    observer.observe(actions);
+    return () => {
+      observer.disconnect();
+      setHidden(false);
+    };
+  }, [pathname]);
+
   return (
-    <div className="floating-contact">
+    <div className={hidden ? "floating-contact is-hidden" : "floating-contact"}>
       {phone && (
         <a
           className="floating-call"

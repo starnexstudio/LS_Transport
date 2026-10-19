@@ -1,6 +1,6 @@
 import { ArrowUpRight } from "lucide-react";
 import { Header } from "@/components/header";
-import { Hero } from "@/components/hero";
+import { Hero, ServicesOverview } from "@/components/hero";
 import { Inquiry } from "@/components/inquiry";
 import { Footer } from "@/components/footer";
 import { ContactActions } from "@/components/contact-actions";
@@ -37,6 +37,7 @@ export default function Home() {
       <Header />
       <main id="inhalt">
         <Hero />
+        <ServicesOverview />
         <section className="process section" id="ablauf">
           <div className="process-intro">
             <span className="eyebrow">01 / A CLEAR PROCESS</span>

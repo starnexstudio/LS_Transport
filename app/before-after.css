@@ -52,7 +52,7 @@
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: #fff;
-  background: #141513b8;
+  background: #00434ad1;
   backdrop-filter: blur(10px);
   border: 1px solid #ffffff26;
   pointer-events: none;
@@ -117,7 +117,7 @@
   font-weight: 650;
   white-space: nowrap;
   color: #fff;
-  background: #141513b8;
+  background: #00434ad1;
   backdrop-filter: blur(10px);
   transform: translateX(-50%);
   pointer-events: none;

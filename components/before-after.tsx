@@ -1,43 +1,6 @@
 import { ArrowRight } from "lucide-react";
 import { pairs as photoPairs } from "@/lib/gallery";
-import { CompareSlider, type SliderPair } from "@/components/compare-slider";
-
-type Pair = SliderPair & { id: string; title: string };
-
-// Both photos of a pair must show the same room from the same spot, at the
-// same size, so the slider seam lines up.
-const sliderPairs: Pair[] = [
-  {
-    id: "schlafzimmer",
-    label: "Bedroom",
-    title: "Boxes loaded, room cleared",
-    width: 1600,
-    height: 900,
-    before: {
-      src: "/images/vorher.jpg",
-      alt: "Bedroom full of stacked moving boxes before removal",
-    },
-    after: {
-      src: "/images/nachher.jpg",
-      alt: "The same bedroom after the moving boxes were removed",
-    },
-  },
-  {
-    id: "wohnbereich",
-    label: "Living & dining area",
-    title: "Boxes out, living space back",
-    width: 750,
-    height: 1000,
-    before: {
-      src: "/images/vorher-2.jpg",
-      alt: "Living and dining area full of moving and shipping boxes",
-    },
-    after: {
-      src: "/images/nachher-2.jpg",
-      alt: "The same living and dining area without the boxes, the floor clear again",
-    },
-  },
-];
+import { CompareSlider } from "@/components/compare-slider";
 
 // Supplied before/after pairs.
 const pairRows = [
@@ -100,35 +63,6 @@ export function BeforeAfter() {
             <figcaption>
               <strong>{label}</strong>
               {title}
-            </figcaption>
-          </figure>
-        ))}
-      </div>
-      <h3 className="slider-heading">More examples</h3>
-      {/* Column widths follow each photo's proportions, so all frames share one height. */}
-      <div
-        className="before-after-gallery"
-        style={
-          {
-            "--columns": sliderPairs
-              .map((pair) => `minmax(0, ${pair.width / pair.height}fr)`)
-              .join(" "),
-          } as React.CSSProperties
-        }
-      >
-        {sliderPairs.map((pair) => (
-          <figure
-            key={pair.id}
-            className={
-              pair.height > pair.width
-                ? "before-after-item is-portrait"
-                : "before-after-item"
-            }
-          >
-            <CompareSlider pair={pair} />
-            <figcaption>
-              <strong>{pair.label}</strong>
-              {pair.title}
             </figcaption>
           </figure>
         ))}

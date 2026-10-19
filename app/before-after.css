@@ -143,14 +143,6 @@
   outline-offset: 4px;
 }
 
-.slider-heading {
-  margin: 72px 0 24px;
-  font-family: var(--font-display), var(--font-manrope), Arial, sans-serif;
-  font-size: clamp(24px, 2vw, 30px);
-  font-weight: 700;
-  letter-spacing: -0.025em;
-}
-
 /* Call to action under the gallery */
 .before-after-footer {
   display: flex;

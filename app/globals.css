@@ -14,6 +14,8 @@
   --muted: #4c6266;
   --paper: #f6f9f9;
   --line: #d4e1e2;
+  /* Warm off-white for copy on teal. */
+  --off-white: #f5f3ed;
   --font-sans: var(--font-manrope);
 }
 * {
@@ -95,113 +97,22 @@ h2 {
   font-family: var(--font-display), var(--font-manrope), Arial, sans-serif;
   letter-spacing: -0.03em;
 }
-/* Slim utility bar above the header: availability left, direct contact right. */
-.topbar {
+/* Header on the hero's teal, as in the Figma hero frames. On wide screens it
+   lines up with a centred 1440px frame, like the hero copy. */
+.header {
   position: relative;
+  z-index: 20;
+  height: 104px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  height: 42px;
-  padding: 0 5.2%;
-  background: var(--teal-ink);
-  border-bottom: 1px solid #ffffff0d;
-  font-size: 13px;
-  line-height: 1;
-  color: #cfe6e7;
-}
-.topbar::before {
-  /* Hairline brand accent that fades out across the bar. */
-  content: "";
-  position: absolute;
-  inset: 0 0 auto;
-  height: 2px;
-  background: linear-gradient(90deg, var(--orange) 0%, #fc561a00 55%);
-}
-.topbar ul {
-  list-style: none;
-  display: flex;
-  align-items: center;
-  margin: 0;
-  padding: 0;
-}
-.topbar li {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  white-space: nowrap;
-}
-.topbar li + li {
-  margin-left: 22px;
-  padding-left: 22px;
-  border-left: 1px solid #ffffff1a;
-}
-.topbar strong {
-  font-weight: 700;
-  color: #fff;
-}
-.topbar svg {
-  flex-shrink: 0;
-  color: var(--orange);
-}
-.topbar-contact a {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  padding: 6px 0;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  color: #e6f2f2;
-}
-.topbar-contact a:hover {
-  color: #fff;
-}
-.topbar-whatsapp svg {
-  color: #5fd08f;
-}
-.topbar-live {
-  width: 8px;
-  height: 8px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  background: #4ade80;
-  box-shadow: 0 0 0 3px #4ade8026;
-}
-@media (max-width: 1100px) {
-  .topbar {
-    padding: 0 5%;
-  }
-  .topbar .topbar-mail {
-    display: none;
-  }
-}
-@media (max-width: 760px) {
-  .topbar {
-    height: 38px;
-    font-size: 12.5px;
-  }
-  .topbar .topbar-region,
-  .topbar .topbar-whatsapp {
-    display: none;
-  }
-}
-/* Dark, low-glare header that suits the logo and flows into the hero. */
-.header {
-  --header-text: #e6f2f2;
-  --header-line: #ffffff59;
-  height: 116px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 5.2%;
-  border-bottom: 1px solid #ffffff12;
+  padding: 0
+    max(clamp(40px, 4.444vw, 64px), calc((100% - 1440px) / 2 + 64px));
   background: var(--teal);
-  color: #f1f2ec;
-  position: relative;
-  z-index: 20;
+  color: var(--off-white);
 }
 /* Teal and dark surfaces: white focus rings stay visible. */
-.topbar :focus-visible,
 .header :focus-visible,
 .hero :focus-visible,
 .process :focus-visible,
@@ -211,41 +122,43 @@ h2 {
 .brand {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
 }
 .brand img {
-  width: auto;
-  height: 92px;
-  object-fit: contain;
+  width: 146px;
+  height: auto;
 }
 .navigation {
   display: flex;
   align-items: center;
-  gap: 34px;
-  font-size: 14px;
+  gap: 36px;
+  font-size: 15px;
   font-weight: 600;
-  color: var(--header-text);
+  line-height: normal;
 }
 .navigation > a:hover {
   color: #fff;
 }
-.header-cta {
+.header-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 11px 18px;
-  border: 1px solid var(--header-line);
+  gap: 10px;
+}
+.header-call {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  border: 1.5px solid #fff;
   border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: normal;
+  white-space: nowrap;
   color: #fff;
 }
-.header-cta {
-  background: var(--orange);
-  border-color: var(--orange);
-  color: var(--ink);
-}
-.header-cta:hover {
-  background: var(--orange-hover);
-  border-color: var(--orange-hover);
-  color: var(--ink);
+.header-call:hover {
+  background: #ffffff14;
 }
 .menu-toggle {
   display: none;
@@ -687,13 +600,84 @@ h2 {
     margin: auto;
   }
 }
-@media (max-width: 1100px) {
+@media (max-width: 1023px) {
   .header {
-    padding: 0 5%;
+    height: 92px;
+    padding: 0 48px;
+  }
+  .brand img {
+    width: 132px;
+  }
+  .header-call {
+    height: 44px;
+    gap: 9px;
+    padding: 0 16px 0 14px;
+    font-size: 14px;
+  }
+  .menu-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1.5px solid #fff;
+    border-radius: 10px;
+    background: transparent;
+    color: #fff;
   }
   .navigation {
-    gap: 22px;
+    display: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    padding: 8px 48px 20px;
+    background: var(--teal-deep);
+    box-shadow: 0 24px 40px -12px #0009;
   }
+  .navigation.is-open {
+    display: flex;
+    align-items: stretch;
+    flex-direction: column;
+    gap: 0;
+  }
+  .navigation > a {
+    padding: 15px 0;
+    font-size: 16px;
+  }
+  .navigation > a + a {
+    border-top: 1px solid #ffffff1f;
+  }
+}
+@media (max-width: 760px) {
+  .header {
+    height: 84px;
+    padding: 0 24px;
+  }
+  .brand img {
+    width: 116px;
+  }
+  .header-call {
+    display: none;
+  }
+  .navigation {
+    padding-inline: 24px;
+  }
+}
+@media (max-width: 374px) {
+  .header {
+    height: 80px;
+    padding: 0 20px;
+  }
+  .brand img {
+    width: 112px;
+  }
+  .navigation {
+    padding-inline: 20px;
+  }
+}
+@media (max-width: 1100px) {
   .section {
     padding: 70px 6%;
   }
@@ -718,52 +702,6 @@ h2 {
 @media (max-width: 760px) {
   html {
     scroll-padding-top: 25px;
-  }
-  .header {
-    height: 88px;
-    padding: 0 5%;
-  }
-  .brand img {
-    height: 68px;
-  }
-  .menu-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    border: 1px solid var(--header-line);
-    border-radius: 10px;
-    background: transparent;
-    color: inherit;
-  }
-  .navigation {
-    display: none;
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 87px;
-    background: var(--teal-deep);
-    padding: 16px 5% 24px;
-    border-bottom: 1px solid #ffffff12;
-    box-shadow: 0 24px 40px -12px #0009;
-  }
-  .navigation.is-open {
-    display: flex;
-    align-items: stretch;
-    flex-direction: column;
-    gap: 0;
-  }
-  .navigation > a {
-    padding: 15px;
-    font-size: 15px;
-  }
-  .navigation > a:not(.header-cta) + a:not(.header-cta) {
-    border-top: 1px solid #ffffff0f;
-  }
-  .header-cta {
-    justify-content: space-between;
-    margin-top: 10px;
   }
   .eyebrow {
     font-size: 10px;
@@ -903,7 +841,6 @@ h2 {
 .contact-intro > p {
   font-size: 16px;
 }
-.navigation,
 .button,
 .text-link,
 .faq-list summary,

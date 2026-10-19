@@ -1,46 +1,47 @@
-/* Teal hero: copy on the left, a stepped photo composition on the right
-   that drops past the hero's lower edge into the light section below. */
+/* Teal hero: steady copy beside a cutaway room that is cleared piece by piece.
+   Everything inside the room is measured in Figma desktop units: the room
+   artwork is 872 units wide and --u is one unit at the current size. */
 .hero {
-  --hero-overhang: 72px;
   position: relative;
   z-index: 1;
-  color: #fff;
+  /* Furniture leaving the room must never widen the page. */
+  overflow-x: hidden;
+  overflow-x: clip;
+  color: var(--off-white);
   background: var(--teal);
 }
-.hero::after {
-  /* Fine orange baseline under the teal block, ending where the photo starts. */
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 44%;
-  height: 4px;
-  background: var(--orange);
-}
-.hero-grid {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 72px 5.2% 0;
+.hero-inner {
+  --copy-width: clamp(360px, 29.86vw, 430px);
   display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  column-gap: 24px;
-  align-items: center;
+  grid-template-columns: minmax(0, var(--copy-width)) minmax(0, 1fr);
+  grid-template-rows: auto auto auto 1fr;
+  grid-template-areas:
+    "copy scene"
+    "actions scene"
+    "note scene"
+    ". scene";
+  column-gap: 4px;
+  /* Copy lines up with a centred 1440px frame; the scene runs to the edge. */
+  padding-left: max(
+    clamp(48px, 6.667vw, 96px),
+    calc((100% - 1440px) / 2 + 96px)
+  );
 }
 
 /* Copy */
 .hero-copy {
-  grid-column: 1 / span 6;
-  padding: 24px 0 calc(var(--hero-overhang) + 24px);
+  grid-area: copy;
+  padding-top: 86px;
 }
 .hero-label {
   display: flex;
   align-items: center;
   gap: 12px;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
+  line-height: normal;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--teal-pale);
 }
 .hero-label::before {
   content: "";
@@ -49,118 +50,346 @@
   flex-shrink: 0;
   background: var(--orange);
 }
-.hero-copy h1 {
+.hero h1 {
   margin: 26px 0 0;
-  font-size: clamp(44px, 4.9vw, 76px);
-  font-weight: 700;
-  font-stretch: 110%;
-  line-height: 1;
-  letter-spacing: -0.035em;
+  font-size: clamp(52px, 4.72vw, 68px);
+  font-weight: 600;
+  font-stretch: 100%;
+  line-height: 1.02;
+  letter-spacing: -0.025em;
   color: #fff;
 }
-.hero-copy h1 > span {
-  color: var(--teal-pale);
+.hero-break-2 {
+  display: none;
 }
 .hero-text {
-  margin-top: 26px;
-  max-width: 27em;
-  font-size: clamp(17px, 1.35vw, 20px);
-  line-height: 1.55;
-  color: #e6f2f2;
+  margin-top: 24px;
+  font-size: 18px;
+  line-height: 1.56;
   text-wrap: pretty;
 }
 .hero-actions {
+  grid-area: actions;
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 38px;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 36px;
 }
-.hero-actions .button {
+.hero-button {
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
-  gap: 12px;
-  min-height: 56px;
-  padding: 0 26px;
+  gap: 10px;
+  height: 56px;
   border-radius: 10px;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
+  line-height: normal;
+  white-space: nowrap;
 }
-.button-outline {
+.hero-button svg {
+  flex-shrink: 0;
+}
+.hero-button-primary {
+  padding: 0 18px 0 20px;
+  color: var(--ink);
+  background: var(--orange);
+}
+.hero-button-primary:hover {
+  background: var(--orange-hover);
+}
+.hero-button-outline {
+  padding: 0 18px 0 16px;
+  border: 1.5px solid #fff;
   color: #fff;
-  border: 1.5px solid #ffffff80 !important;
-  background: transparent;
 }
-.button-outline:hover {
+.hero-button-outline:hover {
   background: #ffffff14;
-  border-color: #fff !important;
 }
 .hero-note {
+  grid-area: note;
   display: flex;
   align-items: center;
   gap: 10px;
   margin-top: 28px;
-  font-size: 14px;
+  /* Keeps the copy off the hero's lower edge where the scene is shorter. */
+  padding-bottom: 48px;
+  font-size: 15px;
   font-weight: 600;
-  color: var(--teal-pale);
+  line-height: normal;
 }
 .hero-note > span {
   width: 7px;
   height: 7px;
+  flex-shrink: 0;
   border-radius: 50%;
   background: var(--orange);
 }
 
-/* Photos */
-.hero-media {
-  grid-column: 7 / span 6;
+/* Scene: a clipping box with the room anchored to its right edge, close
+   enough that every piece has fully left the box when its exit ends. */
+.hero-scene {
+  grid-area: scene;
   position: relative;
-  align-self: end;
-  margin-bottom: calc(var(--hero-overhang) * -1);
-  padding: 0 0 56px 14%;
-}
-.hero-media::before {
-  /* Offset orange step behind the photo's top-right corner. */
-  content: "";
-  position: absolute;
-  top: -16px;
-  right: -16px;
-  width: 38%;
-  height: 34%;
-  background: var(--orange);
-}
-.hero-photo {
-  margin: 0;
   overflow: hidden;
-  background: var(--teal-deep);
+  overflow: clip;
+  container-type: inline-size;
 }
-.hero-photo img {
+.hero-stage {
+  --room: min(872px, 100cqw * 872 / 910);
+  --u: calc(100cqw / 872);
+  position: relative;
+  container-type: inline-size;
+  width: var(--room);
+  aspect-ratio: 872 / 678;
+  margin: calc(var(--room) * 70 / 872) calc(var(--room) * 38 / 872)
+    calc(var(--room) * 48 / 872) auto;
+}
+.hero-room {
+  position: absolute;
+  inset: 0;
+}
+.hero-room img {
+  position: absolute;
   display: block;
+  max-width: none;
+}
+.hero-room-shadow {
+  left: calc(39.76 * var(--u));
+  top: calc(553.08 * var(--u));
+  width: calc(809.92 * var(--u));
+  height: calc(141.36 * var(--u));
+}
+.hero-room .hero-room-empty {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.hero-piece {
+  position: absolute;
+  left: calc(var(--x) * var(--u));
+  top: calc(var(--y) * var(--u));
+  width: calc(var(--w) * var(--u));
+  height: calc(var(--h) * var(--u));
+}
+.hero-room .hero-piece-image {
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
-.hero-photo-main {
-  position: relative;
-  aspect-ratio: 4 / 5;
-  /* Stepped notch at the lower left, where the detail photo sits. */
-  clip-path: polygon(
-    0 0,
-    100% 0,
-    100% 100%,
-    30% 100%,
-    30% 84%,
-    0 84%
-  );
+/* Each contact-shadow SVG carries a 7-unit blur margin around its ellipse. */
+.hero-piece-shadow {
+  left: calc((var(--cx) - 7) * var(--u));
+  top: calc((var(--cy) - 7) * var(--u));
+  width: calc((var(--cw) + 14) * var(--u));
+  height: calc((var(--ch) + 14) * var(--u));
 }
-.hero-photo-main img {
-  object-position: 50% 62%;
-}
-.hero-photo-detail {
+.hero-replay {
   position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 36%;
-  aspect-ratio: 3 / 4;
-  box-shadow: 0 0 0 8px var(--paper);
+  left: calc(30 * var(--u));
+  top: calc(648 * var(--u));
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px 9px 14px;
+  border: 1px solid #fff;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: normal;
+  white-space: nowrap;
+  color: #fff;
+  background: var(--teal-ink);
+}
+.hero-replay:hover {
+  background: var(--teal-deep);
+}
+.hero-replay svg {
+  flex-shrink: 0;
+}
+/* Reduced motion: the empty room straight away, nothing to replay. */
+@media (prefers-reduced-motion: reduce) {
+  .hero-piece,
+  .hero-replay {
+    display: none;
+  }
+}
+
+/* Tablet: copy and actions above a full-bleed scene. */
+@media (max-width: 1023px) {
+  .hero-inner {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+    grid-template-areas:
+      "copy"
+      "actions"
+      "scene"
+      "note";
+    padding-left: 0;
+  }
+  .hero-copy,
+  .hero-actions,
+  .hero-note {
+    padding-inline: 48px;
+  }
+  .hero-copy {
+    padding-top: 36px;
+  }
+  .hero-label {
+    gap: 10px;
+    letter-spacing: 0.12em;
+  }
+  .hero-label::before {
+    width: 22px;
+  }
+  .hero h1 {
+    margin-top: 20px;
+    font-size: 60px;
+    line-height: 1.03;
+  }
+  .hero-break-1,
+  .hero-break-3 {
+    display: none;
+  }
+  .hero-break-2 {
+    display: inline;
+  }
+  .hero-text {
+    max-width: 520px;
+    margin-top: 18px;
+    line-height: 1.55;
+  }
+  .hero-actions {
+    gap: 12px;
+    margin-top: 28px;
+  }
+  .hero-button-primary {
+    padding: 0 20px;
+  }
+  .hero-button-outline {
+    height: 52px;
+    padding: 0 20px;
+  }
+  .hero-scene {
+    margin-top: 8px;
+  }
+  .hero-stage {
+    --room: min(800px, 90.83cqw);
+    margin: calc(var(--room) * 20 / 872) 5.39cqw calc(var(--room) * 49.5 / 872)
+      auto;
+  }
+  .hero-replay {
+    top: calc(647.5 * var(--u));
+    gap: 7px;
+    padding: 8px 14px 8px 12px;
+  }
+  .hero-replay svg {
+    width: 14px;
+    height: 14px;
+  }
+  .hero-note {
+    margin-top: 4px;
+    padding-bottom: 48px;
+  }
+}
+
+/* Mobile: headline above the scene, actions below it. */
+@media (max-width: 760px) {
+  .hero-inner {
+    grid-template-areas:
+      "copy"
+      "scene"
+      "actions"
+      "note";
+  }
+  .hero-copy,
+  .hero-actions,
+  .hero-note {
+    padding-inline: 24px;
+  }
+  .hero-copy {
+    padding-top: 16px;
+  }
+  .hero-label {
+    font-size: 11px;
+  }
+  .hero h1 {
+    margin-top: 14px;
+    font-size: 40px;
+  }
+  .hero-break-1 {
+    display: inline;
+  }
+  .hero-break-2 {
+    display: none;
+  }
+  .hero-text {
+    margin-top: 12px;
+    font-size: 16px;
+  }
+  .hero-scene {
+    margin-top: 10px;
+  }
+  .hero-stage {
+    --room: 96.2cqw;
+    margin: calc(var(--room) * 23 / 872) auto calc(var(--room) * 54 / 872)
+      1.5cqw;
+  }
+  /* Sits just inside the scene's lower edge, as in the mobile frames. */
+  .hero-replay {
+    left: calc(32.6 * var(--u));
+    top: auto;
+    bottom: calc(2px - 54 * var(--u));
+  }
+  .hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+    margin-top: 12px;
+  }
+  .hero-button {
+    width: 100%;
+    height: 54px;
+  }
+  .hero-button-outline {
+    height: 50px;
+  }
+  .hero-note {
+    margin-top: 18px;
+    padding-bottom: 32px;
+    font-size: 14px;
+  }
+}
+@media (max-width: 374px) {
+  .hero-copy,
+  .hero-actions,
+  .hero-note {
+    padding-inline: 20px;
+  }
+  .hero-copy {
+    padding-top: 14px;
+  }
+  .hero-label {
+    font-size: 10.5px;
+  }
+  .hero h1 {
+    margin-top: 12px;
+    font-size: 37px;
+  }
+  .hero-text {
+    font-size: 15.5px;
+  }
+  .hero-button {
+    height: 52px;
+    font-size: 15.5px;
+  }
+  .hero-button-outline {
+    height: 48px;
+  }
+  .hero-note {
+    padding-bottom: 30px;
+  }
 }
 
 /* Service line-up below the hero (light surface). */
@@ -170,7 +399,7 @@
 .hero-services-head {
   max-width: 1400px;
   margin: 0 auto;
-  padding: calc(var(--hero-overhang, 72px) + 56px) 5.2% 0;
+  padding: 72px 5.2% 0;
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
@@ -261,78 +490,13 @@
 }
 
 @media (max-width: 1100px) {
-  .hero {
-    --hero-overhang: 56px;
-  }
-  .hero-grid {
-    padding-top: 56px;
-  }
-  .hero-copy {
-    grid-column: 1 / -1;
-    padding-bottom: 40px;
-  }
-  .hero-media {
-    grid-column: 3 / -1;
-    padding-left: 18%;
-  }
-  .hero::after {
-    width: 30%;
-  }
   .hero-services-grid {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 @media (max-width: 760px) {
-  .hero {
-    --hero-overhang: 40px;
-  }
-  .hero-grid {
-    padding: 40px 5.5% 0;
-    column-gap: 0;
-  }
-  .hero-copy {
-    padding: 0 0 36px;
-  }
-  .hero-label {
-    font-size: 11.5px;
-    letter-spacing: 0.12em;
-  }
-  .hero-copy h1 {
-    margin-top: 20px;
-    font-size: clamp(40px, 12vw, 56px);
-    font-stretch: 104%;
-  }
-  .hero-text {
-    margin-top: 18px;
-    font-size: 16.5px;
-  }
-  .hero-actions {
-    flex-direction: column;
-    margin-top: 28px;
-  }
-  .hero-actions .button {
-    width: 100%;
-  }
-  .hero-note {
-    margin-top: 22px;
-  }
-  .hero-media {
-    grid-column: 1 / -1;
-    padding: 0 0 40px 22%;
-  }
-  .hero-media::before {
-    top: -10px;
-    right: -10px;
-  }
-  .hero-photo-detail {
-    width: 38%;
-    box-shadow: 0 0 0 6px var(--paper);
-  }
-  .hero::after {
-    display: none;
-  }
   .hero-services-head {
-    padding-top: calc(var(--hero-overhang, 40px) + 44px);
+    padding-top: 52px;
   }
   .hero-card-title {
     font-size: 23px;

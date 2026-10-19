@@ -1,4 +1,3 @@
-import Image from "next/image";
 import {
   ArrowRight,
   CircleCheck,
@@ -9,77 +8,62 @@ import {
   Sparkles,
   Truck,
 } from "lucide-react";
-import { asset } from "@/lib/base-path";
+import { HeroRoom } from "@/components/hero-room";
 import { business, services } from "@/lib/content";
-import { pairs } from "@/lib/gallery";
 
 const serviceIcons = [PackageOpen, Recycle, Hammer, Truck, Sparkles];
 
-// Owner-supplied photos: a fully cleared room, and a bathroom stripped back
-// to the wall – clearance and dismantling, the two core services.
-const mainPhoto = pairs.clearance.after;
-const detailPhoto = {
-  src: "/images/bathroom-after.webp",
-  width: 800,
-  height: 1067,
-};
-
+// Copy stays still while the room beside it is cleared. The headline breaks
+// differently per layout, so the line breaks are switched in hero.css.
 export function Hero() {
   const phone = business.phone.trim();
   return (
-    <section className="hero" aria-labelledby="hero-title">
-      <div className="hero-grid">
+    <section className="hero" aria-labelledby="hero-title" lang="de">
+      <div className="hero-inner">
         <div className="hero-copy">
           <p className="hero-label">Entrümpelung · Demontage · Transport</p>
-          <h1 id="hero-title" lang="de">
-            Mehr Platz.
-            <br />
-            <span>Weniger Stress.</span>
+          <h1 id="hero-title">
+            Wir machen
+            <br className="hero-break-1" /> Platz
+            <br className="hero-break-2" /> für
+            <br className="hero-break-3" /> Neues.
           </h1>
-          <p className="hero-text" lang="de">
+          <p className="hero-text">
             Wir übernehmen die komplette Räumung – von der Planung bis zur
             besenreinen Übergabe.
           </p>
-          <div className="hero-actions" lang="de">
-            <a href="#anfrage" className="button button-orange">
-              Unverbindlich anfragen <ArrowRight size={18} aria-hidden="true" />
+        </div>
+        <div className="hero-actions">
+          <a href="#anfrage" className="hero-button hero-button-primary">
+            Unverbindlich anfragen
+            <ArrowRight
+              size={18}
+              strokeWidth={1.8333}
+              absoluteStrokeWidth
+              aria-hidden="true"
+            />
+          </a>
+          {phone && (
+            <a
+              className="hero-button hero-button-outline"
+              href={`tel:${phone.replace(/[^+\d]/g, "")}`}
+              aria-label={`Jetzt anrufen: ${phone}`}
+            >
+              <Phone
+                size={17}
+                strokeWidth={1.5}
+                absoluteStrokeWidth
+                aria-hidden="true"
+              />
+              Jetzt anrufen
             </a>
-            {phone && (
-              <a
-                className="button button-outline"
-                href={`tel:${phone.replace(/[^+\d]/g, "")}`}
-                aria-label={`Jetzt anrufen: ${phone}`}
-              >
-                <Phone size={18} aria-hidden="true" /> Jetzt anrufen
-              </a>
-            )}
-          </div>
-          <p className="hero-note" lang="de">
-            <span aria-hidden="true" />
-            Schnell, zuverlässig und stressfrei.
-          </p>
+          )}
         </div>
-        <div className="hero-media">
-          <figure className="hero-photo hero-photo-main">
-            <Image
-              src={asset(mainPhoto.src)}
-              alt="Fully cleared room with bare wooden floor after a clearance"
-              width={mainPhoto.width}
-              height={mainPhoto.height}
-              sizes="(max-width: 760px) 90vw, (max-width: 1100px) 60vw, 44vw"
-              priority
-            />
-          </figure>
-          <figure className="hero-photo hero-photo-detail">
-            <Image
-              src={asset(detailPhoto.src)}
-              alt="Bathroom stripped back to the wall after tiles and fittings were dismantled"
-              width={detailPhoto.width}
-              height={detailPhoto.height}
-              sizes="(max-width: 760px) 40vw, 18vw"
-            />
-          </figure>
-        </div>
+        <HeroRoom />
+        <p className="hero-note">
+          <span aria-hidden="true" />
+          Schnell, zuverlässig und stressfrei.
+        </p>
       </div>
     </section>
   );
@@ -88,7 +72,11 @@ export function Hero() {
 // Service line-up, directly below the hero.
 export function ServicesOverview() {
   return (
-    <section className="hero-services" aria-labelledby="services-title">
+    <section
+      className="hero-services"
+      id="leistungen"
+      aria-labelledby="services-title"
+    >
       <div className="hero-services-head">
         <div>
           <p className="hero-card-label">Our services</p>

@@ -22,28 +22,6 @@
     transform: scale(1);
   }
 }
-@keyframes photo-mask {
-  from {
-    clip-path: inset(100% 0 0 0);
-    transform: scale(1.06);
-  }
-  to {
-    clip-path: inset(0 0 0 0);
-    transform: scale(1);
-  }
-}
-@keyframes step-in {
-  from {
-    transform: scale(0.6);
-    transform-origin: top right;
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    transform-origin: top right;
-    opacity: 1;
-  }
-}
 @keyframes hero-zoom {
   from {
     transform: scale(1.12);
@@ -60,14 +38,6 @@
   to {
     opacity: 1;
     transform: translateX(0);
-  }
-}
-@keyframes live-pulse {
-  0% {
-    box-shadow: 0 0 0 0 #4ade8080;
-  }
-  100% {
-    box-shadow: 0 0 0 8px #4ade8000;
   }
 }
 @keyframes contact-ring {
@@ -90,19 +60,103 @@
     transform: translateY(0) scale(1);
   }
 }
+/* Hero room: each track from the Figma timeline. Per-piece values and
+   timing come from custom properties set in hero-room.tsx. */
+@keyframes room-piece-out {
+  from {
+    translate: 0 0;
+  }
+  to {
+    translate: calc(var(--dx) * var(--u)) calc(var(--dy) * var(--u));
+  }
+}
+@keyframes room-piece-step {
+  from {
+    translate: 0 0;
+  }
+  to {
+    translate: calc(var(--sx) * var(--u)) calc(var(--sy) * var(--u));
+  }
+}
+@keyframes room-piece-out-from-step {
+  from {
+    translate: calc(var(--sx) * var(--u)) calc(var(--sy) * var(--u));
+  }
+  to {
+    translate: calc(var(--dx) * var(--u)) calc(var(--dy) * var(--u));
+  }
+}
+@keyframes room-piece-lift {
+  from {
+    translate: 0 0;
+    rotate: 0rad;
+  }
+  to {
+    translate: 0 calc(var(--lift) * var(--u));
+    rotate: var(--tilt);
+  }
+}
+@keyframes room-piece-carry {
+  from {
+    rotate: var(--tilt);
+  }
+  to {
+    rotate: var(--tilt-rest);
+  }
+}
+@keyframes room-shadow-lift {
+  from {
+    opacity: 1;
+    scale: 1;
+  }
+  to {
+    opacity: 0.62;
+    scale: 0.9;
+  }
+}
+@keyframes room-shadow-thin {
+  from {
+    opacity: 0.62;
+  }
+  to {
+    opacity: 0.5;
+  }
+}
+@keyframes room-shadow-out {
+  from {
+    opacity: 0.5;
+  }
+  to {
+    opacity: 0;
+  }
+}
 @media (prefers-reduced-motion: no-preference) {
-  .topbar-live {
-    animation: live-pulse 2s ease-out infinite;
+  /* Hero room: the clearing plays once, then holds the empty room. An
+     animation later in the list takes a property over from earlier ones
+     once it starts, which chains the segments of a track. */
+  .hero-room.is-playing .hero-piece {
+    animation: room-piece-out calc(var(--t5) - var(--t4)) var(--t4)
+      var(--ease, cubic-bezier(0.5, 0, 0.3, 1)) both;
   }
-  /* Hero: headline is readable at once; only the photos reveal. */
-  .hero-photo-main img {
-    animation: photo-mask 1000ms 120ms var(--motion-ease) both;
+  .hero-room.is-playing .hero-piece[data-step] {
+    animation:
+      room-piece-step calc(var(--ts) - var(--t4)) var(--t4)
+        cubic-bezier(0.45, 0, 0.4, 1) both,
+      room-piece-out-from-step calc(var(--t5) - var(--ts)) var(--ts)
+        var(--ease) forwards;
   }
-  .hero-photo-detail img {
-    animation: photo-mask 800ms 520ms var(--motion-ease) both;
+  .hero-room.is-playing .hero-piece-image {
+    animation:
+      room-piece-lift calc(var(--t1) - var(--t0)) var(--t0) ease-out both,
+      room-piece-carry calc(var(--t5) - var(--t1)) var(--t1) ease-in-out
+        forwards;
   }
-  .hero-media::before {
-    animation: step-in 700ms 700ms var(--motion-ease) both;
+  .hero-room.is-playing .hero-piece-shadow {
+    animation:
+      room-shadow-lift calc(var(--t1) - var(--t0)) var(--t0) ease-out both,
+      room-shadow-thin calc(var(--t2) - var(--t1)) var(--t1) ease-in-out
+        forwards,
+      room-shadow-out calc(var(--t3) - var(--t2)) var(--t2) ease-in forwards;
   }
   .floating-contact a {
     animation: contact-in 600ms 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) both;
@@ -128,7 +182,7 @@
     transition: transform 800ms var(--motion-ease);
   }
   .button,
-  .header-cta {
+  .hero-button {
     transition:
       background 220ms,
       color 220ms,
@@ -136,7 +190,7 @@
       box-shadow 260ms;
   }
   .button svg,
-  .header-cta svg,
+  .hero-button svg,
   .text-link svg {
     transition: transform 300ms var(--motion-ease);
   }
@@ -155,7 +209,7 @@
     box-shadow: 0 3px 0 -1px var(--orange);
   }
   .button:active,
-  .header-cta:active {
+  .hero-button:active {
     transform: translateY(0) scale(0.985);
   }
   @media (hover: hover) and (pointer: fine) {
@@ -163,7 +217,7 @@
       transform: scale(1.035);
     }
     .button:hover svg,
-    .header-cta:hover svg,
+    .hero-button:hover svg,
     .text-link:hover svg {
       transform: translate(3px, -2px);
     }
@@ -172,10 +226,10 @@
     }
   }
 }
-.navigation > a:not(.header-cta) {
+.navigation > a {
   position: relative;
 }
-.navigation > a:not(.header-cta)::after {
+.navigation > a::after {
   content: "";
   position: absolute;
   bottom: -6px;
@@ -187,8 +241,8 @@
   transform-origin: left;
   transition: transform 250ms var(--motion-ease);
 }
-.navigation > a:not(.header-cta):hover::after,
-.navigation > a:not(.header-cta):focus-visible::after {
+.navigation > a:hover::after,
+.navigation > a:focus-visible::after {
   transform: scaleX(1);
 }
 @media (prefers-reduced-motion: reduce) {

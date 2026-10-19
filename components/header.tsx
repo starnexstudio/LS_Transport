@@ -20,7 +20,6 @@ export function Header() {
   return (
     <header
       className="header"
-      lang="de"
       onKeyDown={(event) => {
         if (event.key === "Escape" && open) {
           setOpen(false);

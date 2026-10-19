@@ -7,7 +7,7 @@ const failures = [];
 page.on("pageerror", (error) => failures.push(error.message));
 await page.goto("http://localhost:3000", { waitUntil: "networkidle" });
 await page.evaluate(() => document.fonts.ready);
-assert.equal(await page.locator("html").getAttribute("lang"), "en");
+assert.equal(await page.locator("html").getAttribute("lang"), "de");
 await page.screenshot({ path: "artifacts/desktop.png", fullPage: true });
 for (const width of [1440, 1024, 768, 390, 320]) {
   await page.setViewportSize({ width, height: 900 });
@@ -31,39 +31,41 @@ assert.equal(
     .getAttribute("aria-expanded"),
   "false",
 );
-await page.locator("#service").selectOption("Cleaning after clearance");
+await page.locator("#service").selectOption("Reinigung nach der Räumung");
 assert.equal(
   await page.locator("#service").inputValue(),
-  "Cleaning after clearance",
+  "Reinigung nach der Räumung",
 );
-await page.getByRole("button", { name: "Prepare email request" }).click();
+await page.getByRole("button", { name: "E-Mail-Anfrage vorbereiten" }).click();
 assert.equal(
   await page.locator("#name-error").innerText(),
-  "Please enter your name.",
+  "Bitte geben Sie Ihren Namen ein.",
 );
 await page.locator("#name").fill("Erika Muster");
 await page.locator("#place").fill("10115 Berlin");
 await page
   .locator("#message")
-  .fill("One wardrobe, 2nd floor. Date to be agreed.");
-await page.getByRole("button", { name: "Prepare email request" }).click();
+  .fill("Ein Kleiderschrank, 2. Stock. Termin nach Absprache.");
+await page.getByRole("button", { name: "E-Mail-Anfrage vorbereiten" }).click();
 assert.ok(
-  await page.getByRole("heading", { name: "Your draft is ready." }).isVisible(),
+  await page
+    .getByRole("heading", { name: "Ihr Entwurf ist fertig." })
+    .isVisible(),
 );
 const mailto = await page
-  .getByRole("link", { name: "Open email" })
+  .getByRole("link", { name: "E-Mail öffnen" })
   .getAttribute("href");
 assert.match(mailto, /^mailto:Info@entruempelung-demontage.de/);
 assert.match(decodeURIComponent(mailto), /Erika Muster/);
 assert.match(decodeURIComponent(mailto), /10115 Berlin/);
 await page
   .locator("summary")
-  .filter({ hasText: "How much will my job cost?" })
+  .filter({ hasText: "Was kostet mein Auftrag?" })
   .click();
 assert.ok(
   await page
     .locator("details[open]")
-    .filter({ hasText: "The price depends on" })
+    .filter({ hasText: "Der Preis hängt" })
     .isVisible(),
 );
 assert.ok(
@@ -71,17 +73,17 @@ assert.ok(
     .locator(".hero-room-empty")
     .evaluate((image) => image.complete && image.naturalWidth > 0),
 );
-for (const route of ["legal-notice", "privacy"]) {
+for (const route of ["impressum", "datenschutz"]) {
   const response = await page.goto(`http://localhost:3000/${route}`);
   assert.equal(response.status(), 200);
   assert.ok(
-    await page.getByRole("link", { name: "← Back to home" }).isVisible(),
+    await page.getByRole("link", { name: "← Zur Startseite" }).isVisible(),
   );
 }
 const missing = await page.goto("http://localhost:3000/missing-page");
 assert.equal(missing.status(), 404);
 assert.ok(
-  await page.getByRole("heading", { name: "Plenty of room here." }).isVisible(),
+  await page.getByRole("heading", { name: "Hier ist viel Platz." }).isVisible(),
 );
 assert.deepEqual(failures, []);
 await browser.close();
@@ -92,7 +94,7 @@ await fs.writeFile(
       status: "passed",
       viewports: [1440, 1024, 768, 390, 320],
       checks: [
-        "English language",
+        "German language",
         "No horizontal overflow",
         "Mobile navigation",
         "Service preselection",

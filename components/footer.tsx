@@ -6,7 +6,7 @@ export function Footer() {
   return (
     <footer className="footer">
       <div className="footer-top">
-        <Link href="/" aria-label="L&S home">
+        <Link href="/" aria-label="L&S – zur Startseite">
           <Image
             src={asset("/images/ls-logo.webp")}
             alt="L&S Entrümpelung & Demontagearbeiten"
@@ -15,12 +15,12 @@ export function Footer() {
           />
         </Link>
         <p>
-          Make space.
+          Platz schaffen.
           <br />
-          <span>Move forward.</span>
+          <span>Weiterkommen.</span>
         </p>
         <a href="mailto:Info@entruempelung-demontage.de">
-          Let&apos;s talk <ArrowUpRight size={19} />
+          Kontakt aufnehmen <ArrowUpRight size={19} />
         </a>
       </div>
       <div className="footer-bottom">
@@ -28,9 +28,9 @@ export function Footer() {
           © {new Date().getFullYear()} L&S Entrümpelung & Demontagearbeiten
         </span>
         <div>
-          <Link href="/legal-notice">Legal notice</Link>
-          <Link href="/privacy">Privacy</Link>
-          <a href="#inhalt">Back to top ↑</a>
+          <Link href="/impressum">Impressum</Link>
+          <Link href="/datenschutz">Datenschutz</Link>
+          <a href="#inhalt">Nach oben ↑</a>
         </div>
       </div>
     </footer>

@@ -105,14 +105,14 @@ export function ServicesOverview() {
     >
       <div className="hero-services-head">
         <div>
-          <p className="hero-card-label">Our services</p>
+          <p className="hero-card-label">Unsere Leistungen</p>
           <h2 className="hero-card-title" id="services-title">
-            All from one team
+            Alles aus einer Hand
           </h2>
         </div>
         <p className="hero-services-note">
           <CircleCheck size={16} aria-hidden="true" />
-          Combine any of them in one job
+          Beliebig in einem Auftrag kombinierbar
         </p>
       </div>
       <ol className="hero-services-grid">

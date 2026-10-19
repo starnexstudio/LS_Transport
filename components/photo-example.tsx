@@ -5,16 +5,16 @@ export function PhotoExample() {
     <section className="section photo-example" id="transportvorbereitung">
       <div className="photo-example-intro">
         <div>
-          <span className="eyebrow">FURNITURE TRANSPORT & DELIVERY</span>
+          <span className="eyebrow">MÖBELTRANSPORT & LIEFERUNG</span>
           <h2>
-            All packed.
+            Alles verpackt.
             <br />
-            Ready for the next step.
+            Bereit für den nächsten Schritt.
           </h2>
         </div>
         <p>
-          We carefully pack, protect, and secure your furniture for safe
-          transport, from collection to delivery.
+          Wir verpacken, schützen und sichern Ihre Möbel sorgfältig für einen
+          sicheren Transport – von der Abholung bis zur Lieferung.
         </p>
       </div>
       <figure>
@@ -22,20 +22,20 @@ export function PhotoExample() {
           <div className="moving-photo">
             <Image
               src={asset("/images/packed-moving-boxes.jpg")}
-              alt="Bright living room with sealed moving boxes, a suitcase and a covered armchair"
+              alt="Helles Wohnzimmer mit verschlossenen Umzugskartons, einem Koffer und einem abgedeckten Sessel"
               fill
               sizes="(max-width: 760px) 86vw, 43vw"
             />
-            <span>Carefully packed for transport</span>
+            <span>Sorgfältig für den Transport verpackt</span>
           </div>
           <div className="moving-photo">
             <Image
               src={asset("/images/wrapped-living-room.jpg")}
-              alt="Living room with a sofa and armchairs covered in protective film"
+              alt="Wohnzimmer mit Sofa und Sesseln unter Schutzfolie"
               fill
               sizes="(max-width: 760px) 86vw, 43vw"
             />
-            <span>Furniture protected throughout the move</span>
+            <span>Möbel während des ganzen Umzugs geschützt</span>
           </div>
         </div>
       </figure>

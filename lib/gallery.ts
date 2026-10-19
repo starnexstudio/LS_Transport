@@ -13,13 +13,13 @@ export const pairs = {
   clearance: {
     before: {
       src: "/images/clearance-before.webp",
-      alt: "Living room crowded with boxes, clothes and household items",
+      alt: "Wohnzimmer voller Kartons, Kleidung und Hausrat",
       width: 800,
       height: 1200,
     },
     after: {
       src: "/images/clearance-after.webp",
-      alt: "The same room cleared, with an empty wooden floor",
+      alt: "Derselbe Raum geräumt, mit leerem Holzboden",
       width: 800,
       height: 1200,
     },
@@ -27,13 +27,13 @@ export const pairs = {
   bedroom: {
     before: {
       src: "/images/bedroom-before.webp",
-      alt: "Bedroom with a wooden bed frame, chest of drawers and chair",
+      alt: "Schlafzimmer mit Holzbett, Kommode und Stuhl",
       width: 800,
       height: 1066,
     },
     after: {
       src: "/images/bedroom-after.webp",
-      alt: "The same bedroom empty after the furniture was removed",
+      alt: "Dasselbe Schlafzimmer, leer nach dem Abtransport der Möbel",
       width: 800,
       height: 1066,
     },
@@ -41,13 +41,13 @@ export const pairs = {
   bathroom: {
     before: {
       src: "/images/bathroom-before.webp",
-      alt: "Bathroom with teal wall tiles, a bathtub and a toilet",
+      alt: "Badezimmer mit petrolfarbenen Wandfliesen, Badewanne und WC",
       width: 800,
       height: 1067,
     },
     after: {
       src: "/images/bathroom-after.webp",
-      alt: "The same bathroom after the tiles, bathtub and toilet were removed",
+      alt: "Dasselbe Badezimmer nach dem Entfernen von Fliesen, Badewanne und WC",
       width: 800,
       height: 1067,
     },

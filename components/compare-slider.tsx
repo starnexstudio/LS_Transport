@@ -65,13 +65,13 @@ export function CompareSlider({ pair }: { pair: SliderPair }) {
         className={`compare-tag compare-tag-before${hideBefore ? " is-hidden" : ""}`}
         aria-hidden="true"
       >
-        Before
+        Vorher
       </span>
       <span
         className={`compare-tag compare-tag-after${hideAfter ? " is-hidden" : ""}`}
         aria-hidden="true"
       >
-        After
+        Nachher
       </span>
       <span className="compare-divider" aria-hidden="true">
         <span className="compare-handle">
@@ -79,7 +79,7 @@ export function CompareSlider({ pair }: { pair: SliderPair }) {
         </span>
       </span>
       <span className="compare-hint" aria-hidden="true">
-        Drag to compare
+        Zum Vergleichen ziehen
       </span>
       <input
         type="range"
@@ -87,8 +87,8 @@ export function CompareSlider({ pair }: { pair: SliderPair }) {
         max={100}
         step={1}
         value={position}
-        aria-label={`Before-and-after comparison, ${pair.label}: move the slider left or right`}
-        aria-valuetext={`${position}% of the before photo visible`}
+        aria-label={`Vorher-Nachher-Vergleich, ${pair.label}: Regler nach links oder rechts bewegen`}
+        aria-valuetext={`${position} % des Vorher-Fotos sichtbar`}
         onChange={(event) => {
           setPosition(Number(event.target.value));
           setTouched(true);

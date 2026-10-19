@@ -1,6 +1,6 @@
 # L&S website
 
-An English-language, frontend-only website for L&S Entrümpelung & Demontagearbeiten.
+A German-language, frontend-only website for L&S Entrümpelung & Demontagearbeiten.
 
 ## Development
 
@@ -11,7 +11,7 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:3000. The public interface, source and documentation are all in English. The company name, "L&S Entrümpelung & Demontagearbeiten", stays in German.
+Open http://localhost:3000. The public interface is in German (`<html lang="de">`); source code and documentation are in English.
 
 ## Production
 
@@ -37,7 +37,7 @@ The browser checks cover responsive overflow, navigation, service preselection, 
 ## Project structure
 
 - `app/`: home page, legal draft pages, metadata, global styles, favicon, and not-found page.
-- `components/`: shared header, top bar, hero, before/after comparisons, footer, and inquiry form.
+- `components/`: shared header, hero (pinned scroll stage and cutaway room), before/after comparisons, footer, and inquiry form.
 - `lib/content.ts`: confirmed contact information and service content.
 - `public/images/`: original supplied logo and generated editorial illustration.
 - `tests/`: browser and accessibility checks.
@@ -58,7 +58,7 @@ No phone number, street address, certifications, reviews, fixed prices, or proje
 
 ## Pages and direct contact
 
-The site has three pages: the home page, `/legal-notice` and `/privacy`, plus the 404 page. The home page holds everything else: services, before/after sliders (`components/compare-slider.tsx`, photos in `lib/gallery.ts`), FAQ and the inquiry form.
+The site has three pages: the home page, `/impressum` and `/datenschutz`, plus the 404 page. The home page holds everything else: services, before/after sliders (`components/compare-slider.tsx`, photos in `lib/gallery.ts`), FAQ and the inquiry form.
 
 Phone and WhatsApp links are implemented in `components/contact-actions.tsx`. Set `business.phone` and `business.whatsapp` in `lib/content.ts` to the confirmed international numbers. These values deliberately remain empty until supplied by the owner; the corresponding controls stay hidden to avoid publishing fabricated numbers or broken destinations. Call links use `tel:`; WhatsApp links use `wa.me` with a prefilled message (`whatsappGreeting` in `lib/content.ts`) and open only after a visitor clicks. No WhatsApp script is embedded.
 

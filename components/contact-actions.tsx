@@ -7,34 +7,34 @@ export function ContactActions({ compact = false }: { compact?: boolean }) {
   return (
     <div
       className={compact ? "direct-contact compact" : "direct-contact"}
-      aria-label="Direct contact"
+      aria-label="Direkter Kontakt"
     >
       {phone && (
         <a
-          aria-label={`Call L&S: ${phone}`}
+          aria-label={`L&S anrufen: ${phone}`}
           className="contact-call"
           href={`tel:${phone.replace(/[^+\d]/g, "")}`}
         >
           <Phone size={18} />
-          <span>{compact ? "Call" : phone}</span>
+          <span>{compact ? "Anrufen" : phone}</span>
         </a>
       )}
       {whatsapp && (
         <a
-          aria-label="Message L&S on WhatsApp (opens in a new tab)"
+          aria-label="L&S per WhatsApp schreiben (öffnet in neuem Tab)"
           className="contact-whatsapp"
           href={`https://wa.me/${whatsapp.replace(/\D/g, "")}?text=${encodeURIComponent(whatsappGreeting)}`}
           target="_blank"
           rel="noopener noreferrer"
         >
           <MessageCircle size={18} />
-          <span>Message on WhatsApp</span>
+          <span>Per WhatsApp schreiben</span>
         </a>
       )}
       {!compact && (
         <a className="contact-mail" href={`mailto:${business.email}`}>
           <Mail size={18} />
-          <span>Send an email</span>
+          <span>E-Mail senden</span>
         </a>
       )}
     </div>

@@ -28,9 +28,9 @@ export function BeforeAfter() {
         <div>
           <span className="eyebrow">VORHER & NACHHER</span>
           <h2>
-            Randvoll.
+            Räumungsbeginn
             <br />
-            Ausgeräumt.
+            Räumungsabschluss
           </h2>
         </div>
         <p>Ziehen Sie den Regler, um den Unterschied zu sehen.</p>

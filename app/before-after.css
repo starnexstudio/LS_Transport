@@ -195,4 +195,8 @@
   .before-after-cta.button {
     flex: 1;
   }
+  /* "Räumungsabschluss" is one long word: scale it to fit narrow phones. */
+  .before-after h2 {
+    font-size: min(36px, 8.6vw);
+  }
 }

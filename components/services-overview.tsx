@@ -1,6 +1,7 @@
 "use client";
 import { useRef, useState } from "react";
 import {
+  ArrowLeft,
   ArrowRight,
   Check,
   CircleCheck,
@@ -16,16 +17,19 @@ import {
 import { business, services } from "@/lib/content";
 
 const serviceIcons = [PackageOpen, Recycle, Hammer, Truck, Sparkles];
+const number = (index: number) => String(index + 1).padStart(2, "0");
 
 // Service line-up below the hero. Each card opens a dialog with the full
-// description and checklist; from there the visitor can request that service
-// (preselected in the inquiry form) or call.
+// description and checklist; visitors can browse to the other services from
+// there, request one (preselected in the inquiry form) or call.
 export function ServicesOverview() {
   const dialog = useRef<HTMLDialogElement>(null);
   const [active, setActive] = useState(0);
   const phone = business.phone.trim();
   const service = services[active];
   const Icon = serviceIcons[active];
+  const previous = (active + services.length - 1) % services.length;
+  const next = (active + 1) % services.length;
 
   function open(index: number) {
     setActive(index);
@@ -70,7 +74,7 @@ export function ServicesOverview() {
                 onClick={() => open(index)}
               >
                 <span className="hero-service-number" aria-hidden="true">
-                  0{index + 1}
+                  {number(index)}
                 </span>
                 <span className="hero-service-icon" aria-hidden="true">
                   <CardIcon size={22} />
@@ -94,36 +98,69 @@ export function ServicesOverview() {
           // A click on the backdrop lands on the dialog element itself.
           if (event.target === event.currentTarget) dialog.current?.close();
         }}
+        onKeyDown={(event) => {
+          if (event.key === "ArrowRight") setActive(next);
+          if (event.key === "ArrowLeft") setActive(previous);
+        }}
       >
-        <div className="service-dialog-body">
-          <div className="service-dialog-head">
-            <span className="hero-service-icon" aria-hidden="true">
-              <Icon size={22} />
+        <div className="service-dialog-panel">
+          <button
+            type="button"
+            className="service-dialog-close"
+            aria-label="Schließen"
+            onClick={() => dialog.current?.close()}
+          >
+            <X size={20} aria-hidden="true" />
+          </button>
+          <div className="service-dialog-intro">
+            <span className="service-dialog-handle" aria-hidden="true" />
+            <span className="service-dialog-index" aria-hidden="true">
+              {number(active)}
             </span>
-            <span className="service-dialog-number" aria-hidden="true">
-              0{active + 1} / 0{services.length}
-            </span>
-            <button
-              type="button"
-              className="service-dialog-close"
-              aria-label="Schließen"
-              onClick={() => dialog.current?.close()}
-            >
-              <X size={20} aria-hidden="true" />
-            </button>
+            {/* Keyed so the intro animates in again when browsing. */}
+            <div key={active} className="service-dialog-heading">
+              <span className="service-dialog-icon" aria-hidden="true">
+                <Icon size={24} strokeWidth={1.75} />
+              </span>
+              <h3 id="service-dialog-title">{service.title}</h3>
+              <p className="service-dialog-short">{service.short}</p>
+            </div>
+            <div className="service-dialog-nav">
+              <button
+                type="button"
+                aria-label={`Vorherige Leistung: ${services[previous].title}`}
+                onClick={() => setActive(previous)}
+              >
+                <ArrowLeft size={18} aria-hidden="true" />
+              </button>
+              <span aria-hidden="true">
+                {number(active)} <i>/</i> {number(services.length - 1)}
+              </span>
+              <button
+                type="button"
+                aria-label={`Nächste Leistung: ${services[next].title}`}
+                onClick={() => setActive(next)}
+              >
+                <ArrowRight size={18} aria-hidden="true" />
+              </button>
+            </div>
           </div>
-          <h3 id="service-dialog-title">{service.title}</h3>
-          <p className="service-dialog-short">{service.short}</p>
-          <p className="service-dialog-text">{service.text}</p>
-          <h4>Das gehört dazu</h4>
-          <ul className="service-dialog-list">
-            {service.items.map((item) => (
-              <li key={item}>
-                <Check size={16} aria-hidden="true" />
-                {item}
-              </li>
-            ))}
-          </ul>
+          <div key={active} className="service-dialog-content">
+            <p className="service-dialog-text">{service.text}</p>
+            <h4>Das gehört dazu</h4>
+            <ul className="service-dialog-list">
+              {service.items.map((item) => (
+                <li key={item}>
+                  <Check size={14} strokeWidth={2.5} aria-hidden="true" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+            <p className="service-dialog-note">
+              <CircleCheck size={16} aria-hidden="true" />
+              Beliebig in einem Auftrag kombinierbar
+            </p>
+          </div>
           <div className="service-dialog-actions">
             <button
               type="button"

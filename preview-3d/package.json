@@ -1,0 +1,13 @@
+{
+  "name": "ls-clearance-3d-preview",
+  "private": true,
+  "description": "Isolated three.js scroll preview of the L&S house-clearance hero. Not part of the website build.",
+  "type": "module",
+  "scripts": {
+    "fetch-assets": "node scripts/fetch-assets.mjs",
+    "serve": "python -m http.server 4180"
+  },
+  "dependencies": {
+    "three": "0.170.0"
+  }
+}

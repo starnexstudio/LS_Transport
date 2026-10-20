@@ -1,6 +1,7 @@
 import { ArrowUpRight } from "lucide-react";
 import { Header } from "@/components/header";
-import { Hero, ServicesOverview } from "@/components/hero";
+import { Hero } from "@/components/hero";
+import { ServicesOverview } from "@/components/services-overview";
 import { Inquiry } from "@/components/inquiry";
 import { Footer } from "@/components/footer";
 import { ContactActions } from "@/components/contact-actions";

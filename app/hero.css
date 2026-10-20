@@ -492,15 +492,33 @@
   grid-template-columns: repeat(5, 1fr);
   gap: 16px;
 }
+.hero-services-grid > li {
+  display: flex;
+}
+/* Each card is a button that opens the service's detail dialog. */
 .hero-service-card {
   position: relative;
   overflow: hidden;
+  flex: 1;
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   padding: 22px 20px 20px;
   border: 1px solid var(--line);
   border-top: 3px solid var(--teal);
+  text-align: left;
+  color: inherit;
   background: #fff;
+  transition:
+    border-color 200ms,
+    box-shadow 260ms,
+    transform 260ms;
+}
+.hero-service-card:hover {
+  border-color: #b8d3d5;
+  border-top-color: var(--orange);
+  box-shadow: 0 14px 30px -18px #00434a59;
+  transform: translateY(-3px);
 }
 .hero-service-number {
   position: absolute;
@@ -530,11 +548,161 @@
   line-height: 1.3;
   color: var(--ink);
 }
-.hero-service-card p {
+.hero-service-short {
   margin: 6px 0 0;
   font-size: 13px;
   line-height: 1.5;
   color: var(--muted);
+}
+.hero-service-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 16px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--teal);
+}
+.hero-service-more svg {
+  transition: transform 260ms;
+}
+.hero-service-card:hover .hero-service-more svg {
+  transform: rotate(90deg);
+}
+
+/* Service details: a centred panel; a bottom sheet on phones. */
+html:has(.service-dialog[open]) {
+  overflow: hidden;
+  scrollbar-gutter: stable;
+}
+.service-dialog {
+  width: min(620px, calc(100% - 32px));
+  max-width: none;
+  max-height: calc(100dvh - 48px);
+  /* The global reset zeroes margins; auto centres the modal again. */
+  margin: auto;
+  padding: 0;
+  border: 0;
+  border-top: 4px solid var(--teal);
+  border-radius: 14px;
+  color: var(--ink);
+  background: #fff;
+  box-shadow: 0 30px 80px -24px #00222699;
+}
+.service-dialog::backdrop {
+  background: #0a2a2ec7;
+  backdrop-filter: blur(3px);
+}
+.service-dialog-body {
+  padding: 26px 32px 30px;
+}
+.service-dialog-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.service-dialog-number {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: var(--muted);
+}
+.service-dialog-close {
+  width: 42px;
+  height: 42px;
+  margin-left: auto;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--ink);
+  background: #fff;
+}
+.service-dialog-close:hover {
+  background: var(--mist);
+}
+.service-dialog h3 {
+  margin: 20px 0 0;
+  font-family: var(--font-display), var(--font-manrope), Arial, sans-serif;
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+}
+.service-dialog-short {
+  margin-top: 6px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--teal);
+}
+.service-dialog-text {
+  margin-top: 14px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.service-dialog h4 {
+  margin: 24px 0 0;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: normal;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--teal);
+}
+.service-dialog-list {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 10px 20px;
+  margin: 12px 0 0;
+  padding: 0;
+}
+.service-dialog-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 15px;
+  line-height: 1.45;
+}
+.service-dialog-list svg {
+  flex-shrink: 0;
+  box-sizing: content-box;
+  margin-top: 1px;
+  padding: 2px;
+  border-radius: 50%;
+  color: var(--teal);
+  background: var(--mist);
+}
+.service-dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 28px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+}
+.service-dialog-actions .hero-button-primary {
+  border: 0;
+}
+.service-dialog-call {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 56px;
+  padding: 0 18px 0 16px;
+  border: 1.5px solid var(--ink);
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: normal;
+  color: var(--ink);
+}
+.service-dialog-call:hover {
+  background: var(--mist);
 }
 
 @media (max-width: 1100px) {
@@ -557,6 +725,33 @@
   }
   .hero-service-card {
     padding: 18px 16px 16px;
+  }
+  .service-dialog {
+    width: 100%;
+    max-height: 88dvh;
+    margin: auto 0 0;
+    border-radius: 18px 18px 0 0;
+  }
+  .service-dialog-body {
+    padding: 20px 20px calc(24px + env(safe-area-inset-bottom));
+  }
+  .service-dialog h3 {
+    margin-top: 16px;
+    font-size: 26px;
+  }
+  .service-dialog-text {
+    font-size: 15.5px;
+  }
+  .service-dialog-actions {
+    flex-direction: column;
+    margin-top: 24px;
+    padding-top: 18px;
+  }
+  .service-dialog-actions > * {
+    width: 100%;
+  }
+  .service-dialog-call {
+    height: 50px;
   }
   .hero-service-number {
     font-size: 42px;

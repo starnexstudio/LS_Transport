@@ -1,19 +1,8 @@
 import { Fragment, type CSSProperties } from "react";
-import {
-  ArrowRight,
-  CircleCheck,
-  Hammer,
-  PackageOpen,
-  Phone,
-  Recycle,
-  Sparkles,
-  Truck,
-} from "lucide-react";
+import { ArrowRight, Phone } from "lucide-react";
 import { HeroRoom } from "@/components/hero-room";
 import { HeroStage } from "@/components/hero-stage";
-import { business, services } from "@/lib/content";
-
-const serviceIcons = [PackageOpen, Recycle, Hammer, Truck, Sparkles];
+import { business } from "@/lib/content";
 
 const copy =
   "Wir übernehmen die komplette Räumung – von der Planung bis zur besenreinen Übergabe.";
@@ -92,46 +81,5 @@ export function Hero() {
         <span />
       </div>
     </HeroStage>
-  );
-}
-
-// Service line-up, directly below the hero.
-export function ServicesOverview() {
-  return (
-    <section
-      className="hero-services"
-      id="leistungen"
-      aria-labelledby="services-title"
-    >
-      <div className="hero-services-head">
-        <div>
-          <p className="hero-card-label">Unsere Leistungen</p>
-          <h2 className="hero-card-title" id="services-title">
-            Alles aus einer Hand
-          </h2>
-        </div>
-        <p className="hero-services-note">
-          <CircleCheck size={16} aria-hidden="true" />
-          Beliebig in einem Auftrag kombinierbar
-        </p>
-      </div>
-      <ol className="hero-services-grid">
-        {services.map((service, index) => {
-          const Icon = serviceIcons[index];
-          return (
-            <li key={service.title} className="hero-service-card">
-              <span className="hero-service-number" aria-hidden="true">
-                0{index + 1}
-              </span>
-              <span className="hero-service-icon" aria-hidden="true">
-                <Icon size={22} />
-              </span>
-              <strong>{service.title}</strong>
-              <p>{service.short}</p>
-            </li>
-          );
-        })}
-      </ol>
-    </section>
   );
 }

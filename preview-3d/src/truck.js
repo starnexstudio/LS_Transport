@@ -63,17 +63,32 @@ function liveryCanvas(logo, w, h, { phone = true } = {}) {
   t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8;
   return t;
 }
-function rearCanvas(logo, w, h) {
-  const c = document.createElement("canvas");
+// Outer skin of one rear door: livery plus red reflective contour marking along
+// the top, bottom and outer edge (as on real trucks), none on the meeting edge.
+function doorCanvas(logo, side) {
+  const w = 512, h = 1040, c = document.createElement("canvas");
   c.width = w; c.height = h;
   const g = c.getContext("2d");
   g.fillStyle = "#f4f4f1"; g.fillRect(0, 0, w, h);
-  g.fillStyle = "#007782"; g.fillRect(w * 0.18, h * 0.16, w * 0.64, h * 0.5);
-  const lh = h * 0.42, lw = (lh * logo.width) / logo.height;
-  g.drawImage(logo, (w - lw) / 2, h * 0.2, lw, lh);
-  g.fillStyle = "#0b4f56"; g.textAlign = "center";
-  g.font = `800 ${Math.round(h * 0.085)}px Manrope, Arial, sans-serif`;
-  g.fillText("+49 170 2919567", w / 2, h * 0.8);
+  const outerX = side > 0 ? 14 : w - 30;
+  g.fillStyle = "#c8161d";
+  for (let x = side > 0 ? 14 : 0; x < (side > 0 ? w : w - 14); x += 64) { g.fillRect(x, 14, 52, 16); g.fillRect(x, h - 30, 52, 16); }
+  for (let y = 14; y < h - 14; y += 64) g.fillRect(outerX, y, 16, 52);
+  g.textAlign = "center";
+  if (side > 0) {
+    g.fillStyle = "#007782";
+    const bx = 56, by = 210, bw = w - 112, bh = 300, r = 22;
+    g.beginPath(); g.moveTo(bx + r, by); g.arcTo(bx + bw, by, bx + bw, by + bh, r); g.arcTo(bx + bw, by + bh, bx, by + bh, r); g.arcTo(bx, by + bh, bx, by, r); g.arcTo(bx, by, bx + bw, by, r); g.fill();
+    const lw = bw - 40, lh = (lw * logo.height) / logo.width;
+    g.drawImage(logo, bx + 20, by + (bh - lh) / 2, lw, lh);
+    g.fillStyle = "#0b4f56"; g.font = "700 46px Manrope, Arial, sans-serif"; g.fillText("Entrümpelung", w / 2, 600);
+    g.fillStyle = "#4b5b5d"; g.font = "600 30px Manrope, Arial, sans-serif"; g.fillText("Haushaltsauflösung", w / 2, 648);
+  } else {
+    g.fillStyle = "#4b5b5d"; g.font = "600 34px Manrope, Arial, sans-serif"; g.fillText("Jetzt anrufen", w / 2, 300);
+    g.fillStyle = "#ff581c"; g.fillRect(w / 2 - 60, 326, 120, 6);
+    g.fillStyle = "#0b4f56"; g.font = "800 74px Manrope, Arial, sans-serif"; g.fillText("+49 170", w / 2, 430); g.fillText("2919567", w / 2, 516);
+    g.fillStyle = "#4b5b5d"; g.font = "600 30px Manrope, Arial, sans-serif"; g.fillText("Kostenlose Besichtigung", w / 2, 590);
+  }
   const t = new THREE.CanvasTexture(c);
   t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8;
   return t;
@@ -194,29 +209,33 @@ export async function buildTruck() {
   lamp.position.set(0, roof - 0.25, midZ - 0.6); body.add(lamp);
   box(0.6, 0.03, 0.12, M.lamp, 0, roof - 0.07, midZ - 0.6, body);
 
-  // ---------- Roller shutter: slats run up the rear and along the ceiling ----------
-  const doorH = T.door.y1 - T.door.y0, slatH = 0.098, n = Math.ceil(doorH / slatH);
-  const rearTex = rearCanvas(logo, 1024, 1024);
-  const slatG = new RoundedBoxGeometry(2.28, slatH - 0.004, 0.035, 2, 0.012);
-  const slats = [];
-  for (let k = 0; k < n; k++) {
-    const t = rearTex.clone(); t.needsUpdate = true;
-    t.repeat.set(1, slatH / doorH); t.offset.set(0, (k * slatH) / doorH);
-    const outer = new THREE.MeshStandardMaterial({ map: t, roughness: 0.38, metalness: 0.15 });
-    const s = mesh(slatG, outer, 0, 0, 0, body);
-    s.userData.dynamic = true; slats.push(s);
-  }
-  const handle = box(0.5, 0.04, 0.05, M.dark, 0, 0, 0, body); handle.userData.dynamic = true;
-  function setDoor(p) { // 0 open (rolled into the roof), 1 closed
-    const travel = (1 - p) * doorH;
-    slats.forEach((s, k) => {
-      const u = k * slatH + travel;
-      if (u <= doorH - slatH / 2) { s.position.set(0, T.door.y0 + u + slatH / 2, rear + 0.02); s.rotation.x = 0; }
-      else { s.position.set(0, T.door.y1 - 0.02, rear + 0.02 + (u - doorH) + slatH); s.rotation.x = -Math.PI / 2; }
+  // ---------- Rear doors: two swing doors, folded back 270° along the sides when open ----------
+  // Each turns about a hinge line at the box's rear corner; locking bars, cams,
+  // handles and hinges sit on the outer skin, the plywood lining faces the cargo.
+  const dY0 = floor - 0.03, dH = T.door.y1 + 0.04 - dY0, dW = 1.24, hingeX = halfW + 0.03, hingeZ = rear - 0.05;
+  const barG = new THREE.CylinderGeometry(0.014, 0.014, dH - 0.12, 10);
+  const doors = [1, -1].map((s) => {
+    const g = new THREE.Group(); g.position.set(s * hingeX, 0, hingeZ); g.userData.dynamic = true; body.add(g);
+    const skin = new THREE.MeshStandardMaterial({ map: doorCanvas(logo, s), roughness: 0.4 });
+    mesh(new RoundedBoxGeometry(dW, dH, 0.045, 2, 0.012), [M.panel, M.panel, M.panel, M.panel, M.ply, skin], -s * (dW / 2 + 0.012), dY0 + dH / 2, 0, g);
+    for (const f of [0.3, 0.8]) {
+      const x = -s * (0.012 + dW * f);
+      mesh(barG, M.chrome, x, dY0 + dH / 2, -0.05, g);
+      for (const y of [0.35, 1.25, 2.05]) box(0.07, 0.04, 0.035, M.chrome, x, dY0 + y, -0.04, g);   // bar brackets
+      for (const y of [0.03, dH - 0.03]) box(0.08, 0.06, 0.06, M.dark, x, dY0 + y, -0.045, g);       // cams
+      box(0.04, 0.36, 0.03, M.dark, x + s * 0.045, dY0 + 0.95, -0.07, g);                            // handle
+      box(0.06, 0.05, 0.04, M.chrome, x + s * 0.045, dY0 + 0.74, -0.06, g);                          // handle keeper
+    }
+    for (const y of [0.3, 0.95, 1.65, 2.3]) box(0.1, 0.12, 0.05, M.dark, -s * 0.03, dY0 + y, -0.03, g); // hinges
+    box(0.025, dH - 0.02, 0.05, M.black, -s * (dW + 0.006), dY0 + dH / 2, 0, g);                    // rubber seal
+    return g;
+  });
+  const smooth = (u) => u * u * (3 - 2 * u);
+  function setDoor(p) { // 0 open (folded back), 1 closed; the right door shuts first
+    doors.forEach((g, i) => {
+      const s = i === 0 ? 1 : -1, u = i === 0 ? Math.min(1, Math.max(0, (p - 0.4) / 0.6)) : Math.min(1, p / 0.6);
+      g.rotation.y = -s * 1.5 * Math.PI * (1 - smooth(u));
     });
-    const b = slats[0];
-    handle.position.set(0, b.position.y - 0.02, b.position.z - 0.04);
-    handle.visible = b.rotation.x === 0;
   }
 
   // ---------- Tail lift: on the ground, up to floor height, folded against the rear ----------
@@ -258,8 +277,14 @@ export async function buildTruck() {
   wsm.rotation.x = -Math.atan2(0.26, 0.9);
   for (const s of [-1, 1]) {
     sideShape([[3.48, 1.82], [4.7, 1.82], [4.5, 2.62], [3.48, 2.62]], 0.012, s * (cabW / 2 + 0.006), M.glass, cab);
-    sideShape([[3.3, 0.68], [3.34, 0.68], [3.34, 2.8], [3.3, 2.8]], 0.008, s * (cabW / 2 + 0.006), M.dark, cab); // door seam
-    box(0.03, 0.04, 0.16, M.dark, s * (cabW / 2 + 0.01), 1.62, 3.55, cab);                                      // handle
+    // Door: shut lines round the door, black rubber round the window, flush handle
+    const seam = (pts) => sideShape(pts, 0.006, s * (cabW / 2 + 0.004), M.dark, cab);
+    seam([[3.3, 0.7], [3.325, 0.7], [3.325, 2.8], [3.3, 2.8]]);
+    seam([[4.52, 0.7], [4.545, 0.7], [4.545, 1.8], [4.52, 1.8]]);
+    seam([[3.3, 0.7], [4.545, 0.7], [4.545, 0.722], [3.3, 0.722]]);
+    sideShape([[3.44, 1.78], [4.75, 1.78], [4.54, 2.66], [3.44, 2.66]], 0.008, s * (cabW / 2 + 0.002), M.black, cab);
+    box(0.02, 0.05, 0.2, M.black, s * (cabW / 2 + 0.008), 1.6, 3.52, cab);
+    box(0.025, 0.025, 0.16, M.chrome, s * (cabW / 2 + 0.018), 1.6, 3.52, cab);
     box(0.42, 0.06, 0.62, M.black, s * 1.05, 0.48, 3.75, cab);                                                  // step
     // Teal door plate with the logo
     const lp = new THREE.Mesh(new THREE.PlaneGeometry(0.95, 0.6), new THREE.MeshStandardMaterial({ map: (() => { const t = new THREE.CanvasTexture(logo); t.colorSpace = THREE.SRGBColorSpace; return t; })(), transparent: true, roughness: 0.4 }));

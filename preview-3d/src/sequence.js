@@ -4,7 +4,7 @@
 import * as THREE from "three";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { model } from "./assets.js";
-import { HOUSE } from "./world.js";
+import { HOUSE, contactShadow } from "./world.js";
 import { T } from "./truck.js";
 import { planLoad } from "./pack.js";
 import { mergeStatic } from "./merge.js";
@@ -103,7 +103,7 @@ const PACKED = {
 };
 
 // Timeline (fractions of the scroll)
-export const TL = { fly0: 0.03, fly1: 0.72, flight: 0.12, cleared: 0.73, door: [0.76, 0.82], lift: [0.81, 0.87], rev: [0.87, 0.94], drive: [0.945, 1.0] };
+export const TL = { fly0: 0.0, fly1: 0.72, flight: 0.12, cleared: 0.73, door: [0.77, 0.835], lift: [0.83, 0.885], rev: [0.885, 0.95], drive: [0.952, 1.0] };
 
 // Moving box: one mesh, a cardboard texture with packing tape over the top and ends.
 let boxMat = null;
@@ -242,6 +242,7 @@ export async function buildSequence({ scene, truck, mobile }) {
   // ---------- Truck: parked nose-first in the drive, rear and tail lift to the street ----------
   const parked = { pos: V(-13.0, 0, -0.5), yaw: Math.PI };
   truck.root.position.copy(parked.pos); truck.root.rotation.y = parked.yaw; scene.add(truck.root);
+  truck.root.add(contactShadow(2.7, 9.9, 0, 1.65, 0.55)); // travels with the truck
   truck.root.updateMatrixWorld(true);
   const toWorld = (p) => truck.root.localToWorld(p.clone());
 
@@ -279,23 +280,25 @@ export async function buildSequence({ scene, truck, mobile }) {
   }
 
   // ---------- Camera ----------
+  // A slow, continuous dolly like a filmed shot: wide on the full house, easing in as
+  // it empties, round to the truck's doors, then back out as the truck leaves.
   const camKeys = {
     wide: [
-      { t: 0, pos: V(-9.4, 6.3, 22.5), look: V(-7.1, 2.7, -1.2) },
-      { t: 0.32, pos: V(-9.1, 6.0, 21.2), look: V(-7.1, 2.7, -1.2) },
-      { t: 0.72, pos: V(-8.4, 5.5, 19.5), look: V(-6.8, 2.7, -1.4) },
-      { t: 0.765, pos: V(-6.8, 4.7, 14.5), look: V(-5.6, 2.6, -2.2) },
-      { t: 0.83, pos: V(-10.8, 3.9, 13.0), look: V(-12.8, 2.1, 1.6) },
-      { t: 0.94, pos: V(-10.0, 8.0, 26.5), look: V(-9.0, 1.5, 4.0) },
-      { t: 1, pos: V(-8.8, 6.2, 22.5), look: V(-6.3, 2.7, -1.0) },
+      { t: 0, pos: V(-9.2, 9.5, 25.7), look: V(-6.5, 5.8, -0.5) },
+      { t: 0.36, pos: V(-8.6, 9.0, 24.2), look: V(-6.4, 5.6, -0.7) },
+      { t: 0.72, pos: V(-7.4, 8.2, 22.0), look: V(-6.2, 5.3, -1.0) },
+      { t: 0.78, pos: V(-6.0, 8.6, 21.5), look: V(-5.7, 6.0, -1.6) },
+      { t: 0.845, pos: V(-9.9, 6.6, 17.5), look: V(-11.8, 4.6, 1.0) },
+      { t: 0.95, pos: V(-9.0, 10.5, 33.0), look: V(-8.0, 4.8, 2.0) },
+      { t: 1, pos: V(-7.6, 9.2, 26.5), look: V(-6.0, 5.6, -0.8) },
     ],
     tall: [
-      { t: 0, pos: V(-9.4, 8.4, 31.5), look: V(-8.0, 2.5, -1.0) },
-      { t: 0.72, pos: V(-9.0, 7.8, 29.5), look: V(-7.8, 2.6, -1.2) },
-      { t: 0.765, pos: V(-6.2, 5.6, 19.5), look: V(-5.6, 2.6, -2.0) },
-      { t: 0.83, pos: V(-11.4, 4.6, 16.5), look: V(-12.8, 2.1, 1.6) },
-      { t: 0.94, pos: V(-9.5, 10.0, 35.0), look: V(-8.6, 1.5, 4.0) },
-      { t: 1, pos: V(-8.0, 8.2, 31.0), look: V(-6.0, 2.5, -1.0) },
+      { t: 0, pos: V(-9.6, 11.5, 39.0), look: V(-7.9, 4.6, -1.0) },
+      { t: 0.72, pos: V(-9.2, 10.8, 37.0), look: V(-7.7, 4.5, -1.2) },
+      { t: 0.78, pos: V(-6.2, 8.4, 26.0), look: V(-5.6, 4.0, -1.8) },
+      { t: 0.845, pos: V(-10.6, 7.4, 23.0), look: V(-12.2, 3.8, 1.2) },
+      { t: 0.95, pos: V(-9.0, 13.0, 44.0), look: V(-8.0, 3.8, 3.0) },
+      { t: 1, pos: V(-7.6, 11.4, 37.5), look: V(-6.0, 4.6, -0.8) },
     ],
   };
 

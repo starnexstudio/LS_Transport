@@ -9,7 +9,23 @@ export const HOUSE = {
   x0: -10, x1: -1, z0: -5.5, z1: 1.0, t: 0.36, // outer footprint (front cut at z1), wall thickness
   F0: 0.45, C0: 3.05, F1: 3.35, C1: 5.85, eaves: 6.05, partX: -5.5,
 };
-export const STREET = { pave0: 6.0, kerb: 7.8, road0: 8.0, road1: 14.5, drive: [-14.9, -11.1] };
+
+// Soft contact shadow: a blurred dark rounded rectangle lying on the ground, the
+// ambient occlusion where a footprint meets the floor that the sun's shadow misses.
+export function contactShadow(w, d, x, z, strength = 0.5) {
+  const res = 256, pad = 0.18, c = document.createElement("canvas");
+  c.width = c.height = res;
+  const g = c.getContext("2d");
+  g.filter = `blur(${res * 0.05}px)`;
+  g.fillStyle = "#00262c";
+  const m = res * pad;
+  g.beginPath(); g.roundRect(m, m, res - 2 * m, res - 2 * m, res * 0.06); g.fill();
+  const tex = new THREE.CanvasTexture(c);
+  const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, opacity: strength, depthWrite: false, toneMapped: false });
+  const plane = new THREE.Mesh(new THREE.PlaneGeometry(w / (1 - 2 * pad), d / (1 - 2 * pad)), mat);
+  plane.rotation.x = -Math.PI / 2; plane.position.set(x, 0.004, z); plane.renderOrder = -1;
+  return plane;
+}
 
 // Box whose UVs are in metres on every face, so tiled textures keep their scale.
 function blockGeo(w, h, d) {
@@ -150,17 +166,11 @@ function house(parent, M, H, { open, wallColor, hole }) {
   return g;
 }
 
-export async function buildWorld(scene, { lowDetail = false } = {}) {
-  const [grass, asphalt, pavers, drive, granite, renderT, paintT, roofT, parquet, oak, conc] = await Promise.all([
-    texture("leafy_grass"), texture("asphalt_04"), texture("concrete_pavers_02", { gray: 0.9 }), texture("interlocking_concrete_pavers", { gray: 0.85 }), texture("granite_tile_04"),
+export async function buildWorld(scene) {
+  const [renderT, paintT, roofT, parquet, oak, conc] = await Promise.all([
     texture("beige_wall_001"), texture("beige_wall_002"), texture("ceramic_roof_01", { gray: 1 }), texture("herringbone_parquet"), texture("grey_oak_veneer_01"), texture("concrete_floor_02"),
   ]);
   const M = {
-    grass: surface(grass, { tile: 2.0, color: "#9ec46f", roughness: 1 }),
-    asphalt: surface(asphalt, { tile: 3.5, color: "#c2c2c2", roughness: 0.95 }),
-    pavers: surface(pavers, { tile: 1.6, color: "#e4e4e2", roughness: 0.9 }),
-    drive: surface(drive, { tile: 1.1, color: "#d2d2d0", roughness: 0.9 }),
-    kerb: surface(granite, { tile: 1.0, color: "#dcdcdc", roughness: 0.75 }),
     render: surface(renderT, { tile: 2.0, color: "#ffffff", roughness: 0.95, normalScale: 0.6 }),
     paint: surface(paintT, { tile: 2.0, color: "#f6f3ee", roughness: 0.95, normalScale: 0.3, noMap: true }),
     accent: surface(paintT, { tile: 2.0, color: "#9fb3aa", roughness: 0.95, normalScale: 0.3, noMap: true }),
@@ -182,36 +192,18 @@ export async function buildWorld(scene, { lowDetail = false } = {}) {
     wood: surface(oak, { tile: 1.0, color: "#c9a77f", roughness: 0.55 }),
   };
   const world = new THREE.Group(); world.name = "World"; scene.add(world);
-  const H = HOUSE, S = STREET;
+  const H = HOUSE;
 
-  // ---------- Ground ----------
-  const ground = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), M.grass);
-  ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true;
-  const uv = ground.geometry.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * 400, uv.getY(i) * 400);
-  world.add(ground);
-  flat(160, S.road1 - S.road0, M.asphalt, 0, 0.02, (S.road0 + S.road1) / 2, world);
-  flat(160, S.kerb - S.pave0, M.pavers, 0, 0.12, (S.pave0 + S.kerb) / 2, world);
-  flat(160, 1.8, M.pavers, 0, 0.12, S.road1 + 0.2 + 0.9, world);
-  // Granite kerbs, lowered at the drive
-  const [d0, d1] = S.drive;
-  for (const [a, b, h] of [[-80, d0, 0.14], [d0, d1, 0.05], [d1, 80, 0.14]]) block(b - a, h, 0.2, M.kerb, (a + b) / 2, h / 2, S.kerb + 0.1, world);
-  block(160, 0.14, 0.2, M.kerb, 0, 0.07, S.road1 + 0.1, world);
-  flat(d1 - d0, S.pave0 + 9, M.drive, (d0 + d1) / 2, 0.05, (S.pave0 - 9) / 2, world);
-  flat(d1 - d0, S.kerb - S.pave0, M.drive, (d0 + d1) / 2, 0.125, (S.pave0 + S.kerb) / 2, world);
-  // Path to the side door and a gravel strip round the house
-  flat(1.0, 3.2, M.pavers, d1 + 0.5, 0.05, -0.9, world);
-  // Manholes in the street
-  for (const x of [-6, 18]) {
-    const mh = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.32, 0.02, 28), new THREE.MeshStandardMaterial({ color: "#3b3c3d", metalness: 0.6, roughness: 0.6 }));
-    mh.position.set(x, 0.045, 11.6); mh.receiveShadow = true; world.add(mh);
-  }
+  // ---------- Ground: invisible, it only catches shadows; the page's teal shows through ----------
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(220, 220), new THREE.ShadowMaterial({ color: "#00313a", opacity: 0.5 }));
+  ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; world.add(ground);
+  world.add(contactShadow(H.x1 - H.x0 + 1.4, H.z1 - H.z0 + 1.4, (H.x0 + H.x1) / 2, (H.z0 + H.z1) / 2, 0.6));
 
-  // ---------- The house (open) and neighbours ----------
+  // ---------- The house (open) ----------
   const { x0, x1, z0, z1, t, F0, C0, F1, C1, partX } = H;
   const ix0 = x0 + t, ix1 = x1 - t, iz0 = z0 + t;
   const steps = 14, rise = (F1 - F0) / steps, run = 0.25, sx0 = ix0 + 0.05, sw = 1.0, sxEnd = sx0 + steps * run;
   house(world, M, H, { open: true, hole: { x0: sxEnd - 2.4, x1: sxEnd, z0: iz0, z1: iz0 + sw } });
-  for (const [dx, dz, color] of [[-18.5, -1.5, "#efe9dc"], [15.5, -2.0, "#e7ebec"]]) house(world, M, H, { open: false, wallColor: color }).position.set(dx, 0, dz);
 
   // ---------- Interior fit-out ----------
   for (const [yb, yt] of [[F0, C0], [F1, C1]]) {
@@ -242,23 +234,10 @@ export async function buildWorld(scene, { lowDetail = false } = {}) {
   for (const [x, z, c] of [[-3.4, -2.6, C0], [-7.6, -2.0, C0], [-3.2, -2.4, C1], [-7.6, -1.8, C1]]) {
     const l = lampModel.clone(); l.position.set(x, c - lampModel.userData.size.y, z); world.add(l);
   }
-  // Low granite edging along the front garden
-  const fenceMat = new THREE.MeshStandardMaterial({ color: "#33373a", metalness: 0.5, roughness: 0.5 });
-  block(2.0 - d1 - 0.3, 0.3, 0.2, M.kerb, (d1 + 0.3 + 2.0) / 2, 0.15, S.pave0 - 0.12, world);
   bin(world, "#4d5357", -10.75, 4.6, Math.PI); bin(world, "#2f5c9e", -10.75, 3.85, Math.PI); bin(world, "#6a4b33", -10.75, 3.1, Math.PI);
-  // Letterbox
-  block(0.06, 1.1, 0.06, fenceMat, d1 + 0.25, 0.6, S.pave0 - 0.15, world);
-  block(0.36, 0.42, 0.18, new THREE.MeshStandardMaterial({ color: "#2f3436", roughness: 0.4 }), d1 + 0.25, 1.2, S.pave0 - 0.15, world);
-
-  const [lampPost, car, gardenSet, planter] = await Promise.all([
-    model("street_lamp_01", { texSize: 512, shadows: false }), // thin and high-poly: not worth a shadow pass
-    model("covered_car", { texSize: lowDetail ? 512 : 1024 }), model("outdoor_table_chair_set_01", { texSize: 512 }),
-    model("planter_box_02", { texSize: 512 }),
-  ]);
-  for (const x of [-24, 6]) { const l = lampPost.clone(); l.position.set(x, 0.12, S.kerb - 0.35); l.rotation.y = Math.PI; world.add(l); }
-  car.position.set(4.8, 0.02, S.road0 + 1.15); car.rotation.y = Math.PI / 2; world.add(car);
+  const [gardenSet, planter] = await Promise.all([model("outdoor_table_chair_set_01", { texSize: 512 }), model("planter_box_02", { texSize: 512 })]);
   gardenSet.position.set(0.6, 0, 2.6); gardenSet.rotation.y = 0.4; world.add(gardenSet);
-  planter.position.set(d1 + 0.45, 0.05, 1.3); planter.rotation.y = Math.PI / 2; world.add(planter);
+  planter.position.set(-10.65, 0, 1.3); planter.rotation.y = Math.PI / 2; world.add(planter);
   mergeStatic(world, (o) => o.userData.model);
   return { world, M };
 }

@@ -20,10 +20,10 @@ export const models = [
   "ceramic_vase_02", "ceramic_vase_03", "ceramic_vase_04", "antique_ceramic_vase_01", "wooden_bowl_01",
   "alarm_clock_01", "standing_picture_frame_01", "standing_picture_frame_02", "hanging_picture_frame_01", "hanging_picture_frame_02",
   // Fixtures, garden and street
-  "modern_ceiling_lamp_01", "covered_car", "street_lamp_01", "outdoor_table_chair_set_01", "planter_box_02",
+  "modern_ceiling_lamp_01", "outdoor_table_chair_set_01", "planter_box_02",
 ];
 const textures = [
-  "leafy_grass", "asphalt_04", "concrete_pavers_02", "interlocking_concrete_pavers", "granite_tile_04", "beige_wall_001",
+  "beige_wall_001",
   "beige_wall_002", "ceramic_roof_01", "herringbone_parquet", "grey_oak_veneer_01", "metal_plate", "ash_veneer", "concrete_floor_02",
 ];
 const hdri = "kloofendal_48d_partly_cloudy_puresky";

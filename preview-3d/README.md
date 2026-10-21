@@ -11,25 +11,26 @@ npm run fetch-assets
 npm run serve
 ```
 
-Then open http://localhost:4180. Scrolling drives the whole sequence: about two and a half screen heights on desktop, and slightly less on phones. Nothing moves on its own, and scrolling back plays it in reverse.
+Then open http://localhost:4180. Scrolling drives the whole sequence: about two and a half screen heights on desktop, and slightly less on phones. The header is part of the pinned stage, so the clearance starts on the first pixel of scroll. Nothing moves on its own, and scrolling back plays it in reverse.
 
 ## Assets (all CC0, from Poly Haven)
 
 `npm run fetch-assets` downloads them into `assets/` (about 180 MB, not committed):
 
 - **Contents:** about 25 furniture and household models, including the sofa, armchairs, tables, chairs, cabinets, shelves, bed, TVs, plants, vases, pictures and baskets. The moving boxes and book rows are made in code, which keeps them light.
-- **Garden and street props:** street lamps, a covered car, a garden set and planters.
-- **Surfaces:** PBR textures for the lawn, asphalt, paving, granite kerbs, render, roof tiles, parquet and plywood.
+- **Garden props:** a garden set and a planter.
+- **Surfaces:** PBR textures for the render, roof tiles, parquet, oak, concrete, plywood and the tail lift's tread plate.
 - **Lighting:** an HDRI (kloofendal_48d_partly_cloudy_puresky) for ambient light and reflections.
 
-The removal truck, the house and the street are built in code (`src/truck.js`, `src/world.js`).
+The removal truck and the house are built in code (`src/truck.js`, `src/world.js`).
 
 ## The scene
 
+The scene stands on the page's teal like a product shot. The canvas is transparent, and there's no sky, street or neighbourhood. The floor is invisible and only catches shadows, tinted dark teal, with soft contact shadows under the house and the truck.
+
 - **House:** a two-storey detached house shown in section from the front. It has four furnished rooms, a staircase, windows with sills, skirting boards, ceiling lamps, a side entrance, gutters, downpipes and a chimney.
-- **Front garden:** stacks of packed moving boxes, some of them open and full of books, dishes and ornaments.
-- **Street:** neighbouring houses, a driveway, pavement with granite kerbs, the street, lamp posts and a parked covered car.
-- **Truck:** a 12-tonne removal truck in L&S livery, parked nose-first in the drive. It has a roller shutter, a tail lift, a lit cargo area with lashing rails, dual rear wheels and steered front wheels.
+- **Around it:** stacks of packed moving boxes, some of them open and full of books, dishes and ornaments, plus bins and a garden set.
+- **Truck:** a 12-tonne removal truck in L&S livery, parked nose-first beside the house. It has two rear swing doors (locking bars, hinges, seals, red contour marking) that fold back 270° along the sides when open, a tail lift, a lit cargo area with lashing rails, dual rear wheels and steered front wheels.
 
 ## The sequence
 
@@ -39,17 +40,17 @@ The removal truck, the house and the street are built in code (`src/truck.js`, `
    - boxes and small things stacked on flat tops;
    - anything standing on furniture at home leaves before the piece under it.
 3. **Cleared:** the empty house shows "Geräumt. Besenrein übergeben."
-4. **Closing up:** the roller shutter comes down and the tail lift folds up.
-5. **Departure:** the truck reverses out of the drive in a quarter turn and drives off down the street, with the wheels rolling and the front wheels steering.
+4. **Closing up:** the rear doors swing shut, right then left, and the tail lift rises and folds up against them.
+5. **Departure:** the truck reverses out in a quarter turn and drives off out of frame, with the wheels rolling and the front wheels steering.
 
 ## Rendering
 
-- **Lighting:** ACES tone mapping, a sun with soft shadows, HDRI image-based lighting turned to match the sun, and a sky dome with procedural clouds.
-- **Merged geometry:** static parts of the house, street and truck are merged per material, about 340 draw calls in all.
+- **Lighting:** ACES tone mapping, a sun with soft shadows, and HDRI image-based lighting turned to match the sun.
+- **Merged geometry:** static parts of the house and truck are merged per material.
 - **Lighter models:** dense Poly Haven models are thinned at load with meshoptimizer (UV seams kept), about 370k triangles in all.
 - **Shadows:** PCF with a wide kernel instead of PCFSoft: soft edges at about half the cost. Below the top level, the shadow map is redrawn every other frame while things move, and always once they settle.
 - **Quality levels:** at load the page times one frame and picks a level:
-  - **high:** ground-truth ambient occlusion (GTAO), 4× MSAA and 4K shadows;
+  - **high:** 4K shadows, updated every frame;
   - **medium:** 2K shadows;
   - **low:** 1K shadows.
 
@@ -57,7 +58,7 @@ The removal truck, the house and the street are built in code (`src/truck.js`, `
 - **Dynamic resolution:** while scrolling, the render scale follows the frame rate (aiming for 60 fps), and a full-resolution frame is drawn once the motion stops. On an Intel integrated GPU it holds 60 fps.
 - **Smooth motion:**
   - **Scroll:** the scene follows the scroll on a critically damped spring, so each wheel step or swipe becomes one glide.
-  - **Camera:** moves on a continuous spline, without stopping between keys.
+  - **Camera:** a slow, continuous dolly like a filmed shot, on a spline that never stops between keys.
   - **Flights:** each piece follows one smooth curve with a sine ease, through the middle of the truck's rear opening.
 - **Phones:** smaller textures, and never the high level.
 - **Framing:** separate camera paths for desktop and phones (`wide` / `tall`).
@@ -68,5 +69,4 @@ The removal truck, the house and the street are built in code (`src/truck.js`, `
 
 - **Truck:** procedural, so it's clean but simpler than a scanned vehicle. There is no realistic CC0 truck model.
 - **Wardrobe:** there's no CC0 modern wardrobe, so cabinets and shelving stand in.
-- **Trees:** the CC0 trees available are millions of triangles each, so the gardens have none.
 - **Flights:** the pieces fly in smoothly but don't avoid each other. Inside the truck, a piece can briefly pass through one placed just before it.

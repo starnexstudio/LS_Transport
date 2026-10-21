@@ -22,7 +22,7 @@
   .nav { display: flex; gap: 36px; font-weight: 600; font-size: 15px; }
   .call { display: inline-flex; align-items: center; gap: 10px; padding: 12px 18px; border: 1.5px solid #fff; border-radius: 10px; font-weight: 700; font-size: 15px; }
   .menu { display: none; width: 44px; height: 44px; border: 1.5px solid #fff; border-radius: 10px; background: none; color: #fff; align-items: center; justify-content: center; }
-  .hero { position: relative; height: calc(100svh + 460vh); }
+  .hero { position: relative; height: calc(100svh + 230vh); }
   .stage { position: sticky; top: 0; height: 100svh; min-height: 620px; display: flex; flex-direction: column; overflow: hidden; }
   .intro { display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; padding: 8px max(40px, calc((100% - 1440px) / 2 + 120px)) 18px; }
   h1 { margin: 0; font-family: Archivo, Arial, sans-serif; font-weight: 600; font-size: clamp(36px, 3.8vw, 54px); line-height: 1.04; letter-spacing: -0.025em; color: #fff; }
@@ -55,7 +55,7 @@
     .hdr img { width: 100px; }
     .nav, .hdr .call { display: none; }
     .menu { display: inline-flex; }
-    .hero { height: calc(100svh + 420vh); }
+    .hero { height: calc(100svh + 210vh); }
     .stage { min-height: 560px; padding-bottom: 92px; }
     .intro { flex-direction: column; align-items: flex-start; gap: 0; padding: 4px 20px 12px; }
     h1 { font-size: 34px; }
@@ -121,7 +121,7 @@
           <p class="line">Schnell, zuverlässig und stressfrei.</p>
         </div>
       </div>
-      <div class="scene" role="img" aria-label="Ein volles Haus wird geräumt: Möbel und Kartons werden in einen Transporter geladen, der Transporter fährt ab, das Haus ist leer.">
+      <div class="scene" role="img" aria-label="Ein volles Haus wird geräumt: Möbel und Kartons wandern in den L&amp;S-Umzugswagen, der Wagen fährt ab, das Haus ist leer.">
         <img class="poster" src="static/fallback-before.jpg" alt="" />
         <canvas id="scene-canvas" aria-hidden="true"></canvas>
         <div class="label" aria-live="polite">
@@ -132,7 +132,7 @@
         <div class="status" aria-hidden="true">Lokale 3D-Vorschau</div>
       </div>
       <div class="still" aria-label="Vorher und nachher">
-        <figure><img id="still-before" src="static/fallback-before.jpg" alt="Vorher: das Haus ist voll möbliert, der Transporter wartet mit offener Hecktür." /><figcaption>Vorher</figcaption></figure>
+        <figure><img id="still-before" src="static/fallback-before.jpg" alt="Vorher: das Haus ist voll möbliert, der L&amp;S-Umzugswagen wartet mit offener Hecktür." /><figcaption>Vorher</figcaption></figure>
         <figure><img id="still-after" src="static/fallback-after.jpg" alt="Nachher: das Haus ist leer und besenrein, der Transporter ist abgefahren." /><figcaption>Nachher – geräumt und besenrein</figcaption></figure>
       </div>
     </div>

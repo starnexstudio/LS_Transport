@@ -1,29 +1,32 @@
 // Downloads the CC0 assets for the 3D preview into ../assets (not committed).
-//   Kenney packs (kenney.nl, CC0): Mini Characters, Car Kit, Furniture Kit
-//   Poly Haven (polyhaven.com, CC0): furniture models + PBR textures (1k)
+// Everything comes from Poly Haven (polyhaven.com, CC0): furniture and props as
+// glTF (1k textures), PBR surface textures (1k) and an HDRI for lighting.
 // Run from anywhere: node preview-3d/scripts/fetch-assets.mjs
-import { mkdir, writeFile, readdir, copyFile, stat } from "node:fs/promises";
+import { mkdir, writeFile, stat } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { execFileSync } from "node:child_process";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..", "assets");
-const downloads = join(root, "_downloads");
 
-const kenney = {
-  "kenney-mini-characters": "https://kenney.nl/media/pages/assets/mini-characters/bfc7e272b4-1774770718/kenney_mini-characters.zip",
-  "kenney-car-kit": "https://kenney.nl/media/pages/assets/car-kit/1a312ec241-1775131960/kenney_car-kit.zip",
-  "kenney-furniture-kit": "https://kenney.nl/media/pages/assets/furniture-kit/440e0608a4-1677580847/kenney_furniture-kit.zip",
-};
-// Kenney models copied into assets/models/<set>/ (with their Textures folder).
-const curate = {
-  "kenney-mini-characters": { dir: "Models/GLB format", to: "characters", files: ["character-male-a.glb", "character-male-b.glb", "character-male-c.glb"] },
-  "kenney-car-kit": { dir: "Models/GLB format", to: "vehicles", files: ["van.glb", "delivery.glb", "wheel-default.glb"] },
-  "kenney-furniture-kit": { dir: "Models/GLTF format", to: "furniture", files: ["loungeSofa.glb", "loungeChair.glb", "bookcaseClosedDoors.glb", "bookcaseOpen.glb", "cardboardBoxClosed.glb", "rugRectangle.glb"] },
-};
-const polyModels = ["Sofa_01", "ArmChair_01", "cardboard_box_01", "hand_truck", "painted_wooden_cabinet_02"];
-const polyTextures = ["clay_roof_tiles", "painted_plaster_wall", "herringbone_parquet", "grey_roof_tiles", "asphalt_02", "leafy_grass", "concrete_floor_02", "brick_pavement_02"];
+export const models = [
+  // Furniture and household contents that get cleared
+  "Sofa_01", "modern_arm_chair_01", "mid_century_lounge_chair", "modern_coffee_table_01", "modern_wooden_cabinet",
+  "Television_01", "potted_plant_02", "potted_plant_04", "wooden_display_shelves_01", "wooden_table_02",
+  "side_table_01", "old_bed_frame", "drawer_cabinet", "ClassicNightstand_01", "vintage_suitcase", "wooden_bookshelf_worn",
+  "steel_frame_shelves_01", "ornate_mirror_01", "desk_lamp_arm_01",
+  "Ottoman_01", "side_table_tall_01", "GothicCommode_01", "Rockingchair_01", "painted_wooden_cabinet", "television_02",
+  "painted_wooden_chair_01", "throw_pillows_01", "wicker_basket_02",
+  "ceramic_vase_02", "ceramic_vase_03", "ceramic_vase_04", "antique_ceramic_vase_01", "wooden_bowl_01",
+  "alarm_clock_01", "standing_picture_frame_01", "standing_picture_frame_02", "hanging_picture_frame_01", "hanging_picture_frame_02",
+  // Fixtures, garden and street
+  "modern_ceiling_lamp_01", "covered_car", "street_lamp_01", "outdoor_table_chair_set_01", "planter_box_02",
+];
+const textures = [
+  "leafy_grass", "asphalt_04", "concrete_pavers_02", "interlocking_concrete_pavers", "granite_tile_04", "beige_wall_001",
+  "beige_wall_002", "ceramic_roof_01", "herringbone_parquet", "grey_oak_veneer_01", "metal_plate", "ash_veneer", "concrete_floor_02",
+];
+const hdri = "kloofendal_48d_partly_cloudy_puresky";
 
 async function download(url, file) {
   if (existsSync(file) && (await stat(file)).size > 0) return false;
@@ -33,46 +36,24 @@ async function download(url, file) {
   await writeFile(file, Buffer.from(await res.arrayBuffer()));
   return true;
 }
+const files = async (id) => (await fetch(`https://api.polyhaven.com/files/${id}`)).json();
 
 const log = [];
-for (const [name, url] of Object.entries(kenney)) {
-  const zip = join(downloads, name, "pack.zip");
-  if (await download(url, zip)) log.push(`downloaded ${name}`);
-  const out = join(downloads, name, "x");
-  if (!existsSync(out)) execFileSync("unzip", ["-q", "-o", zip, "-d", out]);
-  const c = curate[name];
-  const src = join(out, c.dir), dest = join(root, "models", c.to);
-  await mkdir(dest, { recursive: true });
-  for (const f of c.files) await copyFile(join(src, f), join(dest, f));
-  // Some packs embed colours in the materials and ship no texture folder.
-  if (existsSync(join(src, "Textures"))) {
-    await mkdir(join(dest, "Textures"), { recursive: true });
-    for (const t of await readdir(join(src, "Textures"))) await copyFile(join(src, "Textures", t), join(dest, "Textures", t));
-  }
-  await copyFile(join(out, "License.txt"), join(dest, `LICENSE-${name}.txt`));
-}
-
-for (const id of polyModels) {
-  const files = await (await fetch(`https://api.polyhaven.com/files/${id}`)).json();
-  const g = files.gltf["1k"].gltf;
+await Promise.all(models.map(async (id) => {
+  const g = (await files(id)).gltf["1k"].gltf;
   const dir = join(root, "polyhaven", id);
-  await download(g.url, join(dir, `${id}.gltf`));
-  for (const [rel, f] of Object.entries(g.include ?? {})) await download(f.url, join(dir, rel));
-  log.push(`model ${id}`);
-}
-for (const id of polyTextures) {
-  const files = await (await fetch(`https://api.polyhaven.com/files/${id}`)).json();
-  const dir = join(root, "textures", id);
+  let fresh = await download(g.url, join(dir, `${id}.gltf`));
+  for (const [rel, f] of Object.entries(g.include ?? {})) fresh = (await download(f.url, join(dir, rel))) || fresh;
+  if (fresh) log.push(`model ${id}`);
+}));
+await Promise.all(textures.map(async (id) => {
+  const f = await files(id), dir = join(root, "textures", id);
   for (const [map, out] of [["Diffuse", "diffuse.jpg"], ["nor_gl", "normal.jpg"], ["Rough", "rough.jpg"]]) {
-    const entry = files[map]?.["1k"]?.jpg;
-    if (entry) await download(entry.url, join(dir, out));
+    const entry = f[map]?.["1k"]?.jpg;
+    if (entry && (await download(entry.url, join(dir, out)))) log.push(`texture ${id}/${out}`);
   }
-  log.push(`texture ${id}`);
-}
-await writeFile(join(root, "polyhaven", "LICENSE.txt"), "All Poly Haven assets are CC0 (public domain): https://polyhaven.com/license\n");
-
-// Rigged worker: "Worker" on poly.pizza (https://poly.pizza/m/Yg2bQZO6Hj), CC0 public domain.
-const workerFile = join(root, "models", "characters", "worker.glb");
-if (await download("https://static.poly.pizza/3a5f3056-ffe6-42eb-bd52-122afcbd22b2.glb", workerFile)) log.push("model worker");
-await writeFile(join(root, "models", "characters", "LICENSE-worker.txt"), "\"Worker\" from https://poly.pizza/m/Yg2bQZO6Hj – CC0 1.0 Public Domain.\n");
-console.log(log.join("\n"));
+}));
+const h = (await files(hdri)).hdri["1k"].hdr;
+if (await download(h.url, join(root, "hdri", `${hdri}.hdr`))) log.push(`hdri ${hdri}`);
+await writeFile(join(root, "LICENSE.txt"), "All assets in this folder are from Poly Haven and are CC0 (public domain): https://polyhaven.com/license\n");
+console.log(log.length ? log.join("\n") : "all assets present");

@@ -12,20 +12,14 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "..", "assets");
 export const models = [
   // Furniture and household contents that get cleared
   "Sofa_01", "modern_arm_chair_01", "mid_century_lounge_chair", "modern_coffee_table_01", "modern_wooden_cabinet",
-  "Television_01", "potted_plant_02", "potted_plant_04", "wooden_display_shelves_01", "wooden_table_02",
-  "side_table_01", "old_bed_frame", "drawer_cabinet", "ClassicNightstand_01", "vintage_suitcase", "wooden_bookshelf_worn",
-  "steel_frame_shelves_01", "ornate_mirror_01", "desk_lamp_arm_01",
-  "Ottoman_01", "side_table_tall_01", "GothicCommode_01", "Rockingchair_01", "painted_wooden_cabinet", "television_02",
+  "Television_01", "potted_plant_02", "wooden_table_02", "drawer_cabinet", "vintage_suitcase", "wooden_bookshelf_worn",
+  "steel_frame_shelves_01", "Ottoman_01", "side_table_tall_01", "GothicCommode_01",
   "painted_wooden_chair_01", "throw_pillows_01", "wicker_basket_02",
   "ceramic_vase_02", "ceramic_vase_03", "ceramic_vase_04", "antique_ceramic_vase_01", "wooden_bowl_01",
   "alarm_clock_01", "standing_picture_frame_01", "standing_picture_frame_02", "hanging_picture_frame_01", "hanging_picture_frame_02",
-  // Fixtures, garden and street
-  "modern_ceiling_lamp_01", "outdoor_table_chair_set_01", "planter_box_02",
 ];
-const textures = [
-  "beige_wall_001",
-  "beige_wall_002", "ceramic_roof_01", "herringbone_parquet", "grey_oak_veneer_01", "metal_plate", "ash_veneer", "concrete_floor_02",
-];
+// Room walls and floor; the truck's cargo floor and tail lift
+const textures = ["beige_wall_002", "herringbone_parquet", "metal_plate", "ash_veneer"];
 const hdri = "kloofendal_48d_partly_cloudy_puresky";
 
 async function download(url, file) {

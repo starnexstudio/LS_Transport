@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>L&amp;S Hausräumung – 3D-Vorschau (lokal)</title>
+<title>L&amp;S Räumung – 3D-Vorschau (lokal)</title>
 <link rel="icon" href="static/ls-logo.webp" />
 <meta name="robots" content="noindex" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -45,15 +45,15 @@
   .word { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: 0.1em; margin-bottom: -0.1em; }
   .word > span { display: inline-block; }
   .accent { position: relative; }
-  /* "Neues." is underlined once the house is empty (--a, set from the timeline). */
+  /* "Neues." is underlined once the room is empty (--a, set from the timeline). */
   .accent::after { content: ""; position: absolute; left: 0.02em; right: 0.14em; bottom: 0.04em; height: 0.07em; background: var(--orange); transform-origin: left; transform: scaleX(var(--a, 0)); }
   .br-mobile, .br-tablet { display: none; }
-  /* The sentence lights up word by word while the house empties (--t, the timeline). */
+  /* The sentence lights up word by word while the room empties (--t, the timeline). */
   .lead { max-width: 31em; margin: 16px auto 0; font-size: 18px; line-height: 1.56; text-wrap: balance; }
   .lead > span { opacity: calc(0.34 + 0.66 * clamp(0, (var(--t, 0) - 0.02 - var(--i) * 0.053) / 0.06, 1)); }
 
   /* Scene: the band between the copy and the actions. The canvas covers the whole
-     stage, and the camera frames the house and the truck inside this band. */
+     stage, and the camera frames the room and the van inside this band. */
   .scene { position: relative; z-index: 1; flex: 1 1 0; min-height: 0; --lift: 104px; --room: 0.76; }
   .stage > canvas { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; display: block; pointer-events: none; }
   .poster { position: absolute; left: 50%; top: 20px; width: calc(var(--room) * 100%); height: calc(100% - 20px - var(--lift)); translate: -50% 0; object-fit: contain; display: block; transition: opacity 500ms; }
@@ -209,13 +209,13 @@
         </h1>
         <p class="lead">Wir übernehmen die komplette Räumung – von der Planung bis zur besenreinen Übergabe.</p>
       </div>
-      <div class="scene" role="img" aria-label="Ein volles Haus wird geräumt: Möbel und Kartons wandern in den L&amp;S-Umzugswagen, der Wagen fährt ab, das Haus ist leer.">
-        <img class="poster" src="static/fallback-before.webp" alt="" />
+      <div class="scene" role="img" aria-label="Ein voll gepacktes Zimmer wird geräumt: Möbel und Kartons wandern in den L&amp;S-Umzugswagen, der Wagen fährt ab, das Zimmer ist leer.">
+        <picture><source media="(max-width: 760px)" srcset="static/fallback-before-m.webp" /><img class="poster" src="static/fallback-before.webp" alt="" /></picture>
       </div>
       <canvas id="scene-canvas" aria-hidden="true"></canvas>
       <div class="still" aria-label="Vorher und nachher">
-        <figure><img id="still-before" src="static/fallback-before.webp" alt="Vorher: das Haus ist voll möbliert, der L&amp;S-Umzugswagen wartet mit offener Hecktür." /><figcaption>Vorher</figcaption></figure>
-        <figure><img id="still-after" src="static/fallback-after.webp" alt="Nachher: das Haus ist leer und besenrein, der Transporter ist abgefahren." /><figcaption>Nachher – geräumt und besenrein</figcaption></figure>
+        <figure><img id="still-before" src="static/fallback-before.webp" alt="Vorher: das Zimmer ist voll mit Möbeln und Umzugskartons, der L&amp;S-Umzugswagen wartet mit offener Hecktür." /><figcaption>Vorher</figcaption></figure>
+        <figure><img id="still-after" src="static/fallback-after.webp" alt="Nachher: das Zimmer ist leer und besenrein, der Umzugswagen ist abgefahren." /><figcaption>Nachher – geräumt und besenrein</figcaption></figure>
       </div>
       <div class="actions">
         <a class="button button-primary" href="https://starnexstudio.github.io/LS_Transport/#anfrage">Unverbindlich anfragen

@@ -1,10 +1,10 @@
-// Master timeline for the hero, t from 0 (furnished house) to 1 (truck gone).
+// Master timeline for the hero, t from 0 (room packed full) to 1 (empty room, van gone).
 // Everything is a pure function of t, so any scroll position maps to one exact
 // state and scrolling back plays it in reverse.
 import * as THREE from "three";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { model } from "./assets.js";
-import { HOUSE, contactShadow } from "./world.js";
+import { ROOM, contactShadow } from "./world.js";
 import { T } from "./truck.js";
 import { planLoad } from "./pack.js";
 import { mergeStatic } from "./merge.js";
@@ -16,84 +16,66 @@ const ease = (u) => u * u * (3 - 2 * u);
 const span = (t, a, b) => clamp01((t - a) / (b - a));
 const qYaw = (a) => new THREE.Quaternion().setFromAxisAngle(UP, a);
 
-const { F0, F1, C0, C1 } = HOUSE;
+const { F } = ROOM;
 const B = 0.34; // stacked box height
 const Q = Math.PI / 2;
 const BOX = "box"; // procedural moving box (see cardboardBox)
 
-// Household contents: where each piece stands at home. `on` names the piece it
-// stands on (its height then follows from that piece); otherwise `y` is the floor
-// or base height. Packed boxes: "openbox:<contents>". The loading order comes from
-// the packing plan (large pieces first, front of the cargo first).
-const item = (key, m, x, z, o = {}) => ({ key, m, x, z, y: o.y ?? F0, r: o.r ?? 0, on: o.on, f: o.f ?? "" });
-const boxes = (prefix, x, z, y, n, top) => Array.from({ length: n }, (_, i) =>
-  item(`${prefix}${i}`, i === n - 1 && top ? `openbox:${top}` : BOX, x, z, { y: y + i * B, r: ((i * 7) % 5 - 2) * 0.03, f: i === n - 1 && top ? "stack" : "stack support" }));
+// The room's contents, packed and ready to go: where each piece stands. `on` names
+// the piece it stands on (its height then follows from that piece); otherwise `y`
+// is its base height. Packed boxes: "openbox:<contents>". The loading order comes
+// from the packing plan (large pieces first, front of the cargo first).
+const item = (key, m, x, z, o = {}) => ({ key, m, x, z, y: o.y ?? F, r: o.r ?? 0, on: o.on, f: o.f ?? "" });
+const boxes = (prefix, x, z, n, top) => Array.from({ length: n }, (_, i) =>
+  item(`${prefix}${i}`, i === n - 1 && top ? `openbox:${top}` : BOX, x, z, { y: F + i * B, r: ((i * 7) % 5 - 2) * 0.03, f: i === n - 1 && top ? "stack" : "stack support" }));
 const CONTENTS = [
-  // Ground floor, living room
-  item("sofa", "Sofa_01", -3.4, -4.77, { f: "support" }),
-  item("pillows", "throw_pillows_01", -3.4, -4.74, { y: F0 + 0.38, on: "sofa", f: "stack" }),
-  item("coffeetable", "modern_coffee_table_01", -3.4, -3.55, { r: Q, f: "stack support" }),
-  item("vase1", "ceramic_vase_04", -3.15, -3.55, { on: "coffeetable", f: "stack" }),
-  item("bowl1", "wooden_bowl_01", -3.68, -3.5, { on: "coffeetable", f: "stack" }),
-  item("armchair", "modern_arm_chair_01", -4.75, -3.4, { r: Q }),
-  item("lounge", "mid_century_lounge_chair", -2.2, -3.6, { r: -Q + 0.45 }),
-  item("ottoman", "Ottoman_01", -2.7, -2.5, { r: 0.3, f: "stack" }),
-  item("sideboard", "modern_wooden_cabinet", -1.64, -1.3, { r: -Q, f: "support" }),
-  item("tv", "Television_01", -1.64, -1.5, { r: -Q, on: "sideboard", f: "stack" }),
-  item("vase2", "ceramic_vase_03", -1.64, -0.4, { on: "sideboard", f: "stack" }),
-  item("frame1", "standing_picture_frame_01", -1.64, -2.2, { r: -Q - 0.3, on: "sideboard", f: "stack" }),
-  item("shelf", "wooden_display_shelves_01", -5.23, -1.6, { f: "support" }),
-  item("books1", "books", -5.23, -1.62, { r: Q, on: "shelf", f: "stack" }),
-  item("talltable", "side_table_tall_01", -4.85, -4.72, { f: "stack support" }),
-  item("vase3", "ceramic_vase_02", -4.85, -4.72, { on: "talltable", f: "stack" }),
-  item("bigplant", "potted_plant_02", -1.95, 0.35, { r: 0.3, f: "stack" }),
-  item("pic1", "hanging_picture_frame_02", -5.42, -1.6, { y: F0 + 1.88, r: Q, f: "stack" }),
-  item("pic2", "hanging_picture_frame_01", -5.42, -3.5, { y: F0 + 1.25, r: Q, f: "stack" }),
-  ...boxes("lbox", -4.85, 0.4, F0, 2),
-  item("lopen", "openbox:decor", -4.25, 0.5, { r: 0.25, f: "stack" }),
-  // Ground floor, dining room
-  item("table", "wooden_table_02", -7.6, -2.0, { f: "support" }),
-  item("bowl2", "wooden_bowl_01", -7.6, -2.0, { on: "table", f: "stack" }),
-  item("chair1", "painted_wooden_chair_01", -7.35, -1.25, { r: Math.PI, f: "stack" }),
-  item("chair2", "painted_wooden_chair_01", -7.85, -2.75, { f: "stack" }),
-  item("chair3", "painted_wooden_chair_01", -8.5, -2.0, { r: Q, f: "stack" }),
-  item("chair4", "painted_wooden_chair_01", -6.7, -2.0, { r: -Q, f: "stack" }),
-  item("commode", "GothicCommode_01", -5.87, -3.1, { r: -Q, f: "support" }),
-  item("vase4", "antique_ceramic_vase_01", -5.87, -3.4, { on: "commode", f: "stack" }),
-  item("clock1", "alarm_clock_01", -5.87, -2.72, { r: -Q, on: "commode", f: "stack" }),
-  item("pic3", "hanging_picture_frame_01", -5.58, -3.1, { y: F0 + 1.75, r: -Q, f: "stack" }),
-  item("sidetable", "side_table_01", -9.2, 0.3, { r: 0.2, f: "stack support" }),
-  item("smallplant", "potted_plant_04", -9.2, 0.3, { r: 0.4, on: "sidetable", f: "stack" }),
-  item("dopen", "openbox:kitchen", -6.3, 0.45, { r: -0.2, f: "stack" }),
-  // Upstairs, bedroom
-  item("bed", "old_bed_frame", -3.0, -4.1, { y: F1 }),
-  item("nightstand", "ClassicNightstand_01", -1.95, -4.85, { y: F1, f: "stack support" }),
-  item("desklamp", "desk_lamp_arm_01", -1.95, -4.85, { r: -0.6, on: "nightstand", f: "stack" }),
-  item("drawers", "drawer_cabinet", -1.63, -2.2, { y: F1, r: -Q, f: "support" }),
-  item("frame2", "standing_picture_frame_02", -1.63, -2.55, { r: -Q + 0.3, on: "drawers", f: "stack" }),
-  item("vase5", "ceramic_vase_03", -1.63, -1.8, { on: "drawers", f: "stack" }),
-  item("cabinet", "painted_wooden_cabinet", -5.13, -3.3, { y: F1, r: Q, f: "support" }),
-  item("basket1", "wicker_basket_02", -5.13, -3.3, { r: 0.4, on: "cabinet", f: "stack" }),
-  item("mirror", "ornate_mirror_01", -5.4, -1.6, { y: F1, r: Q }),
-  item("rocking", "Rockingchair_01", -2.1, -0.4, { y: F1, r: -2.3 }),
-  item("suitcases", "vintage_suitcase", -4.0, 0.2, { y: F1, r: 0.15 }),
-  // Upstairs, storage room
-  ...boxes("sa", -8.6, -0.6, F1, 3, "books"),
-  ...boxes("sb", -8.0, -0.4, F1, 3),
-  ...boxes("sc", -7.3, -1.1, F1, 2, "decor"),
-  ...boxes("sd", -6.4, 0.3, F1, 2),
-  item("steelshelf", "steel_frame_shelves_01", -5.83, -2.2, { y: F1, r: -Q, f: "support" }),
-  item("books2", "books", -5.83, -2.2, { r: Q, on: "steelshelf", f: "stack" }),
-  item("bookshelf", "wooden_bookshelf_worn", -9.33, -2.6, { y: F1, r: Q, f: "support" }),
-  item("books3", "books", -9.33, -2.9, { r: Q, on: "bookshelf", f: "stack" }),
-  item("oldtv", "television_02", -7.0, -3.2, { y: F1, r: 0.5, f: "stack support" }),
-  item("woodchair", "painted_wooden_chair_01", -6.6, -1.6, { y: F1, r: -0.4, f: "stack" }),
-  // Packed and waiting in the front garden
-  ...boxes("ya", -9.2, 2.5, 0, 3, "books"),
-  ...boxes("yb", -8.5, 2.3, 0, 2, "kitchen"),
-  ...boxes("yc", -7.8, 2.75, 0, 2),
-  item("yopen", "openbox:decor", -8.95, 3.35, { y: 0, r: 0.5, f: "stack" }),
-  ...boxes("yd", -8.2, 3.5, 0, 1),
+  // Along the back wall
+  item("bookshelf", "wooden_bookshelf_worn", -5.15, -3.88, { f: "support" }),
+  item("books1", "books", -5.15, -3.9, { on: "bookshelf", f: "stack" }),
+  item("sideboard", "modern_wooden_cabinet", -2.75, -3.91, { f: "support" }),
+  item("tv", "Television_01", -3.35, -3.93, { on: "sideboard", f: "stack" }),
+  item("frame1", "standing_picture_frame_01", -2.45, -3.95, { r: 0.3, on: "sideboard", f: "stack" }),
+  item("vase2", "ceramic_vase_03", -1.85, -3.93, { on: "sideboard", f: "stack" }),
+  item("pic1", "hanging_picture_frame_02", -2.75, -4.18, { y: F + 1.3, f: "stack" }),
+  item("drawers", "drawer_cabinet", -0.75, -3.92, { f: "support" }),
+  item("basket1", "wicker_basket_02", -0.75, -3.92, { r: 0.3, on: "drawers", f: "stack" }),
+  item("bigplant", "potted_plant_02", -0.4, -3.2, { r: 0.3, f: "stack" }),
+  item("talltable", "side_table_tall_01", -4.25, -3.15, { f: "stack support" }),
+  item("vase3", "ceramic_vase_02", -4.25, -3.15, { on: "talltable", f: "stack" }),
+  // Along the left wall
+  item("steelshelf", "steel_frame_shelves_01", -5.72, -2.45, { r: Q, f: "support" }),
+  item("books2", "books", -5.72, -2.45, { r: Q, on: "steelshelf", f: "stack" }),
+  item("commode", "GothicCommode_01", -5.68, -1.05, { r: Q, f: "support" }),
+  item("vase4", "antique_ceramic_vase_01", -5.68, -1.35, { on: "commode", f: "stack" }),
+  item("clock1", "alarm_clock_01", -5.68, -0.7, { r: Q, on: "commode", f: "stack" }),
+  item("pic2", "hanging_picture_frame_01", -5.985, -1.05, { y: F + 1.4, r: Q, f: "stack" }),
+  // Seating
+  item("sofa", "Sofa_01", -3.2, -2.55, { f: "support" }),
+  item("pillows", "throw_pillows_01", -3.2, -2.52, { on: "sofa", f: "stack" }),
+  item("coffeetable", "modern_coffee_table_01", -3.2, -1.5, { r: Q, f: "stack support" }),
+  item("bowl1", "wooden_bowl_01", -3.45, -1.5, { on: "coffeetable", f: "stack" }),
+  item("vase1", "ceramic_vase_04", -2.9, -1.5, { on: "coffeetable", f: "stack" }),
+  item("armchair", "modern_arm_chair_01", -4.68, -2.0, { r: 0.7 }),
+  item("lounge", "mid_century_lounge_chair", -1.55, -2.3, { r: -0.55 }),
+  item("ottoman", "Ottoman_01", -2.05, -0.95, { r: 0.25, f: "stack support" }),
+  item("oopen", "openbox:decor", -2.05, -0.95, { r: -0.2, on: "ottoman", f: "stack" }),
+  // Dining table at the front, cleared into a box
+  item("table", "wooden_table_02", -4.3, -0.5, { f: "support" }),
+  item("topen", "openbox:kitchen", -4.55, -0.5, { r: 0.15, on: "table", f: "stack" }),
+  item("bowl2", "wooden_bowl_01", -3.95, -0.45, { on: "table", f: "stack" }),
+  item("chair1", "painted_wooden_chair_01", -4.3, 0.15, { r: Math.PI, f: "stack" }),
+  item("chair2", "painted_wooden_chair_01", -5.0, -0.5, { r: Q, f: "stack" }),
+  item("suitcases", "vintage_suitcase", -3.1, 0.35, { r: 0.05 }),
+  // Packed boxes, stacked by the open side, ready to go
+  ...boxes("ra", -0.5, 0.2, 3),
+  ...boxes("rb", -0.5, -0.4, 3, "books"),
+  ...boxes("rc", -1.0, 0.25, 2),
+  ...boxes("rd", -1.0, -0.35, 3),
+  ...boxes("re", -0.5, -1.0, 2, "kitchen"),
+  ...boxes("rf", -1.5, 0.3, 2),
+  ...boxes("rg", -0.5, -1.6, 2),
+  ...boxes("lc", -1.95, 0.3, 2),
+  ...boxes("la", -5.55, 0.3, 3, "decor"),
 ];
 // What goes into the open boxes (on top of crumpled paper).
 const PACKED = {
@@ -103,7 +85,7 @@ const PACKED = {
 };
 
 // Timeline (fractions of the scroll)
-export const TL = { fly0: 0.0, fly1: 0.72, flight: 0.12, cleared: 0.73, door: [0.77, 0.835], lift: [0.83, 0.885], rev: [0.885, 0.95], drive: [0.952, 1.0] };
+export const TL = { fly0: 0.0, fly1: 0.72, flight: 0.12, cleared: 0.73, door: [0.77, 0.835], lift: [0.83, 0.885], drive: [0.89, 1.0] };
 
 // Moving box: one mesh, a cardboard texture with packing tape over the top and ends.
 let boxMat = null;
@@ -223,7 +205,6 @@ export async function buildSequence({ scene, truck, mobile }) {
   for (const it of items) {
     const base = baseOf(it);
     it.home = { pos: V(it.c.x, base + it.size.y / 2, it.c.z), quat: qYaw(it.c.r) };
-    it.ceiling = it.c.z > HOUSE.z1 ? Infinity : base < F1 - 0.01 ? C0 : C1;
     if (!it.below) { // stacked boxes: what's directly underneath
       it.below = items.find((o) => o !== it && !o.c.on && Math.hypot(o.c.x - it.c.x, o.c.z - it.c.z) < 0.1 && Math.abs(baseOf(o) + o.size.y - base) < 0.03)?.key;
     }
@@ -239,26 +220,34 @@ export async function buildSequence({ scene, truck, mobile }) {
     it.slot = { pos: V(s.x, C.y0 + s.y + it.size.y / 2 + 0.002, C.z1 - 0.02 - s.z), quat: qYaw(s.rot ? Q : 0) };
   }
 
-  // ---------- Truck: parked nose-first in the drive, rear and tail lift to the street ----------
-  const parked = { pos: V(-13.0, 0, -0.5), yaw: Math.PI };
+  // ---------- Van: parked by the room's open side, rear and tail lift turned to it ----------
+  // Laptops: to the right of the room, turned half a radian off its line, so the camera
+  // sees into the open rear and along the side with the livery. Phones: behind and to
+  // the right of the room, rear towards the camera and the room, nose a little to the
+  // right so its lit side shows; that keeps the pair narrow enough for a phone and
+  // shows the loading straight into the back.
+  const layout = mobile ? { rear: V(2.2, 0, -1.5), yaw: Math.PI - 0.15 } : { rear: V(2.6, 0, -1.0), yaw: Q + 0.5 };
+  const fwd = V(Math.sin(layout.yaw), 0, Math.cos(layout.yaw)), right = V(-fwd.z, 0, fwd.x);
+  const parked = { pos: layout.rear.clone().addScaledVector(fwd, -T.rear), yaw: layout.yaw };
   truck.root.position.copy(parked.pos); truck.root.rotation.y = parked.yaw; scene.add(truck.root);
   truck.root.add(contactShadow(2.7, 9.9, 0, 1.65, 0.55)); // travels with the truck
   truck.root.updateMatrixWorld(true);
   const toWorld = (p) => truck.root.localToWorld(p.clone());
 
-  // ---------- Flight paths (world, truck parked) ----------
+  // ---------- Flight paths (world, van parked) ----------
   const n = items.length, stagger = (TL.fly1 - TL.fly0 - TL.flight) / (n - 1);
   items.forEach((it, i) => {
     it.t0 = TL.fly0 + i * stagger;
     const p0 = it.home.pos, h = it.size.y;
-    const upstairs = it.ceiling === C1; // leaves under the eaves and gutter
-    const rise = Math.max(0.2, Math.min(upstairs ? 0.5 : 1.25, it.ceiling - (p0.y + h / 2) - 0.12));
     const p4 = toWorld(it.slot.pos);
     const p3 = toWorld(V(it.slot.pos.x, it.slot.pos.y + 0.2, T.rear - 1.5));
     // Through the middle of the rear opening, then straight along the cargo space.
     const pIn = it.slot.pos.z > T.rear + 0.7 ? toWorld(V(it.slot.pos.x, it.slot.pos.y + 0.06, T.rear + 0.25)) : null;
-    const p1 = p0.clone().add(V(0, rise, 0.25));
-    const p2 = V(THREE.MathUtils.lerp(p0.x, p3.x, 0.35), upstairs ? p1.y : Math.max(p1.y, p3.y) + 0.6, Math.max(HOUSE.z1 + 1.9, p0.z + 0.6));
+    // Up off its place, then over what still stands in the room (box stacks, chairs),
+    // out through the open side and across to the tail.
+    const travel = Math.max(p0.y + 0.35, F + 1.25 + h / 2, p3.y + 0.3);
+    const p1 = p0.clone().add(V(0, Math.min(0.5, travel - p0.y), 0.15));
+    const p2 = V(ROOM.x1 + 0.45, travel, THREE.MathUtils.lerp(p0.z, p3.z, 0.5));
     it.curve = new THREE.CatmullRomCurve3([p0, p1, p2, p3, ...(pIn ? [pIn] : []), p4], false, "centripetal");
     it.curve.arcLengthDivisions = 400;
     it.curve.getLength();
@@ -266,39 +255,52 @@ export async function buildSequence({ scene, truck, mobile }) {
     it.roll = (i % 2 ? 1 : -1) * 0.06;
   });
 
-  // ---------- Departure: reverse out in a quarter turn, then drive off along the street ----------
-  const R = 6.5, laneZ = 9.7, ZR = laneZ - R;
-  const straight = ZR - parked.pos.z, arc = (Math.PI / 2) * R, REV = straight + arc, FWD = 60;
-  const wheelbase = T.frontAxle, steerMax = -Math.atan(wheelbase / R);
+  // ---------- Departure: gathering speed out of the frame ----------
+  // A short way ahead, then a right turn, so the van leaves sideways and low in the
+  // frame instead of driving up behind the copy: an easy bend on laptops, a quarter
+  // turn on phones.
+  const FWD = 45, drivePos = V(0, 0, 0), heading = V(0, 0, 0);
+  const turn = mobile ? { s0: 0.4, R: 5.5, ang: Q } : { s0: 1.0, R: 9, ang: 0.8 };
+  const steerMax = -Math.atan(T.frontAxle / turn.R), arc = turn.R * turn.ang;
   function truckPose(t) {
-    const rev = ease(span(t, ...TL.rev)) * REV;
-    const uf = span(t, ...TL.drive), ahead = FWD * uf * uf;
-    if (ahead > 0) return { pos: V(parked.pos.x + R - ahead, 0, laneZ), yaw: -Q, dist: ahead - REV, steer: 0 };
-    if (rev <= straight) return { pos: V(parked.pos.x, 0, parked.pos.z + rev), yaw: Math.PI, dist: -rev, steer: steerMax * clamp01((rev - straight + 0.8) / 0.8) };
-    const a = (rev - straight) / R;
-    return { pos: V(parked.pos.x + R - R * Math.cos(a), 0, ZR + R * Math.sin(a)), yaw: Math.PI + a, dist: -rev, steer: steerMax * clamp01((Q - a) / 0.25) };
+    const u = span(t, ...TL.drive), s = FWD * u * u, { s0, R, ang } = turn;
+    if (s <= s0) return { pos: drivePos.copy(parked.pos).addScaledVector(fwd, s), yaw: parked.yaw, dist: s, steer: 0 };
+    // Round a centre to the right of where the turn starts, then straight on.
+    const a = Math.min(s - s0, arc) / R, after = Math.max(0, s - s0 - arc);
+    heading.copy(fwd).multiplyScalar(Math.cos(a)).addScaledVector(right, Math.sin(a));
+    drivePos.copy(parked.pos).addScaledVector(fwd, s0 + R * Math.sin(a)).addScaledVector(right, R * (1 - Math.cos(a))).addScaledVector(heading, after);
+    const steer = steerMax * clamp01((s - s0 + 0.6) / 0.6) * clamp01((s0 + arc + 0.6 - s) / 0.6);
+    return { pos: drivePos, yaw: parked.yaw - a, dist: s, steer };
   }
 
   // ---------- Camera ----------
-  // A slow, continuous dolly like a filmed shot: the full house and the truck, easing
-  // in as the rooms empty, over to the truck as its doors close, then back out as it
-  // leaves. The keys are composed for a 30° lens on a band 1.8 times as wide as it is
-  // tall (main.js frames that band between the copy and the actions); on any other
-  // band the camera backs off along its line of sight until the same view fits.
-  const REF = { aspect: 1.8, halfTan: Math.tan(THREE.MathUtils.degToRad(15)) };
-  const camKeys = [
-    { t: 0, pos: V(-9.0, 6.9, 22.5), look: V(-6.6, 3.2, -0.8) },
-    { t: 0.36, pos: V(-8.4, 6.7, 21.8), look: V(-6.5, 3.1, -0.9) },
-    { t: 0.72, pos: V(-7.7, 6.6, 21.4), look: V(-6.4, 3.2, -1.0) },
-    { t: 0.78, pos: V(-7.9, 6.4, 21.2), look: V(-7.4, 3.2, -0.4) },
-    { t: 0.845, pos: V(-10.6, 6.1, 21.1), look: V(-10.0, 3.3, 0.5) },
-    // Back out before the truck reverses towards us, and stay back while it drives
-    // off, so it never leaves the band at the bottom.
-    { t: 0.95, pos: V(-8.0, 8.3, 34.0), look: V(-7.5, 2.4, 3.0) },
-    { t: 0.975, pos: V(-8.2, 8.2, 32.6), look: V(-7.3, 2.5, 2.4) },
-    { t: 1, pos: V(-7.5, 7.9, 26.3), look: V(-6.0, 3.0, 0.3) },
-  ];
-
+  // A slow, continuous move like a filmed shot, from above and in front like a model
+  // on a table: the room and the van stay whole in the frame while it is loaded and
+  // shut, then the view settles on the empty room as the van leaves. One path for each
+  // layout, each composed for a 30° lens on a band of its own aspect (wide on laptops,
+  // square on phones); on any other band the camera backs off along its line of sight
+  // until the same view fits.
+  // Keys: look-at point, distance, azimuth (0 = straight from the front) and elevation.
+  const key = (t, look, dist, az, el) => ({ t, look, pos: look.clone().add(V(Math.sin(az) * Math.cos(el), Math.sin(el), Math.cos(az) * Math.cos(el)).multiplyScalar(dist)) });
+  const paths = {
+    wide: { aspect: 2.2, keys: [
+      key(0, V(2.1, 0.9, -1.9), 17.2, 0, 0.55),
+      key(0.36, V(2.0, 0.9, -1.9), 16.7, 0.03, 0.56),
+      key(0.72, V(1.9, 0.9, -2.0), 16.4, 0.05, 0.57),
+      key(0.8, V(2.3, 1.0, -2.1), 16.0, 0.04, 0.55),
+      key(0.88, V(2.2, 1.0, -2.2), 16.4, 0, 0.55),
+      key(1, V(-2.8, 0.9, -1.8), 12.0, -0.05, 0.6),
+    ] },
+    narrow: { aspect: 1.0, keys: [
+      key(0, V(-1.0, 1.2, -3.3), 26.0, 0.14, 0.6),
+      key(0.72, V(-0.9, 1.2, -3.3), 25.0, 0.12, 0.61),
+      key(0.8, V(-0.6, 1.3, -3.1), 24.5, 0.16, 0.58),
+      key(0.88, V(-0.7, 1.3, -3.1), 24.5, 0.14, 0.58),
+      key(1, V(-3.0, 0.9, -1.8), 16.4, 0.05, 0.62),
+    ] },
+  };
+  const path = mobile ? paths.narrow : paths.wide;
+  const halfTan = Math.tan(THREE.MathUtils.degToRad(15));
 
   const tmpQ = new THREE.Quaternion(), wob = new THREE.Quaternion(), tan = V(0, 0, 0), side = V(0, 0, 0), look = V(0, 0, 0);
   function evaluate(t, camera) {
@@ -326,9 +328,9 @@ export async function buildSequence({ scene, truck, mobile }) {
       o.quaternion.premultiply(wob.setFromAxisAngle(side, it.roll * Math.sin(Math.PI * clamp01(e / 0.85))));
     }
 
-    // Camera
-    spline(camKeys, t, "pos", camera.position); spline(camKeys, t, "look", look);
-    const fit = (REF.halfTan / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))) * Math.max(1, REF.aspect / camera.aspect);
+    // Camera, fitted to the band
+    spline(path.keys, t, "pos", camera.position); spline(path.keys, t, "look", look);
+    const fit = (halfTan / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))) * Math.max(1, path.aspect / camera.aspect);
     camera.position.sub(look).multiplyScalar(fit).add(look);
     camera.lookAt(look);
     return { cleared: t >= TL.cleared };

@@ -1,7 +1,7 @@
 // Load planning, as movers do it: large pieces first, lengthwise along the walls
 // from the front of the cargo space; boxes and small things stacked on flat tops.
 // The order things fly in follows from the plan: the front of the cargo fills
-// first, and anything standing on furniture in the house leaves before it.
+// first, and anything standing on furniture in the room leaves before it.
 
 // Free-rectangle packer. Coordinates: u across the cargo, v back from the front wall.
 class MaxRects {
@@ -35,7 +35,7 @@ class MaxRects {
 }
 
 // items: [{ key, w (across), d (along), h, stack, support, below }]; `below` is the
-// piece it stands on in the house. space: { w, l, h }.
+// piece it stands on in the room. space: { w, l, h }.
 // Returns slots { key: { x, z, y, rot, on } } (x across from the centre line, z = centre's
 // distance from the front wall, y = height it stands on, rot = quarter turn) and the
 // loading order (keys).

@@ -1,5 +1,5 @@
 // Bootstraps the 3D hero preview: a transparent renderer over the page's teal, the
-// house and the truck lit by sun and HDRI, and the clearance timeline, which native
+// packed room and the van lit by sun and HDRI, and the clearance timeline, which native
 // vertical scroll drives from 0 to 1 like scrubbing a video. The copy follows the same
 // timeline: the sentence lights up, "Neues." is underlined, the rail fills.
 import * as THREE from "three";
@@ -36,9 +36,9 @@ async function start() {
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 400);
 
-  // Afternoon sun from the front left: lights the open rooms and the truck's rear,
-  // and throws the shadows back and to the right onto the teal.
-  const sunDir = new THREE.Vector3(-0.62, 0.6, 0.5).normalize();
+  // High sun from the front right: it reaches into the open room past its walls and
+  // throws short shadows back and to the left onto the teal.
+  const sunDir = new THREE.Vector3(0.35, 0.75, 0.56).normalize();
 
   // HDRI for ambient light and reflections, turned so its sun lines up with ours.
   const env = await hdri("kloofendal_48d_partly_cloudy_puresky");
@@ -50,10 +50,10 @@ async function start() {
   scene.environmentRotation.y = azimuth(sunDir) - azimuth(env.sun);
 
   const sun = new THREE.DirectionalLight("#fff3e2", 5.2);
-  const focus = new THREE.Vector3(-7, 0, 0);
+  const focus = new THREE.Vector3(2, 0, -2);
   sun.position.copy(focus).addScaledVector(sunDir, 50); sun.target.position.copy(focus);
   sun.castShadow = true; sun.shadow.mapSize.setScalar(mobile ? 2048 : 4096);
-  Object.assign(sun.shadow.camera, { left: -14, right: 14, top: 13, bottom: -13, near: 20, far: 90 });
+  Object.assign(sun.shadow.camera, { left: -11, right: 11, top: 10, bottom: -10, near: 30, far: 80 });
   sun.shadow.bias = -0.0002; sun.shadow.normalBias = 0.02; sun.shadow.radius = 3;
   scene.add(sun, sun.target);
 
@@ -110,7 +110,7 @@ async function start() {
   };
   let target = 0, current = 0, velocity = 0, last = performance.now(), frameNo = 0, copyT = "";
   // The copy on the same timeline: --t lights the sentence and fills the rail, --a
-  // draws the underline under "Neues." once the house is empty.
+  // draws the underline under "Neues." once the room is empty.
   const copy = (t) => {
     const v = t.toFixed(4);
     if (v === copyT) return;

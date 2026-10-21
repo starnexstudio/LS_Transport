@@ -1,5 +1,5 @@
 // Merges static meshes under a root into one mesh per material, which cuts the
-// draw calls of the procedural house, street and truck from hundreds to dozens.
+// draw calls of the procedural room and truck from hundreds to dozens.
 import * as THREE from "three";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 

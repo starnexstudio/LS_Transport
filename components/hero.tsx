@@ -1,17 +1,31 @@
 import { Fragment, type CSSProperties } from "react";
 import { ArrowRight, Phone } from "lucide-react";
-import { HeroRoom } from "@/components/hero-room";
+import { HeroScene } from "@/components/hero-scene";
 import { HeroStage } from "@/components/hero-stage";
-import { business } from "@/lib/content";
+import { business, services } from "@/lib/content";
 
 const copy =
   "Wir übernehmen die komplette Räumung – von der Planung bis zur besenreinen Übergabe.";
 
 const order = (i: number) => ({ "--i": i }) as CSSProperties;
 
-// A pinned stage: the headline rises in on load, then scrolling clears the
-// room while the supporting sentence lights up word by word. When the room is
-// empty, "Neues." is underlined. The calls to action are there from the start.
+// The four services in the corners on large screens: the room's on the left,
+// the van's on the right.
+const corners = [
+  ["tl", "Entrümpelung"],
+  ["tr", "Möbeltransport & Lieferung"],
+  ["bl", "Demontage"],
+  ["br", "Fachgerechte Entsorgung"],
+].map(([corner, title]) => ({
+  corner,
+  title,
+  text: services.find((service) => service.title === title)?.text ?? "",
+}));
+
+// A pinned stage: the headline rises in on load, then scrolling empties the
+// room into the van while the supporting sentence lights up word by word. When
+// the room is empty, "Neues." is underlined. The calls to action are there from
+// the start.
 export function Hero() {
   const phone = business.phone.trim();
   return (
@@ -46,7 +60,7 @@ export function Hero() {
           ))}
         </p>
       </div>
-      <HeroRoom />
+      <HeroScene />
       <div className="hero-actions">
         <a href="#anfrage" className="hero-button hero-button-primary">
           Unverbindlich anfragen
@@ -77,6 +91,18 @@ export function Hero() {
         <span aria-hidden="true" />
         Schnell, zuverlässig und stressfrei.
       </p>
+      <ul className="hero-corners" aria-label="Leistungen">
+        {corners.map(({ corner, title, text }, i) => (
+          <li
+            key={corner}
+            className={`hero-corner hero-corner-${corner}`}
+            style={order(i)}
+          >
+            <strong>{title}</strong>
+            {text}
+          </li>
+        ))}
+      </ul>
       <div className="hero-progress" aria-hidden="true">
         <span />
       </div>

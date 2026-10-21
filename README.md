@@ -37,9 +37,10 @@ The browser checks cover responsive overflow, navigation, service preselection, 
 ## Project structure
 
 - `app/`: home page, legal draft pages, metadata, global styles, favicon, and not-found page.
-- `components/`: shared header, hero (pinned scroll stage and cutaway room), before/after comparisons, footer, and inquiry form.
+- `components/`: shared header, hero (pinned scroll stage with the 3D scene, `components/hero-scene/`), before/after comparisons, footer, and inquiry form.
 - `lib/content.ts`: confirmed contact information and service content.
 - `public/images/`: original supplied logo and generated editorial illustration.
+- `public/hero-3d/`: the hero scene's compressed CC0 models, textures, HDRI and posters (built by `preview-3d/scripts/build-web-assets.mjs`).
 - `tests/`: browser and accessibility checks.
 
 ## Inquiry behavior
@@ -63,6 +64,16 @@ The site has three pages: the home page, `/impressum` and `/datenschutz`, plus t
 Phone and WhatsApp links are implemented in `components/contact-actions.tsx`. Set `business.phone` and `business.whatsapp` in `lib/content.ts` to the confirmed international numbers. These values deliberately remain empty until supplied by the owner; the corresponding controls stay hidden to avoid publishing fabricated numbers or broken destinations. Call links use `tel:`; WhatsApp links use `wa.me` with a prefilled message (`whatsappGreeting` in `lib/content.ts`) and open only after a visitor clicks. No WhatsApp script is embedded.
 
 The homepage includes two licensed Pexels photographs of packed moving boxes and protected living-room furniture. They are labeled as illustrative photos, not L&S projects or a before/after pair. See `ASSET_NOTES.md` for provenance.
+
+## Hero scene
+
+The hero is a pinned stage around a three.js scene (`components/hero-scene.tsx`, code in `components/hero-scene/`): a room packed for the move empties into the L&S van, the van shuts and drives off, and scrolling plays it like a video, forwards and backwards. The prototype it comes from, with notes on the scene, the camera and the rendering, is in `preview-3d/` (its README).
+
+- **Loading:** three.js loads after the page; the poster shows until the first frame. The assets in `public/hero-3d/` are about 5 MB.
+- **Large screens:** the four services in the corners, the buttons centred under the scene. Tablets and phones keep the centred copy.
+- **Quality:** the scene times one frame and picks shadows, resolution and ambient occlusion to suit the device.
+- **Fallbacks:** without WebGL the poster stays; with reduced motion a before / after pair rendered from the scene replaces it, and nothing is pinned.
+- **Assets:** to change models or textures, run `npm run fetch-assets` and `npm run build-web-assets` in `preview-3d/`.
 
 ## Motion
 

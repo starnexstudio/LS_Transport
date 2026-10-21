@@ -61,76 +61,8 @@
   }
 }
 /* Hero: tracks named "scrub-" are played by scroll position (hero-stage.tsx),
-   all on one 4.6s timeline. The room tracks are the Figma ones; per-piece
-   values come from custom properties set in hero-room.tsx. */
-@keyframes scrub-piece-out {
-  from {
-    translate: 0 0;
-  }
-  to {
-    translate: calc(var(--dx) * var(--u)) calc(var(--dy) * var(--u));
-  }
-}
-@keyframes scrub-piece-step {
-  from {
-    translate: 0 0;
-  }
-  to {
-    translate: calc(var(--sx) * var(--u)) calc(var(--sy) * var(--u));
-  }
-}
-@keyframes scrub-piece-out-from-step {
-  from {
-    translate: calc(var(--sx) * var(--u)) calc(var(--sy) * var(--u));
-  }
-  to {
-    translate: calc(var(--dx) * var(--u)) calc(var(--dy) * var(--u));
-  }
-}
-@keyframes scrub-piece-lift {
-  from {
-    translate: 0 0;
-    rotate: 0rad;
-  }
-  to {
-    translate: 0 calc(var(--lift) * var(--u));
-    rotate: var(--tilt);
-  }
-}
-@keyframes scrub-piece-carry {
-  from {
-    rotate: var(--tilt);
-  }
-  to {
-    rotate: var(--tilt-rest);
-  }
-}
-@keyframes scrub-shadow-lift {
-  from {
-    opacity: 1;
-    scale: 1;
-  }
-  to {
-    opacity: 0.62;
-    scale: 0.9;
-  }
-}
-@keyframes scrub-shadow-thin {
-  from {
-    opacity: 0.62;
-  }
-  to {
-    opacity: 0.5;
-  }
-}
-@keyframes scrub-shadow-out {
-  from {
-    opacity: 0.5;
-  }
-  to {
-    opacity: 0;
-  }
-}
+   all on one 4.6s timeline; the 3D scene follows the same scroll
+   (components/hero-scene). */
 @keyframes scrub-word {
   from {
     opacity: 0.34;
@@ -171,14 +103,12 @@
     translate: 0 0;
   }
 }
-@keyframes hero-room-in {
+@keyframes hero-scene-in {
   from {
     opacity: 0;
-    translate: 0 36px;
   }
   to {
     opacity: 1;
-    translate: 0 0;
   }
 }
 /* Scroll hint on the rail; it shrinks in and out so its fade stays free for
@@ -275,41 +205,17 @@
   .hero-text {
     animation: entrance-rise 800ms 520ms var(--motion-ease) both;
   }
-  .hero-stage {
-    animation: hero-room-in 1200ms 260ms var(--motion-ease) both;
+  .hero-scene,
+  .hero-canvas {
+    animation: hero-scene-in 1200ms 260ms var(--motion-ease) both;
   }
   .hero-actions,
   .hero-note {
     animation: entrance-rise 800ms 680ms var(--motion-ease) both;
   }
-  /* Hero, on scroll. An animation later in a list takes a property over from
-     earlier ones once it starts, which chains the segments of one track. */
-  .hero-piece {
-    animation: scrub-piece-out calc(var(--t5) - var(--t4)) var(--t4)
-      var(--ease, cubic-bezier(0.5, 0, 0.3, 1)) both paused;
-  }
-  .hero-piece[data-step] {
-    animation:
-      scrub-piece-step calc(var(--ts) - var(--t4)) var(--t4)
-        cubic-bezier(0.45, 0, 0.4, 1) both paused,
-      scrub-piece-out-from-step calc(var(--t5) - var(--ts)) var(--ts)
-        var(--ease) forwards paused;
-  }
-  .hero-piece-image {
-    animation:
-      scrub-piece-lift calc(var(--t1) - var(--t0)) var(--t0) ease-out both
-        paused,
-      scrub-piece-carry calc(var(--t5) - var(--t1)) var(--t1) ease-in-out
-        forwards paused;
-  }
-  .hero-piece-shadow {
-    animation:
-      scrub-shadow-lift calc(var(--t1) - var(--t0)) var(--t0) ease-out both
-        paused,
-      scrub-shadow-thin calc(var(--t2) - var(--t1)) var(--t1) ease-in-out
-        forwards paused,
-      scrub-shadow-out calc(var(--t3) - var(--t2)) var(--t2) ease-in forwards
-        paused;
+  .hero-corner {
+    animation: entrance-rise 800ms calc(560ms + var(--i) * 90ms)
+      var(--motion-ease) both;
   }
   /* The sentence lights up word by word while the room empties. */
   .hero-text > span {

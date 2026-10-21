@@ -1,0 +1,2 @@
+Models, surface textures and the HDRI are from Poly Haven and are CC0 (public domain): https://polyhaven.com/license
+The posters are renders of the scene.

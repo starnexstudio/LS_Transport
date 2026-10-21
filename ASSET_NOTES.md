@@ -20,7 +20,9 @@
 - The TV screen was blurred in both images because the before photo showed personal streaming-profile names.
 - Both images were cropped to the same 3:4 area. The crop removes warp edges and a stray object in the bottom-left corner. They were exported at 750 × 1000.
 
-`public/images/hero-room/` holds the hero's cutaway room, exported from the Figma file (BpwhS8xqHLkMte8zwimTER, Assets section): the empty room (872 × 678, the largest size Figma has) and seven furniture cutouts (Figma AI generated, background removed), converted to WebP with alpha at twice their largest on-screen size. The boxes share `box-large.webp`. The ground and contact shadows (`*.svg`) and the menu icon are Figma vector exports. All are illustrative, not company photographs.
+`public/images/hero-room/icon-menu.svg` is the menu glyph, a vector export from the Figma file (BpwhS8xqHLkMte8zwimTER, Assets section).
+
+`public/hero-3d/` holds the hero's 3D scene assets. The furniture and household models, the surface textures (walls, masonry, parquet, concrete, plywood, tread plate) and the HDRI come from Poly Haven and are CC0 (public domain, `public/hero-3d/LICENSE.txt`). They are compressed copies built by `preview-3d/scripts/build-web-assets.mjs`: models as GLB with meshopt-compressed geometry and WebP textures (512 px, 256 px for small props), surfaces as 512 px WebP. The room, the removal van with its L&S livery, the moving boxes, the rolled rug and the art print are built in code (`components/hero-scene/`). The `fallback-*.webp` posters are renders of that scene. All of it is illustrative, not company photographs.
 
 ## Generation prompt
 

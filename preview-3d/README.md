@@ -1,6 +1,6 @@
 # L&S hero – local 3D scroll preview
 
-An isolated three.js prototype of the clearance hero. It is not part of the live site or its build.
+The three.js prototype of the clearance hero. The website's hero runs a port of it (`components/hero-scene/`); this folder stays a standalone preview and holds the asset pipeline.
 
 ## Run
 
@@ -10,6 +10,8 @@ npm install
 npm run fetch-assets
 npm run serve
 ```
+
+`npm run build-web-assets` then writes the compact copy the website loads to `public/hero-3d/` (models as meshopt-compressed GLB with WebP textures, surfaces as WebP; about 5 MB).
 
 Then open http://localhost:4180. Scrolling drives the whole sequence: about two and a half screen heights on desktop, and slightly less on tablets and phones. The header is part of the pinned stage, so the clearance starts on the first pixel of scroll. Nothing moves on its own, and scrolling back plays it in reverse.
 

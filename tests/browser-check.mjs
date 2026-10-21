@@ -70,7 +70,7 @@ assert.ok(
 );
 assert.ok(
   await page
-    .locator(".hero-room-empty")
+    .locator(".hero-poster")
     .evaluate((image) => image.complete && image.naturalWidth > 0),
 );
 for (const route of ["impressum", "datenschutz"]) {

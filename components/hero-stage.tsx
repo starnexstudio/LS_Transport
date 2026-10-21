@@ -3,9 +3,10 @@ import { useEffect, useRef, type ReactNode } from "react";
 
 // Length of the clearing timeline in ms (Figma: last piece out at 4.47s).
 const timeline = 4600;
-// Share of the pinned scroll spent on the clearing; the rest holds the
-// empty room before the page moves on.
-const clearingShare = 0.85;
+// Share of the pinned scroll spent on the clearing, matched to the 3D scene:
+// "Neues." is underlined as the room empties; the rest of the scroll shuts
+// the van and drives it off.
+const clearingShare = 0.8;
 // Time constant of the easing towards the scroll position, in ms.
 const smoothing = 110;
 

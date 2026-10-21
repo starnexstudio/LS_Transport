@@ -6,21 +6,9 @@ import { mkdir, writeFile, stat } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { models, textures, hdri } from "./asset-list.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..", "assets");
-
-export const models = [
-  // Furniture and household contents that get cleared
-  "Sofa_01", "modern_arm_chair_01", "mid_century_lounge_chair", "modern_coffee_table_01", "modern_wooden_cabinet",
-  "Television_01", "potted_plant_02", "wooden_table_02", "drawer_cabinet", "vintage_suitcase", "wooden_bookshelf_worn",
-  "steel_frame_shelves_01", "Ottoman_01", "side_table_tall_01", "GothicCommode_01",
-  "painted_wooden_chair_01", "throw_pillows_01", "wicker_basket_02",
-  "ceramic_vase_02", "ceramic_vase_03", "ceramic_vase_04", "antique_ceramic_vase_01", "wooden_bowl_01",
-  "alarm_clock_01", "standing_picture_frame_01", "standing_picture_frame_02", "hanging_picture_frame_01", "hanging_picture_frame_02",
-];
-// Room walls, floor and their section (masonry, concrete); the truck's cargo floor and tail lift
-const textures = ["beige_wall_002", "herringbone_parquet", "painted_plaster_wall", "concrete_floor_02", "metal_plate", "ash_veneer"];
-const hdri = "kloofendal_48d_partly_cloudy_puresky";
 
 async function download(url, file) {
   if (existsSync(file) && (await stat(file)).size > 0) return false;

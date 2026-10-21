@@ -44,7 +44,7 @@ The scene stands on the page's teal like a model on a table, seen from above and
 ## The sequence
 
 1. **Packed room:** the van waits with its doors open and the tail lift down.
-2. **Loading:** 54 pieces lift off, glide out through the room's open side and into the van by themselves. Each one has its own place, worked out the way movers load:
+2. **Loading:** 55 pieces lift off, glide out through the room's open side and into the van by themselves. Each one has its own place, worked out the way movers load:
    - large pieces first, lengthwise along the walls from the front;
    - boxes and small things stacked on flat tops;
    - anything standing on furniture leaves before the piece under it.

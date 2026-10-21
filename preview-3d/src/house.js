@@ -5,7 +5,7 @@ import { texture } from "./assets.js";
 
 // Layout shared with the sequence.
 export const H = {
-  x0: -9, x1: -2, z0: -5, z1: 1,      // footprint (right gable at x1 is cut away)
+  x0: -9, x1: -2, z0: -5, z1: 1,      // footprint; the rooms' front wall is cut away
   floor0: 0.3, floor1: 3.1, slab: 0.25, eaves: 5.6, ridge: 7.4, wall: 0.25,
   partitionX: -6.5,                     // hidden hallway (front door + stairs) left of it
   innerDoor: [-0.3, 0.7],               // z range of the doorway in the partition
@@ -59,7 +59,7 @@ export async function buildWorld(scene) {
     texture("painted_plaster_wall", [1, 1]),
     texture("herringbone_parquet", [1, 1]),
     texture("clay_roof_tiles", [1, 1]),
-    texture("leafy_grass", [24, 24]),
+    texture("leafy_grass", [110, 110]),
     texture("brick_pavement_02", [1, 1]),
     texture("concrete_floor_02", [1, 1]),
     texture("asphalt_02", [1, 1]),
@@ -70,9 +70,13 @@ export async function buildWorld(scene) {
     inner: new THREE.MeshStandardMaterial({ normalMap: plaster.normalMap, normalScale: new THREE.Vector2(0.25, 0.25), color: "#f1ede6", roughness: 0.95 }),
     parquet: new THREE.MeshStandardMaterial({ ...parquet, roughness: 0.6 }),
     roof: new THREE.MeshStandardMaterial({ ...roof, roughness: 0.8 }),
-    grass: new THREE.MeshStandardMaterial({ ...grass, color: "#d2e3a4", roughness: 1 }),
-    pavers: new THREE.MeshStandardMaterial({ ...concrete, color: "#ece9e4", roughness: 0.9 }),
-    concrete: new THREE.MeshStandardMaterial({ ...concrete, color: "#b9b6b0", roughness: 0.95 }),
+    grass: new THREE.MeshStandardMaterial({ normalMap: grass.normalMap, normalScale: new THREE.Vector2(0.8, 0.8), color: "#9dbb79", roughness: 1 }),
+    pavers: new THREE.MeshStandardMaterial({ normalMap: concrete.normalMap, color: "#e9e6e0", roughness: 0.9 }),
+    drive: new THREE.MeshStandardMaterial({ normalMap: pavers.normalMap, normalScale: new THREE.Vector2(0.6, 0.6), color: "#d6d1c8", roughness: 0.9 }),
+    kerb: new THREE.MeshStandardMaterial({ color: "#c9c6c0", roughness: 0.85 }),
+    line: new THREE.MeshStandardMaterial({ color: "#f2f2ee", roughness: 0.7 }),
+    // Cut edges of floors, plinth and roof: plain, so the section reads cleanly.
+    concrete: new THREE.MeshStandardMaterial({ color: "#d2cec7", roughness: 0.95 }),
     asphalt: new THREE.MeshStandardMaterial({ ...asphalt, roughness: 0.95 }),
     frame: new THREE.MeshStandardMaterial({ color: "#f7f7f5", roughness: 0.4 }),
     glass: new THREE.MeshStandardMaterial({ color: "#a9c4cf", roughness: 0.08, metalness: 0.2, transparent: true, opacity: 0.55 }),
@@ -81,31 +85,39 @@ export async function buildWorld(scene) {
   };
   const world = new THREE.Group(); scene.add(world);
 
-  // Ground, driveway, road
-  const ground = new THREE.Mesh(new THREE.PlaneGeometry(90, 90), M.grass);
+  // Ground, paths, driveway beside the house, pavement and street
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), M.grass);
   ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; world.add(ground);
-  const slab = (x0, x1, z0, z1, mat, y = 0.025, tile = 1.2) => world.add(at(block(x1 - x0, 0.05, z1 - z0, mat, tile), (x0 + x1) / 2, y, (z0 + z1) / 2));
-  slab(-7.9, -6.3, 1.0, 3.9, M.pavers);           // from the front door
-  slab(-7.9, 1.8, 2.7, 4.0, M.pavers);            // to the van
-  slab(1.8, 30, 1.4, 6.6, M.pavers);              // parking pad and drive to the road
-  slab(-40, 40, 7.4, 12.5, M.asphalt, 0.02, 3);   // road along the front
-  slab(1.8, 30, 6.6, 7.4, M.pavers, 0.024);       // pad joins the road
+  const slab = (x0, x1, z0, z1, mat, y = 0.025, tile = 1.2, h = 0.05) => world.add(at(block(x1 - x0, h, z1 - z0, mat, tile), (x0 + x1) / 2, y, (z0 + z1) / 2));
+  slab(-7.9, -6.3, 1.0, 2.9, M.pavers);           // from the front door
+  slab(-9.6, -6.3, 1.9, 2.9, M.pavers, 0.026);    // across to the drive
+  slab(-13.4, -9.6, -9.0, 6.4, M.drive, 0.024);   // driveway
+  slab(-90, 90, 6.4, 7.55, M.pavers, 0.023);      // pavement
+  slab(-90, 90, 7.55, 7.7, M.kerb, 0.03, 1, 0.06);
+  slab(-90, 90, 7.7, 14.0, M.asphalt, 0.02, 3);   // street
+  for (let x = -90; x < 90; x += 4) slab(x, x + 2, 10.8, 10.92, M.line, 0.046, 1, 0.004);
 
   const { x0, x1, z0, z1, floor0, floor1, slab: st, eaves, ridge, wall: t } = H;
   const house = new THREE.Group(); world.add(house);
   // Plinth and floors (cut edges in concrete)
   house.add(at(block(x1 - x0, floor0, z1 - z0, [M.concrete, M.concrete, M.parquet, M.concrete, M.concrete, M.concrete]), (x0 + x1) / 2, floor0 / 2, (z0 + z1) / 2));
-  house.add(at(block(x1 - x0, st, z1 - z0, [M.concrete, M.concrete, M.parquet, M.inner, M.concrete, M.concrete]), (x0 + x1) / 2, floor1 - st / 2, (z0 + z1) / 2));
-  // Front wall (z1) with door and windows; back wall; left gable; partition
+  // Upper floor slab, inset a few millimetres so it never shares a face with the walls
+  const e = 0.004;
+  house.add(at(block(x1 - x0 - 2 * e, st, z1 - z0 - 2 * e, [M.concrete, M.concrete, M.parquet, M.inner, M.concrete, M.concrete]), (x0 + x1) / 2, floor1 - st / 2, (z0 + z1) / 2));
+  // Front wall only in front of the hallway: the rooms are shown in section.
+  const xp = H.partitionX + 0.075;
   const doorO = { a: H.frontDoor[0], b: H.frontDoor[1], y0: floor0, y1: 2.45 };
   const win = (a, b, y0, y1) => ({ a, b, y0, y1 });
-  const frontOpenings0 = [doorO, win(-5.4, -4.2, 1.1, 2.3), win(-3.6, -2.6, 1.1, 2.3)];
-  const frontOpenings1 = [win(-8.4, -7.4, 3.8, 5.0), win(-5.4, -4.2, 3.8, 5.0), win(-3.6, -2.6, 3.8, 5.0)];
-  wall(house, M.plaster, { along: "x", fixed: z1 - t / 2, from: x0, to: x1, y0: floor0, y1: floor1, t, openings: frontOpenings0 });
-  wall(house, M.plaster, { along: "x", fixed: z1 - t / 2, from: x0, to: x1, y0: floor1, y1: eaves, t, openings: frontOpenings1 });
+  const frontOpenings0 = [win(-8.75, -8.15, 1.1, 2.3), doorO];
+  const frontOpenings1 = [win(-8.4, -7.4, 3.8, 5.0)];
+  wall(house, M.plaster, { along: "x", fixed: z1 - t / 2, from: x0, to: xp, y0: floor0, y1: floor1, t, openings: frontOpenings0 });
+  wall(house, M.plaster, { along: "x", fixed: z1 - t / 2, from: x0, to: xp, y0: floor1, y1: eaves, t, openings: frontOpenings1 });
   wall(house, M.inner, { along: "x", fixed: z0 + t / 2, from: x0, to: x1, y0: floor0, y1: eaves, t, openings: [win(-4.6, -3.4, 1.1, 2.3), win(-4.6, -3.4, 3.8, 5.0)] });
   wall(house, M.plaster, { along: "z", fixed: x0 + t / 2, from: z0, to: z1, y0: floor0, y1: eaves, t, openings: [win(-2.6, -1.4, 1.1, 2.3)] });
-  for (const o of [...frontOpenings0.slice(1), ...frontOpenings1]) windowPane(house, "x", z1 - t / 2, o.a, o.b, o.y0, o.y1, M.frame, M.glass);
+  const sideOpenings = [win(-3.6, -2.4, 1.1, 2.3), win(-3.6, -2.4, 3.8, 5.0)];
+  wall(house, M.plaster, { along: "z", fixed: x1 - t / 2, from: z0, to: z1, y0: floor0, y1: eaves, t, openings: sideOpenings });
+  for (const o of [frontOpenings0[0], ...frontOpenings1]) windowPane(house, "x", z1 - t / 2, o.a, o.b, o.y0, o.y1, M.frame, M.glass);
+  for (const o of sideOpenings) windowPane(house, "z", x1 - t / 2, o.a, o.b, o.y0, o.y1, M.frame, M.glass);
   windowPane(house, "x", z0 + t / 2, -4.6, -3.4, 1.1, 2.3, M.frame, M.glass);
   windowPane(house, "x", z0 + t / 2, -4.6, -3.4, 3.8, 5.0, M.frame, M.glass);
   // Partition walls hiding the hallway, each with a doorway near the front
@@ -119,7 +131,7 @@ export async function buildWorld(scene) {
   house.add(at(block(1.4, 0.15, 0.6, M.concrete), (H.frontDoor[0] + H.frontDoor[1]) / 2, 0.075, z1 + 0.3)); // step
 
   // Gable roof (ridge along x) with overhangs; tiles on top, plaster underneath
-  const ox = 0.45, oz = 0.6, zc = (z0 + z1) / 2, rise = ridge - eaves, halfSpan = (z1 - z0) / 2;
+  const ox = 0.4, oz = 0.4, zc = (z0 + z1) / 2, rise = ridge - eaves, halfSpan = (z1 - z0) / 2;
   const ang = Math.atan2(rise, halfSpan), th = 0.22;
   for (const side of [1, -1]) {
     // From the ridge to the eave edge (including the overhang), along the slope.
@@ -131,12 +143,13 @@ export async function buildWorld(scene) {
     r.position.set((x0 + x1) / 2, (ridge + ey) / 2 + n.y, (zc + ez) / 2 + n.z);
     house.add(r);
   }
-  // Gable triangles (left only; the right gable is cut away)
+  // Gable triangles at both ends
   const tri = new THREE.Shape([new THREE.Vector2(z0, eaves), new THREE.Vector2(z1, eaves), new THREE.Vector2(zc, ridge)]);
   const gable = new THREE.Mesh(new THREE.ExtrudeGeometry(tri, { depth: t, bevelEnabled: false }), M.plaster);
   gable.rotation.y = -Math.PI / 2; gable.position.x = x0 + t; gable.castShadow = true; gable.receiveShadow = true;
   const g2 = gable.geometry.attributes.uv; for (let i = 0; i < g2.count; i++) g2.setXY(i, g2.getX(i), g2.getY(i));
   house.add(gable);
+  const rightGable = gable.clone(); rightGable.position.x = x1; house.add(rightGable);
   const partitionGable = gable.clone(); partitionGable.material = M.inner; partitionGable.position.x = H.partitionX + 0.075; partitionGable.scale.z = 0.6; house.add(partitionGable);
   // Gutter along the front eaves
   const gut = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, x1 - x0 + 2 * ox, 10), M.gutter);

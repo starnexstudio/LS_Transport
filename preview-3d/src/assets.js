@@ -79,15 +79,15 @@ function splitTrolley(root) {
   const pos = geo.attributes.position;
   const box = new THREE.Box3().setFromBufferAttribute(pos);
   const size = box.getSize(new THREE.Vector3());
-  // Wheels sit at the bottom-back; find them as the lowest band of geometry.
-  const wheelTop = box.min.y + size.y * 0.2;
+  // Wheels sit low at the back (−z), outboard of the frame; the nose plate is at +z.
+  const wheelTop = box.min.y + size.y * 0.2, wheelBack = box.min.z + size.z * 0.35;
   const keep = { body: [], left: [], right: [] };
   const midX = (box.min.x + box.max.x) / 2;
   for (let t = 0; t < pos.count; t += 3) {
-    let maxY = -Infinity, cx = 0;
-    for (let k = 0; k < 3; k++) { maxY = Math.max(maxY, pos.getY(t + k)); cx += pos.getX(t + k) / 3; }
-    const wheelSide = Math.abs(cx - midX) > size.x * 0.28;
-    const bucket = maxY < wheelTop && wheelSide ? (cx < midX ? "left" : "right") : "body";
+    let maxY = -Infinity, cx = 0, cz = 0;
+    for (let k = 0; k < 3; k++) { maxY = Math.max(maxY, pos.getY(t + k)); cx += pos.getX(t + k) / 3; cz += pos.getZ(t + k) / 3; }
+    const wheelSide = Math.abs(cx - midX) > size.x * 0.38;
+    const bucket = maxY < wheelTop && wheelSide && cz < wheelBack ? (cx < midX ? "left" : "right") : "body";
     keep[bucket].push(t);
   }
   const build = (tris) => {

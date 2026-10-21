@@ -28,12 +28,12 @@ async function start() {
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color("#dfe6e7");
-  scene.fog = new THREE.Fog("#dfe6e7", 38, 80);
-  scene.add(new THREE.HemisphereLight("#f4f7ff", "#9aa58a", 1.7));
+  scene.fog = new THREE.Fog("#dfe6e7", 40, 110);
+  scene.add(new THREE.HemisphereLight("#f4f7ff", "#b9b4a8", 1.6));
   const sun = new THREE.DirectionalLight("#fff6e8", 2.6);
-  sun.position.set(-9, 16, 12); sun.target.position.set(-1, 0, 1);
+  sun.position.set(-19, 17, 9); sun.target.position.set(-7, 0, 0);
   sun.castShadow = true; sun.shadow.mapSize.set(mobile ? 1024 : 2048, mobile ? 1024 : 2048);
-  Object.assign(sun.shadow.camera, { left: -16, right: 16, top: 14, bottom: -14, near: 1, far: 50 });
+  Object.assign(sun.shadow.camera, { left: -17, right: 17, top: 15, bottom: -15, near: 1, far: 60 });
   sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.02;
   scene.add(sun, sun.target);
   const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 120);
@@ -61,6 +61,8 @@ async function start() {
   let target = 0, current = 0, last = performance.now(), dirty = true, result = null;
   const render = (t) => {
     result = seq.evaluate(t, camera, framing);
+    const cam = window.__preview?.camOverride; // test hook: inspect details from another angle
+    if (cam) { camera.position.set(...cam.pos); camera.lookAt(...cam.look); }
     renderer.render(scene, camera);
     label.classList.toggle("on", result.cleared);
   };
@@ -69,7 +71,7 @@ async function start() {
     // Static before / after, rendered once from the same scene.
     sceneEl.style.display = "block"; sceneEl.style.height = "420px"; resize();
     render(0); document.querySelector("#still-before").src = renderer.domElement.toDataURL("image/jpeg", 0.85);
-    render(seq.marks.T4 + 2); document.querySelector("#still-after").src = renderer.domElement.toDataURL("image/jpeg", 0.85);
+    render(seq.marks.TEND); document.querySelector("#still-after").src = renderer.domElement.toDataURL("image/jpeg", 0.85);
     sceneEl.style.display = ""; sceneEl.style.height = "";
     document.title = "ready";
     return;
@@ -98,7 +100,7 @@ async function start() {
   requestAnimationFrame(frame);
 
   // Test hooks for the local preview.
-  window.__preview = { seq, setTime: (t) => { target = current = t; render(t); }, get time() { return current; } };
+  window.__preview = { seq, scene, assets, camera, setTime: (t) => { target = current = t; render(t); }, get time() { return current; } };
 }
 
 start().catch((e) => { console.error(e); root.classList.add("no-webgl"); document.title = "ready"; });

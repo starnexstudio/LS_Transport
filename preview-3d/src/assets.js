@@ -58,7 +58,16 @@ export async function model(id, { texSize = 512, shadows = true } = {}) {
   const g = await gltfLoader.loadAsync(`assets/polyhaven/${id}/${id}.gltf`);
   const root = g.scene;
   if (SCALE[id]) root.scale.multiplyScalar(SCALE[id]);
-  root.traverse((o) => { if (o.isMesh) { o.castShadow = shadows; o.receiveShadow = true; } });
+  root.traverse((o) => {
+    if (!o.isMesh) return;
+    o.castShadow = shadows; o.receiveShadow = true;
+    // Picture glass: its colour map has no alpha here, so it would cover the artwork
+    // in flat white; make it a thin clear pane that only catches reflections.
+    if (/glass/i.test(o.material.name)) {
+      Object.assign(o.material, { map: null, transparent: true, opacity: 0.1, roughness: 0.04, metalness: 0, depthWrite: false, envMapIntensity: 0.3 });
+      o.material.color.set("#ffffff"); o.castShadow = false;
+    }
+  });
   await Promise.all([shrink(root, texSize), lighten(root)]);
   root.updateMatrixWorld(true);
   const box = new THREE.Box3().setFromObject(root);

@@ -7,6 +7,11 @@ import { hdri } from "./assets.js";
 import { buildWorld } from "./world.js";
 import { buildTruck } from "./truck.js";
 import { buildSequence } from "./sequence.js";
+import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+import { GTAOPass } from "three/addons/postprocessing/GTAOPass.js";
+import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
+import { Pass } from "three/addons/postprocessing/Pass.js";
 
 const root = document.documentElement;
 const hero = document.querySelector(".hero");
@@ -60,6 +65,65 @@ async function start() {
   const [, truck] = await Promise.all([buildWorld(scene), buildTruck()]);
   const seq = await buildSequence({ scene, truck, mobile });
 
+  // Ambient occlusion (GTAO): the soft shading where things meet, in the corners,
+  // under and behind the furniture, round the window and door, that sun and sky
+  // light alone leave flat. The scene renders into a multisampled target, the AO is
+  // multiplied in, and the output pass tone-maps it onto the transparent canvas.
+  // Full resolution on the top quality level, half below it, none on the lowest.
+  const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: 4 }));
+  const ao = new GTAOPass(scene, camera, 1, 1);
+  let aoScale = 1, useAO = true;
+  const aoSetSize = ao.setSize.bind(ao);
+  ao.setSize = (w, h) => aoSetSize(Math.max(1, Math.round(w * aoScale)), Math.max(1, Math.round(h * aoScale)));
+  ao.updateGtaoMaterial({ radius: 1.3, distanceExponent: 1, thickness: 2.5, scale: 1.8, samples: 24 });
+  ao.updatePdMaterial({ lumaPhi: 10, depthPhi: 2, normalPhi: 3, radius: 8, samples: 16 });
+  // GTAO's own denoiser leaves a fine hatch on the flat walls; two depth-aware
+  // Gaussian passes (across, then down) smooth it before the AO is multiplied in.
+  const blurRT = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType });
+  const blur = new THREE.ShaderMaterial({
+    uniforms: { tAO: { value: null }, tDepth: { value: ao.depthTexture }, dir: { value: new THREE.Vector2() }, resolution: { value: new THREE.Vector2(1, 1) }, cameraNear: { value: 0.1 }, cameraFar: { value: 400 } },
+    vertexShader: "varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }",
+    fragmentShader: `
+      #include <packing>
+      uniform sampler2D tAO, tDepth; uniform vec2 dir, resolution; uniform float cameraNear, cameraFar; varying vec2 vUv;
+      float viewZ(vec2 uv) { return perspectiveDepthToViewZ(texture2D(tDepth, uv).x, cameraNear, cameraFar); }
+      void main() {
+        float z0 = viewZ(vUv), sum = 0.0, wsum = 0.0;
+        for (int i = -6; i <= 6; i++) {
+          vec2 uv = vUv + dir * float(i) / resolution;
+          float w = exp(-float(i * i) / 18.0) * max(0.0, 1.0 - abs(viewZ(uv) - z0) / (0.04 * abs(z0)));
+          sum += texture2D(tAO, uv).r * w; wsum += w;
+        }
+        gl_FragColor = vec4(vec3(sum / max(wsum, 1e-4)), 1.0);
+      }`,
+    depthTest: false, depthWrite: false,
+  });
+  class SoftAOPass extends Pass {
+    render(renderer, writeBuffer, readBuffer) {
+      ao.output = GTAOPass.OUTPUT.Off; ao.render(renderer, writeBuffer, readBuffer); // normals, AO, denoise
+      const u = blur.uniforms; u.cameraNear.value = camera.near; u.cameraFar.value = camera.far;
+      u.tAO.value = ao.pdRenderTarget.texture; u.dir.value.set(1, 0); ao.renderPass(renderer, blur, blurRT, 0xffffff, 1);
+      u.tAO.value = blurRT.texture; u.dir.value.set(0, 1); ao.renderPass(renderer, blur, ao.gtaoRenderTarget, 0xffffff, 1);
+      const out = this.renderToScreen ? null : writeBuffer;
+      ao.copyMaterial.uniforms.tDiffuse.value = readBuffer.texture; ao.copyMaterial.blending = THREE.NoBlending;
+      ao.renderPass(renderer, ao.copyMaterial, out);
+      ao.blendMaterial.uniforms.intensity.value = ao.blendIntensity; ao.blendMaterial.uniforms.tDiffuse.value = ao.gtaoRenderTarget.texture;
+      ao.renderPass(renderer, ao.blendMaterial, out);
+    }
+    setSize(w, h) { ao.setSize(w, h); blurRT.setSize(ao.width, ao.height); blur.uniforms.resolution.value.set(ao.width, ao.height); }
+  }
+  composer.addPass(new RenderPass(scene, camera));
+  composer.addPass(new SoftAOPass());
+  // The target holds premultiplied colour (the canvas is transparent): undo that
+  // before tone mapping and sRGB, redo it after, or see-through pixels (the glass,
+  // shadows on the teal) come out too bright.
+  const output = new OutputPass();
+  output.material.fragmentShader = output.material.fragmentShader
+    .replace("gl_FragColor = texture2D( tDiffuse, vUv );", "gl_FragColor = texture2D( tDiffuse, vUv ); float alpha = gl_FragColor.a; gl_FragColor.rgb /= max( alpha, 1e-4 );")
+    .replace(/}\s*$/, "gl_FragColor.rgb *= alpha; }");
+  composer.addPass(output);
+  const draw = () => (useAO ? composer.render() : renderer.render(scene, camera));
+
   // The canvas covers the whole stage; the camera is set up for the band between the
   // copy and the actions (the .scene element, less the room the actions take below it,
   // at the site's room width) and the view extends past it, so nothing is clipped.
@@ -68,10 +132,12 @@ async function start() {
   function resize() {
     const w = canvas.clientWidth || innerWidth, h = canvas.clientHeight || innerHeight;
     renderer.setSize(w, h, false);
+    composer.setPixelRatio(renderer.getPixelRatio()); composer.setSize(w, h);
     const css = getComputedStyle(sceneEl), band = sceneEl.getBoundingClientRect(), c = canvas.getBoundingClientRect();
     const lift = parseFloat(css.getPropertyValue("--lift")) || 0, room = parseFloat(css.getPropertyValue("--room")) || 1;
+    const roomMax = parseFloat(css.getPropertyValue("--room-max")) || Infinity;
     const gap = 20; // clear of the sentence above
-    const bw = Math.max(1, band.width * room), bh = Math.max(120, band.height - gap - lift);
+    const bw = Math.max(1, Math.min(band.width * room, roomMax)), bh = Math.max(120, band.height - gap - lift);
     const left = band.left - c.left + (band.width - bw) / 2, top = band.top - c.top + gap;
     lens(bw / bh);
     camera.setViewOffset(bw, bh, -left, -top, w, h);
@@ -82,24 +148,27 @@ async function start() {
   // Quality follows the device: time a mid-sequence frame and pick the shadow
   // resolution and pixel ratio; dynamic resolution handles the rest while scrolling.
   const gl = renderer.getContext(), px = new Uint8Array(4);
-  const timeFrame = () => { const a = performance.now(); renderer.render(scene, camera); gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px); return performance.now() - a; };
+  const timeFrame = () => { const a = performance.now(); renderer.shadowMap.needsUpdate = true; draw(); gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px); return performance.now() - a; };
+  // The shadow map is drawn by hand (the AO pass renders the scene a second time):
+  // every frame on the top level; below it every other frame while things move (a
+  // 16 ms lag nobody sees) and always once the motion settles.
+  renderer.shadowMap.autoUpdate = false;
+  let level = "high";
   function chooseQuality() {
-    resize(); seq.evaluate(0.3, camera);
+    aoScale = 0.5; resize(); seq.evaluate(0.3, camera);
     timeFrame(); // compiles shaders
     const ms = [timeFrame(), timeFrame(), timeFrame()].sort((a, b) => a - b)[1];
     const forced = new URLSearchParams(location.search).get("quality"); // ?quality=high|medium|low for tests and posters
-    const level = forced ?? (!mobile && ms < 9 ? "high" : ms < 40 ? "medium" : "low");
+    level = forced ?? (!mobile && ms < 11 ? "high" : ms < 40 ? "medium" : "low");
     if (level !== "high") {
       sun.shadow.mapSize.setScalar(level === "low" ? 1024 : 2048);
       sun.shadow.map?.dispose(); sun.shadow.map = null;
       baseRatio = Math.min(devicePixelRatio, level === "low" ? 1 : 1.5);
       renderer.setPixelRatio(baseRatio);
     }
-    // Below the top level the shadow map is redrawn every other frame while things
-    // move (a 16 ms lag nobody sees) and always once the motion settles.
-    renderer.shadowMap.autoUpdate = level === "high";
+    aoScale = level === "high" ? 1 : 0.5; useAO = level !== "low";
     resize();
-    return { level, ms: Math.round(ms) };
+    return { level, ms: Math.round(ms), ao: useAO ? aoScale : 0 };
   }
 
   // Scroll → target progress.
@@ -120,11 +189,11 @@ async function start() {
     stage.style.setProperty("--a", (1 - (1 - u) ** 3).toFixed(4));
   };
   const render = (t, settled = true) => {
-    if (!renderer.shadowMap.autoUpdate) renderer.shadowMap.needsUpdate = settled || frameNo++ % 2 === 0;
+    renderer.shadowMap.needsUpdate = level === "high" || settled || frameNo++ % 2 === 0;
     seq.evaluate(t, camera);
     const cam = window.__preview?.camOverride; // test hook: inspect details from another angle
     if (cam) { camera.position.set(...cam.pos); camera.lookAt(...cam.look); }
-    renderer.render(scene, camera);
+    draw();
     copy(t);
   };
   // A still of the moment t at w × h, with a transparent background (WebP keeps the
@@ -132,9 +201,10 @@ async function start() {
   // reduced-motion pair and the loading / no-WebGL posters.
   const shoot = (t, w, h) => {
     renderer.setPixelRatio(1); renderer.setSize(w, h, false);
+    composer.setPixelRatio(1); composer.setSize(w, h);
     camera.clearViewOffset(); lens(w / h); camera.updateProjectionMatrix();
     renderer.shadowMap.needsUpdate = true;
-    seq.evaluate(t, camera); renderer.render(scene, camera);
+    seq.evaluate(t, camera); draw();
     return canvas.toDataURL("image/webp", 0.9);
   };
 
@@ -199,7 +269,7 @@ async function start() {
 
   // Test hooks for the local preview.
   window.__preview = {
-    seq, scene, camera, renderer, quality, frozen: false,
+    seq, scene, camera, renderer, quality, frozen: false, ao, composer,
     shoot: (t, w, h) => { const url = shoot(t, w, h); renderer.setPixelRatio(baseRatio * scale); resize(); render(current); return url; },
     get scale() { return scale; }, get time() { return current; },
     setTime: (t) => { target = current = t; velocity = 0; render(t); },

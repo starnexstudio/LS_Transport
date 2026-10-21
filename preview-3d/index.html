@@ -140,6 +140,27 @@
     .actions, .note { padding-inline: 20px; }
   }
 
+  /* Large screens: the room and the van fill the middle, the four services stand
+     in the corners (the room's on the left, the van's on the right), and the
+     actions sit centred under the scene. */
+  .corners { display: none; }
+  @media (min-width: 1100px) and (min-height: 640px) {
+    h1 { font-size: clamp(40px, min(4.4vw, 7.6vh), 68px); }
+    .lead { display: none; }
+    .scene { --lift: 140px; --room: 0.84; --room-max: 1200px; }
+    .actions { position: absolute; left: 50%; right: auto; bottom: 70px; padding: 0; translate: -50% 0; }
+    .note { position: absolute; left: 50%; right: auto; bottom: 30px; padding: 0; translate: -50% 0; white-space: nowrap; }
+    .corners { display: block; margin: 0; padding: 0; list-style: none; }
+    .corner { position: absolute; z-index: 2; width: min(220px, 15vw); font-size: 14px; line-height: 1.5; color: #f5f3edc7; }
+    .corner strong { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; font-size: 15px; font-weight: 700; line-height: 1.3; color: #fff; }
+    .corner strong::before { content: ""; width: 18px; height: 2px; flex-shrink: 0; background: var(--orange); }
+    .corner.tl, .corner.tr { top: calc(var(--header) + 24px); }
+    .corner.bl, .corner.br { bottom: 34px; }
+    .corner.tl, .corner.bl { left: var(--gutter); }
+    .corner.tr, .corner.br { right: var(--gutter); text-align: right; }
+    .corner.tr strong, .corner.br strong { flex-direction: row-reverse; }
+  }
+
   /* On load: the headline rises word by word, the rest settles in. */
   @media (prefers-reduced-motion: no-preference) {
     .label { animation: rise 700ms 80ms var(--ease) both; }
@@ -147,6 +168,7 @@
     .lead { animation: rise 800ms 520ms var(--ease) both; }
     .scene, .stage > canvas { animation: fade-in 1200ms 260ms var(--ease) both; }
     .actions, .note { animation: rise 800ms 680ms var(--ease) both; }
+    .corner { animation: rise 800ms calc(560ms + var(--i) * 90ms) var(--ease) both; }
     .progress::before { animation: cue 1800ms 1400ms ease-in-out infinite both; }
   }
   @keyframes rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
@@ -165,8 +187,10 @@
     .still figure { margin: 0; text-align: center; }
     .still img { width: 100%; aspect-ratio: 16 / 10; object-fit: contain; display: block; }
     .still figcaption { margin-top: 6px; font-weight: 700; font-size: 15px; }
-    .actions, .note { position: relative; inset: auto; justify-content: center; }
+    .actions, .note { position: relative; inset: auto; translate: none; justify-content: center; }
     .note { padding: 16px 0 32px; }
+    .corners { display: none; }
+    .lead { display: block; }
     @media (max-width: 760px) { .still { grid-template-columns: 1fr; margin: 16px 24px; } }
   }
   /* No WebGL: the poster stands in for the scene. */
@@ -225,6 +249,12 @@
           Jetzt anrufen</a>
       </div>
       <p class="note"><span aria-hidden="true"></span>Schnell, zuverlässig und stressfrei.</p>
+      <ul class="corners" aria-label="Leistungen">
+        <li class="corner tl" style="--i: 0"><strong>Entrümpelung</strong>Wohnung, Keller oder Dachboden – wir räumen alles oder nur das, was weg soll.</li>
+        <li class="corner tr" style="--i: 1"><strong>Möbeltransport &amp; Lieferung</strong>Ein einzelnes Stück oder eine ganze Ladung – sicher abgeholt und geliefert.</li>
+        <li class="corner bl" style="--i: 2"><strong>Demontage</strong>Wir entfernen, was raus muss – vom Boden bis zur Decke.</li>
+        <li class="corner br" style="--i: 3"><strong>Fachgerechte Entsorgung</strong>Wir sortieren und entsorgen alles fachgerecht – Sie müssen sich um nichts kümmern.</li>
+      </ul>
       <div class="progress" aria-hidden="true"><span></span></div>
     </div>
   </section>

@@ -19,7 +19,7 @@ const qYaw = (a) => new THREE.Quaternion().setFromAxisAngle(UP, a);
 const { F } = ROOM;
 const B = 0.34; // stacked box height
 const Q = Math.PI / 2;
-const BOX = "box"; // procedural moving box (see cardboardBox)
+const BOX = "box", RUG = "rug"; // procedural moving box and rolled rug (see cardboardBox, rugRoll)
 
 // The room's contents, packed and ready to go: where each piece stands. `on` names
 // the piece it stands on (its height then follows from that piece); otherwise `y`
@@ -32,23 +32,23 @@ const CONTENTS = [
   // Along the back wall
   item("bookshelf", "wooden_bookshelf_worn", -5.15, -3.88, { f: "support" }),
   item("books1", "books", -5.15, -3.9, { on: "bookshelf", f: "stack" }),
-  item("sideboard", "modern_wooden_cabinet", -2.75, -3.91, { f: "support" }),
-  item("tv", "Television_01", -3.35, -3.93, { on: "sideboard", f: "stack" }),
-  item("frame1", "standing_picture_frame_01", -2.45, -3.95, { r: 0.3, on: "sideboard", f: "stack" }),
-  item("vase2", "ceramic_vase_03", -1.85, -3.93, { on: "sideboard", f: "stack" }),
-  item("pic1", "hanging_picture_frame_02", -2.75, -4.18, { y: F + 1.3, f: "stack" }),
-  item("drawers", "drawer_cabinet", -0.75, -3.92, { f: "support" }),
-  item("basket1", "wicker_basket_02", -0.75, -3.92, { r: 0.3, on: "drawers", f: "stack" }),
+  item("rug", RUG, -4.32, -3.9),
+  item("sideboard", "modern_wooden_cabinet", -2.95, -3.91, { f: "support" }),
+  item("tv", "Television_01", -3.6, -3.93, { on: "sideboard", f: "stack" }),
+  item("frame1", "standing_picture_frame_01", -2.75, -3.95, { r: 0.3, on: "sideboard", f: "stack" }),
+  item("vase2", "ceramic_vase_03", -2.2, -3.93, { on: "sideboard", f: "stack" }),
+  item("pic1", "hanging_picture_frame_02", -2.95, -4.18, { y: F + 1.3, r: Math.PI, f: "stack" }),
   item("bigplant", "potted_plant_02", -0.4, -3.2, { r: 0.3, f: "stack" }),
   item("talltable", "side_table_tall_01", -4.25, -3.15, { f: "stack support" }),
   item("vase3", "ceramic_vase_02", -4.25, -3.15, { on: "talltable", f: "stack" }),
-  // Along the left wall
-  item("steelshelf", "steel_frame_shelves_01", -5.72, -2.45, { r: Q, f: "support" }),
-  item("books2", "books", -5.72, -2.45, { r: Q, on: "steelshelf", f: "stack" }),
-  item("commode", "GothicCommode_01", -5.68, -1.05, { r: Q, f: "support" }),
-  item("vase4", "antique_ceramic_vase_01", -5.68, -1.35, { on: "commode", f: "stack" }),
-  item("clock1", "alarm_clock_01", -5.68, -0.7, { r: Q, on: "commode", f: "stack" }),
-  item("pic2", "hanging_picture_frame_01", -5.985, -1.05, { y: F + 1.4, r: Q, f: "stack" }),
+  // Along the left wall, either side of the door
+  item("steelshelf", "steel_frame_shelves_01", -5.72, -1.83, { r: Q, f: "support" }),
+  item("books2", "books", -5.72, -1.83, { r: Q, on: "steelshelf", f: "stack" }),
+  item("commode", "GothicCommode_01", -5.68, -0.7, { r: Q, f: "support" }),
+  item("vase4", "antique_ceramic_vase_01", -5.68, -1.0, { on: "commode", f: "stack" }),
+  item("basket1", "wicker_basket_02", -5.68, -0.62, { r: Q + 0.2, on: "commode", f: "stack" }),
+  item("clock1", "alarm_clock_01", -5.68, -0.28, { r: Q, on: "commode", f: "stack" }),
+  item("pic2", "hanging_picture_frame_01", -5.985, -0.7, { y: F + 1.4, r: Q, f: "stack" }),
   // Seating
   item("sofa", "Sofa_01", -3.2, -2.55, { f: "support" }),
   item("pillows", "throw_pillows_01", -3.2, -2.52, { on: "sofa", f: "stack" }),
@@ -66,7 +66,7 @@ const CONTENTS = [
   item("chair1", "painted_wooden_chair_01", -4.3, 0.15, { r: Math.PI, f: "stack" }),
   item("chair2", "painted_wooden_chair_01", -5.0, -0.5, { r: Q, f: "stack" }),
   item("suitcases", "vintage_suitcase", -3.1, 0.35, { r: 0.05 }),
-  // Packed boxes, stacked by the open side, ready to go
+  // Packed boxes, labelled by room, stacked by the open side, ready to go
   ...boxes("ra", -0.5, 0.2, 3),
   ...boxes("rb", -0.5, -0.4, 3, "books"),
   ...boxes("rc", -1.0, 0.25, 2),
@@ -77,6 +77,12 @@ const CONTENTS = [
   ...boxes("lc", -1.95, 0.3, 2),
   ...boxes("la", -5.55, 0.3, 3, "decor"),
 ];
+// What each stack of boxes says on its sides, in marker; `glass` adds a fragile sticker.
+const LABELS = {
+  ra: { text: "Küche" }, rb: { text: "Bücher" }, rc: { text: "Bad" }, rd: { text: "Wohnzimmer" },
+  re: { text: "Geschirr", glass: true }, rf: { text: "Schlafzimmer" }, rg: { text: "Kinderzimmer" },
+  lc: { text: "Deko", glass: true }, la: { text: "Bücher" },
+};
 // What goes into the open boxes (on top of crumpled paper).
 const PACKED = {
   books: [["books", -0.09, 0.13, 0, Q, 0.92], ["books", 0.09, 0.15, 0, Q + 0.05, 0.92]],
@@ -87,25 +93,119 @@ const PACKED = {
 // Timeline (fractions of the scroll)
 export const TL = { fly0: 0.0, fly1: 0.72, flight: 0.12, cleared: 0.73, door: [0.77, 0.835], lift: [0.83, 0.885], drive: [0.89, 1.0] };
 
-// Moving box: one mesh, a cardboard texture with packing tape over the top and ends.
-let boxMat = null;
-function cardboardBox() {
-  if (!boxMat) {
-    const c = document.createElement("canvas"); c.width = c.height = 256;
-    const g = c.getContext("2d");
-    g.fillStyle = "#b8894f"; g.fillRect(0, 0, 256, 256);
-    for (let i = 0; i < 2500; i++) { const v = 150 + ((i * 97) % 60); g.fillStyle = `rgba(${v},${v * 0.72},${v * 0.42},0.18)`; g.fillRect((i * 53) % 256, (i * 31) % 256, 2, 1); }
-    for (let y = 0; y < 256; y += 6) { g.fillStyle = "rgba(90,60,30,0.05)"; g.fillRect(0, y, 256, 2); } // corrugation
-    g.fillStyle = "#cfae78"; g.fillRect(108, 0, 40, 256); g.fillStyle = "rgba(255,255,255,0.18)"; g.fillRect(112, 0, 6, 256);
-    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4;
-    boxMat = new THREE.MeshStandardMaterial({ map: t, roughness: 0.82 });
+// Moving box: one mesh with its own texture atlas: corrugated kraft board, the lid
+// seam taped over and the tape running down the ends, hand holes, printed arrows
+// and the room written on the sides in marker (plus a fragile sticker on some).
+const BOX_SIZE = V(0.39, 0.34, 0.52);
+const boxMats = new Map();
+function boxMaterial({ text = "", glass = false } = {}) {
+  const k = text + glass;
+  if (boxMats.has(k)) return boxMats.get(k);
+  const S = 512, c = document.createElement("canvas"); c.width = c.height = S;
+  const g = c.getContext("2d");
+  const R = { side: [0, 0, 256, 168], end: [256, 0, 192, 168], top: [0, 176, 192, 256], bottom: [256, 176, 192, 256] };
+  const kraft = (x, y, w, h, flutes) => {
+    g.fillStyle = "#b98a51"; g.fillRect(x, y, w, h);
+    for (let i = 0; i < w * h / 30; i++) { const v = 150 + ((i * 97) % 70); g.fillStyle = `rgba(${v},${v * 0.72},${v * 0.42},0.16)`; g.fillRect(x + (i * 53) % w, y + (i * 31) % h, 2, 1); }
+    g.fillStyle = "rgba(80,52,25,0.045)";
+    for (let p = 0; p < (flutes ? w : h); p += 5) flutes ? g.fillRect(x + p, y, 2, h) : g.fillRect(x, y + p, w, 2);
+    const e = g.createLinearGradient(x, y, x, y + h); // scuffed, darker edges
+    e.addColorStop(0, "rgba(70,45,20,0.18)"); e.addColorStop(0.08, "rgba(70,45,20,0)"); e.addColorStop(0.92, "rgba(70,45,20,0)"); e.addColorStop(1, "rgba(70,45,20,0.2)");
+    g.fillStyle = e; g.fillRect(x, y, w, h);
+  };
+  const tape = (x, y, w, h) => {
+    g.fillStyle = "rgba(205,165,105,0.82)"; g.fillRect(x, y, w, h);
+    g.fillStyle = "rgba(255,255,255,0.22)"; g.fillRect(x + w * 0.18, y, w * 0.12, h);
+    g.fillStyle = "rgba(90,60,25,0.25)"; g.fillRect(x, y, 1, h); g.fillRect(x + w - 1, y, 1, h);
+  };
+  for (const [name, [x, y, w, h]] of Object.entries(R)) kraft(x, y, w, h, name !== "top" && name !== "bottom");
+  // Lid: the flaps meet along the middle, taped over
+  { const [x, y, w, h] = R.top; g.fillStyle = "rgba(60,38,16,0.55)"; g.fillRect(x + w / 2 - 1, y, 2, h); tape(x + w / 2 - 13, y, 26, h); }
+  // Ends: tape down from the lid, a hand hole below it
+  { const [x, y, w, h] = R.end; tape(x + w / 2 - 13, y, 26, h * 0.24);
+    g.fillStyle = "#2a1c0e"; g.beginPath(); g.roundRect(x + w / 2 - 24, y + h * 0.36, 48, 13, 6.5); g.fill(); }
+  // Sides: printed arrows, the room in marker, a fragile sticker
+  { const [x, y, w, h] = R.side;
+    g.strokeStyle = "rgba(30,30,30,0.75)"; g.fillStyle = "rgba(30,30,30,0.75)"; g.lineWidth = 2.5;
+    for (const ax of [x + 18, x + 30]) { g.beginPath(); g.moveTo(ax, y + 34); g.lineTo(ax, y + 16); g.stroke(); g.beginPath(); g.moveTo(ax - 5, y + 20); g.lineTo(ax, y + 12); g.lineTo(ax + 5, y + 20); g.fill(); }
+    if (text) {
+      g.save(); g.translate(x + w * 0.54, y + h * 0.55); g.rotate(-0.06);
+      g.font = `700 ${text.length > 9 ? 27 : 34}px "Segoe Print", "Bradley Hand", "Comic Sans MS", cursive`;
+      g.textAlign = "center"; g.textBaseline = "middle"; g.fillStyle = "rgba(18,18,22,0.88)"; g.fillText(text, 0, 0);
+      g.restore();
+    }
+    if (glass) {
+      g.save(); g.translate(x + w - 52, y + 30); g.rotate(0.05);
+      g.fillStyle = "#d8262c"; g.fillRect(-40, -14, 80, 28);
+      g.fillStyle = "#fff"; g.font = "800 10px Arial, sans-serif"; g.textAlign = "center"; g.textBaseline = "middle";
+      g.fillText("VORSICHT", 0, -5); g.fillText("GLAS", 0, 6);
+      g.restore();
+    }
   }
-  const geo = new THREE.BoxGeometry(0.39, 0.34, 0.52), uv = geo.attributes.uv;
-  // Sides (±x) and bottom use the strip left of the tape; top and ends carry the tape.
-  for (const f of [0, 1, 3]) for (let v = 0; v < 4; v++) uv.setX(f * 4 + v, uv.getX(f * 4 + v) * 0.38);
-  const m = new THREE.Mesh(geo, boxMat); m.position.y = 0.17; m.castShadow = m.receiveShadow = true;
-  const wrap = new THREE.Group(); wrap.add(m); wrap.userData.size = V(0.39, 0.34, 0.52);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8;
+  const mat = new THREE.MeshStandardMaterial({ map: t, roughness: 0.85 });
+  mat.userData.regions = R; mat.userData.size = S;
+  boxMats.set(k, mat);
+  return mat;
+}
+function cardboardBox(label) {
+  const mat = boxMaterial(label), { regions: R, size: S } = mat.userData;
+  const geo = new THREE.BoxGeometry(BOX_SIZE.x, BOX_SIZE.y, BOX_SIZE.z), uv = geo.attributes.uv;
+  // Faces +x, −x, +y, −y, +z, −z, each mapped onto its part of the atlas.
+  const faceRegion = [R.side, R.side, R.top, R.bottom, R.end, R.end];
+  for (let f = 0; f < 6; f++) {
+    const [rx, ry, rw, rh] = faceRegion[f];
+    for (let v = 0; v < 4; v++) { const i = f * 4 + v; uv.setXY(i, (rx + uv.getX(i) * rw) / S, 1 - (ry + (1 - uv.getY(i)) * rh) / S); }
+  }
+  const m = new THREE.Mesh(geo, mat); m.position.y = BOX_SIZE.y / 2; m.castShadow = m.receiveShadow = true;
+  const wrap = new THREE.Group(); wrap.add(m); wrap.userData.size = BOX_SIZE.clone();
   return wrap;
+}
+
+// A rug rolled up for the move and stood on end: woven pattern on the outside, the
+// spiral of the roll on the ends, two bands of packing tape round it.
+let rugMats = null;
+function rugRoll() {
+  if (!rugMats) {
+    const c = document.createElement("canvas"); c.width = 512; c.height = 256;
+    const g = c.getContext("2d");
+    g.fillStyle = "#8c3b2e"; g.fillRect(0, 0, 512, 256);
+    const rows = ["#e8dcc4", "#2f3f5c", "#c99a4b", "#e8dcc4", "#5c2620"];
+    for (let y = 0; y < 256; y += 32) {
+      g.fillStyle = rows[(y / 32) % rows.length]; g.fillRect(0, y + 10, 512, 6);
+      for (let x = (y / 32) % 2 ? 16 : 0; x < 512; x += 32) { g.beginPath(); g.moveTo(x, y + 13); g.lineTo(x + 8, y + 5); g.lineTo(x + 16, y + 13); g.lineTo(x + 8, y + 21); g.closePath(); g.fill(); }
+    }
+    for (let i = 0; i < 9000; i++) { g.fillStyle = `rgba(${i % 3 ? 255 : 0},${i % 3 ? 240 : 0},${i % 3 ? 220 : 0},0.05)`; g.fillRect((i * 37) % 512, (i * 71) % 256, 2, 1); }
+    const side = new THREE.CanvasTexture(c); side.colorSpace = THREE.SRGBColorSpace; side.wrapS = THREE.RepeatWrapping; side.repeat.set(2, 3); side.anisotropy = 8;
+    const e = document.createElement("canvas"); e.width = e.height = 128;
+    const h = e.getContext("2d"); h.fillStyle = "#cfc2a8"; h.fillRect(0, 0, 128, 128);
+    h.strokeStyle = "rgba(90,40,30,0.75)"; h.lineWidth = 2.2; h.beginPath();
+    for (let a = 0; a < Math.PI * 2 * 9; a += 0.05) { const r = 6 + a * 1.0; h.lineTo(64 + Math.cos(a) * r, 64 + Math.sin(a) * r); }
+    h.stroke();
+    const end = new THREE.CanvasTexture(e); end.colorSpace = THREE.SRGBColorSpace;
+    rugMats = [new THREE.MeshStandardMaterial({ map: side, roughness: 0.95 }), new THREE.MeshStandardMaterial({ map: end, roughness: 0.95 }), new THREE.MeshStandardMaterial({ color: "#c9a46c", roughness: 0.45 })];
+  }
+  const r = 0.13, len = 1.7, g = new THREE.Group();
+  const roll = new THREE.Mesh(new THREE.CylinderGeometry(r, r, len, 40), [rugMats[0], rugMats[1], rugMats[1]]);
+  roll.position.y = len / 2; g.add(roll);
+  for (const y of [0.35, 1.35]) { const band = new THREE.Mesh(new THREE.CylinderGeometry(r + 0.003, r + 0.003, 0.05, 40, 1, true), rugMats[2]); band.position.y = y; g.add(band); }
+  g.traverse((o) => { if (o.isMesh) o.castShadow = o.receiveShadow = true; });
+  g.userData.size = V(2 * r, len, 2 * r);
+  return g;
+}
+
+// A modern art print on paper: a terracotta sun over sage and teal shapes, thin line.
+function artPrint() {
+  const c = document.createElement("canvas"); c.width = 384; c.height = 512;
+  const g = c.getContext("2d");
+  g.fillStyle = "#efe8dc"; g.fillRect(0, 0, 384, 512);
+  g.fillStyle = "#c2603f"; g.beginPath(); g.arc(214, 190, 88, 0, Math.PI * 2); g.fill();
+  g.fillStyle = "#8fa28c"; g.beginPath(); g.moveTo(40, 470); g.quadraticCurveTo(120, 250, 250, 330); g.quadraticCurveTo(320, 370, 344, 470); g.closePath(); g.fill();
+  g.fillStyle = "#2f5f63"; g.beginPath(); g.moveTo(40, 470); g.quadraticCurveTo(170, 360, 344, 430); g.lineTo(344, 470); g.closePath(); g.fill();
+  g.strokeStyle = "#1d1d1d"; g.lineWidth = 2.5; g.beginPath(); g.moveTo(70, 120); g.bezierCurveTo(140, 60, 220, 330, 330, 260); g.stroke();
+  for (let i = 0; i < 6000; i++) { g.fillStyle = `rgba(80,60,40,${0.03 + (i % 5) * 0.006})`; g.fillRect((i * 53) % 384, (i * 97) % 512, 1, 1); }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.flipY = false; t.anisotropy = 4;
+  return t;
 }
 
 // A row of books in one mesh (vertex colours), about the size of a shelf's worth.
@@ -178,16 +278,19 @@ function spline(keys, t, prop, out) {
 
 export async function buildSequence({ scene, truck, mobile }) {
   // ---------- Items ----------
-  const procedural = new Set([BOX, "books"]), ids = new Set();
+  const procedural = new Set([BOX, RUG, "books"]), ids = new Set();
   for (const c of CONTENTS) if (!c.m.startsWith("openbox") && !procedural.has(c.m)) ids.add(c.m);
   for (const list of Object.values(PACKED)) for (const [id] of list) if (!procedural.has(id)) ids.add(id);
   const models = Object.fromEntries(await Promise.all([...ids].map(async (id) => [id, await model(id, { texSize: mobile ? 256 : 512 })])));
+  // One of the frames ships with a placeholder card; give it a print.
+  models.hanging_picture_frame_01?.traverse((o) => { if (o.isMesh && /artwork/i.test(o.material.name)) o.material.map = artPrint(); });
   const used = new Set();
   const byKey = new Map();
   const items = CONTENTS.map((c) => {
     let src;
     if (c.m.startsWith("openbox:")) src = openBox(models, PACKED[c.m.split(":")[1]], V(0.39, 0.34, 0.52));
-    else if (c.m === BOX) src = cardboardBox();
+    else if (c.m === BOX) src = cardboardBox(LABELS[c.key.replace(/\d+$/, "")]);
+    else if (c.m === RUG) src = rugRoll();
     else if (c.m === "books") src = bookRow(c.key.length + c.x);
     else { src = used.has(c.m) ? models[c.m].clone() : models[c.m]; used.add(c.m); }
     const size = src.userData.size;
@@ -208,6 +311,17 @@ export async function buildSequence({ scene, truck, mobile }) {
     if (!it.below) { // stacked boxes: what's directly underneath
       it.below = items.find((o) => o !== it && !o.c.on && Math.hypot(o.c.x - it.c.x, o.c.z - it.c.z) < 0.1 && Math.abs(baseOf(o) + o.size.y - base) < 0.03)?.key;
     }
+  }
+
+  // Where a picture hung, the paint behind it stayed brighter, and the nail is left.
+  const ghost = new THREE.MeshStandardMaterial({ color: "#fcfbf8", roughness: 0.95, polygonOffset: true, polygonOffsetFactor: -1 });
+  const nail = new THREE.MeshStandardMaterial({ color: "#8e9092", metalness: 0.8, roughness: 0.4 });
+  for (const it of items) if (it.c.m.startsWith("hanging_picture_frame")) {
+    const onLeft = it.c.x < ROOM.x0 + 0.1, { x, y } = it.size, g = new THREE.Group();
+    const mark = new THREE.Mesh(new THREE.PlaneGeometry(x - 0.012, y - 0.012), ghost); mark.receiveShadow = true; g.add(mark);
+    const pin = new THREE.Mesh(new THREE.CylinderGeometry(0.0025, 0.0025, 0.025, 6), nail); pin.rotation.x = Math.PI / 2; pin.position.set(0, y / 2 - 0.07, 0.012); g.add(pin);
+    g.position.set(onLeft ? ROOM.x0 + 0.0015 : it.home.pos.x, it.home.pos.y, onLeft ? it.home.pos.z : ROOM.z0 + 0.0015);
+    g.rotation.y = onLeft ? Q : 0; scene.add(g);
   }
 
   // ---------- Packing plan and loading order ----------
@@ -277,26 +391,26 @@ export async function buildSequence({ scene, truck, mobile }) {
   // A slow, continuous move like a filmed shot, from above and in front like a model
   // on a table: the room and the van stay whole in the frame while it is loaded and
   // shut, then the view settles on the empty room as the van leaves. One path for each
-  // layout, each composed for a 30° lens on a band of its own aspect (wide on laptops,
+  // layout, each composed for a 30° lens on a band of its own aspect (2.4:1 on laptops,
   // square on phones); on any other band the camera backs off along its line of sight
   // until the same view fits.
   // Keys: look-at point, distance, azimuth (0 = straight from the front) and elevation.
   const key = (t, look, dist, az, el) => ({ t, look, pos: look.clone().add(V(Math.sin(az) * Math.cos(el), Math.sin(el), Math.cos(az) * Math.cos(el)).multiplyScalar(dist)) });
   const paths = {
-    wide: { aspect: 2.2, keys: [
-      key(0, V(2.1, 0.9, -1.9), 17.2, 0, 0.55),
-      key(0.36, V(2.0, 0.9, -1.9), 16.7, 0.03, 0.56),
-      key(0.72, V(1.9, 0.9, -2.0), 16.4, 0.05, 0.57),
-      key(0.8, V(2.3, 1.0, -2.1), 16.0, 0.04, 0.55),
-      key(0.88, V(2.2, 1.0, -2.2), 16.4, 0, 0.55),
-      key(1, V(-2.8, 0.9, -1.8), 12.0, -0.05, 0.6),
+    wide: { aspect: 2.4, keys: [
+      key(0, V(2.1, 0.9, -1.9), 15.8, 0, 0.55),
+      key(0.36, V(2.0, 0.9, -1.9), 15.4, 0.03, 0.56),
+      key(0.72, V(1.9, 0.9, -2.0), 15.1, 0.05, 0.57),
+      key(0.8, V(2.3, 1.0, -2.1), 14.7, 0.04, 0.55),
+      key(0.88, V(2.2, 1.0, -2.2), 15.1, 0, 0.55),
+      key(1, V(-2.8, 0.9, -1.8), 11.0, -0.05, 0.6),
     ] },
     narrow: { aspect: 1.0, keys: [
       key(0, V(-1.0, 1.2, -3.3), 26.0, 0.14, 0.6),
       key(0.72, V(-0.9, 1.2, -3.3), 25.0, 0.12, 0.61),
       key(0.8, V(-0.6, 1.3, -3.1), 24.5, 0.16, 0.58),
       key(0.88, V(-0.7, 1.3, -3.1), 24.5, 0.14, 0.58),
-      key(1, V(-3.0, 0.9, -1.8), 16.4, 0.05, 0.62),
+      key(1, V(-3.0, 0.9, -1.8), 19.5, 0.05, 0.62),
     ] },
   };
   const path = mobile ? paths.narrow : paths.wide;

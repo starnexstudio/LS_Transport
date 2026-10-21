@@ -18,8 +18,8 @@ export const models = [
   "ceramic_vase_02", "ceramic_vase_03", "ceramic_vase_04", "antique_ceramic_vase_01", "wooden_bowl_01",
   "alarm_clock_01", "standing_picture_frame_01", "standing_picture_frame_02", "hanging_picture_frame_01", "hanging_picture_frame_02",
 ];
-// Room walls and floor; the truck's cargo floor and tail lift
-const textures = ["beige_wall_002", "herringbone_parquet", "metal_plate", "ash_veneer"];
+// Room walls, floor and their section (masonry, concrete); the truck's cargo floor and tail lift
+const textures = ["beige_wall_002", "herringbone_parquet", "painted_plaster_wall", "concrete_floor_02", "metal_plate", "ash_veneer"];
 const hdri = "kloofendal_48d_partly_cloudy_puresky";
 
 async function download(url, file) {

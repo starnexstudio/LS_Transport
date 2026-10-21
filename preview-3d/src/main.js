@@ -1,6 +1,7 @@
 // Bootstraps the 3D hero preview: a transparent renderer over the page's teal, the
 // house and the truck lit by sun and HDRI, and the clearance timeline, which native
-// vertical scroll drives from 0 to 1 like scrubbing a video.
+// vertical scroll drives from 0 to 1 like scrubbing a video. The copy follows the same
+// timeline: the sentence lights up, "Neues." is underlined, the rail fills.
 import * as THREE from "three";
 import { hdri } from "./assets.js";
 import { buildWorld } from "./world.js";
@@ -9,12 +10,10 @@ import { buildSequence } from "./sequence.js";
 
 const root = document.documentElement;
 const hero = document.querySelector(".hero");
+const stage = document.querySelector(".stage");
 const sceneEl = document.querySelector(".scene");
 const canvas = document.querySelector("#scene-canvas");
-const label = document.querySelector(".label");
-const bar = document.querySelector(".bar");
 const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
-const PAGE = "#007782"; // the page background the scene sits on
 
 function webglAvailable() {
   try { const c = document.createElement("canvas"); return !!(c.getContext("webgl2") || c.getContext("webgl")); }
@@ -61,13 +60,21 @@ async function start() {
   const [, truck] = await Promise.all([buildWorld(scene), buildTruck()]);
   const seq = await buildSequence({ scene, truck, mobile });
 
-  let framing = "wide", dirty = true;
+  // The canvas covers the whole stage; the camera is set up for the band between the
+  // copy and the actions (the .scene element, less the room the actions take below it,
+  // at the site's room width) and the view extends past it, so nothing is clipped.
+  let dirty = true;
+  const lens = (aspect) => { camera.aspect = aspect; camera.fov = aspect < 1.3 ? 38 : 30; };
   function resize() {
-    const w = sceneEl.clientWidth || innerWidth, h = sceneEl.clientHeight || innerHeight * 0.6;
+    const w = canvas.clientWidth || innerWidth, h = canvas.clientHeight || innerHeight;
     renderer.setSize(w, h, false);
-    camera.aspect = w / h;
-    framing = camera.aspect < 0.95 ? "tall" : "wide";
-    camera.fov = framing === "tall" ? 42 : 30;
+    const css = getComputedStyle(sceneEl), band = sceneEl.getBoundingClientRect(), c = canvas.getBoundingClientRect();
+    const lift = parseFloat(css.getPropertyValue("--lift")) || 0, room = parseFloat(css.getPropertyValue("--room")) || 1;
+    const gap = 20; // clear of the sentence above
+    const bw = Math.max(1, band.width * room), bh = Math.max(120, band.height - gap - lift);
+    const left = band.left - c.left + (band.width - bw) / 2, top = band.top - c.top + gap;
+    lens(bw / bh);
+    camera.setViewOffset(bw, bh, -left, -top, w, h);
     camera.updateProjectionMatrix();
     dirty = true;
   }
@@ -77,7 +84,7 @@ async function start() {
   const gl = renderer.getContext(), px = new Uint8Array(4);
   const timeFrame = () => { const a = performance.now(); renderer.render(scene, camera); gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px); return performance.now() - a; };
   function chooseQuality() {
-    resize(); seq.evaluate(0.3, camera, framing);
+    resize(); seq.evaluate(0.3, camera);
     timeFrame(); // compiles shaders
     const ms = [timeFrame(), timeFrame(), timeFrame()].sort((a, b) => a - b)[1];
     const forced = new URLSearchParams(location.search).get("quality"); // ?quality=high|medium|low for tests and posters
@@ -101,28 +108,40 @@ async function start() {
     const range = r.height - innerHeight;
     return range > 0 ? Math.min(1, Math.max(0, -r.top / range)) : 0;
   };
-  let target = 0, current = 0, velocity = 0, last = performance.now(), result = null, frameNo = 0;
+  let target = 0, current = 0, velocity = 0, last = performance.now(), frameNo = 0, copyT = "";
+  // The copy on the same timeline: --t lights the sentence and fills the rail, --a
+  // draws the underline under "Neues." once the house is empty.
+  const copy = (t) => {
+    const v = t.toFixed(4);
+    if (v === copyT) return;
+    copyT = v;
+    const u = Math.min(1, Math.max(0, (t - 0.72) / 0.08));
+    stage.style.setProperty("--t", v);
+    stage.style.setProperty("--a", (1 - (1 - u) ** 3).toFixed(4));
+  };
   const render = (t, settled = true) => {
     if (!renderer.shadowMap.autoUpdate) renderer.shadowMap.needsUpdate = settled || frameNo++ % 2 === 0;
-    result = seq.evaluate(t, camera, framing);
+    seq.evaluate(t, camera);
     const cam = window.__preview?.camOverride; // test hook: inspect details from another angle
     if (cam) { camera.position.set(...cam.pos); camera.lookAt(...cam.look); }
     renderer.render(scene, camera);
-    label.classList.toggle("on", result.cleared);
+    copy(t);
   };
-  // A still of the current frame on the page's teal (the canvas itself is transparent).
-  const still = (type = "image/jpeg") => {
-    const c = document.createElement("canvas"); c.width = canvas.width; c.height = canvas.height;
-    const g = c.getContext("2d"); g.fillStyle = PAGE; g.fillRect(0, 0, c.width, c.height); g.drawImage(canvas, 0, 0);
-    return c.toDataURL(type, 0.88);
+  // A still of the moment t at w × h, with a transparent background (WebP keeps the
+  // alpha), so it sits on the stage's teal like the live canvas. Used for the
+  // reduced-motion pair and the loading / no-WebGL posters.
+  const shoot = (t, w, h) => {
+    renderer.setPixelRatio(1); renderer.setSize(w, h, false);
+    camera.clearViewOffset(); lens(w / h); camera.updateProjectionMatrix();
+    renderer.shadowMap.needsUpdate = true;
+    seq.evaluate(t, camera); renderer.render(scene, camera);
+    return canvas.toDataURL("image/webp", 0.9);
   };
 
   if (reduced) {
     // Static before / after, rendered once from the same scene.
-    sceneEl.style.display = "block"; sceneEl.style.height = "420px"; resize();
-    render(0); document.querySelector("#still-before").src = still();
-    render(1); document.querySelector("#still-after").src = still();
-    sceneEl.style.display = ""; sceneEl.style.height = "";
+    document.querySelector("#still-before").src = shoot(0, 1600, 1000);
+    document.querySelector("#still-after").src = shoot(1, 1600, 1000);
     document.title = "ready";
     return;
   }
@@ -132,11 +151,10 @@ async function start() {
   const onScroll = () => {
     if (window.__preview?.frozen) return; // test hook: time set by setTime only
     target = progress();
-    root.classList.toggle("scrolled", target > 0.004);
-    if (bar) bar.classList.toggle("away", hero.getBoundingClientRect().bottom < innerHeight * 0.6);
   };
   addEventListener("scroll", onScroll, { passive: true });
-  addEventListener("resize", resize);
+  // The band moves when the window or the copy above it changes size (fonts loading).
+  new ResizeObserver(() => resize()).observe(sceneEl);
   resize(); onScroll(); current = target;
 
   // Dynamic resolution: while the scene moves, the render scale follows the frame
@@ -181,7 +199,8 @@ async function start() {
 
   // Test hooks for the local preview.
   window.__preview = {
-    seq, scene, camera, renderer, quality, frozen: false, still,
+    seq, scene, camera, renderer, quality, frozen: false,
+    shoot: (t, w, h) => { const url = shoot(t, w, h); renderer.setPixelRatio(baseRatio * scale); resize(); render(current); return url; },
     get scale() { return scale; }, get time() { return current; },
     setTime: (t) => { target = current = t; velocity = 0; render(t); },
   };

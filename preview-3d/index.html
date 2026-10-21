@@ -11,134 +11,221 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet" />
 <script type="importmap">{ "imports": { "three": "./node_modules/three/build/three.module.js", "three/addons/": "./node_modules/three/examples/jsm/", "meshoptimizer/simplifier": "./node_modules/meshoptimizer/meshopt_simplifier.module.js" } }</script>
 <style>
-  :root { --teal: #007782; --teal-dark: #003e45; --orange: #ff581c; --off: #f5f3ed; --ink: #102326; }
+  /* Copy, header and stage follow the website's hero (app/hero.css, app/globals.css);
+     the 3D scene takes the place of the drawn room. */
+  :root { --teal: #00757f; --teal-deep: #005b63; --orange: #fc561a; --orange-hover: #ff6d36; --off-white: #f5f3ed; --ink: #132a2e; --paper: #f6f9f9; --ease: cubic-bezier(0.22, 1, 0.36, 1); }
   * { box-sizing: border-box; }
   html { background: var(--teal); }
-  body { margin: 0; font-family: Manrope, Arial, sans-serif; color: var(--off); background: var(--teal); }
+  body { margin: 0; font-family: Manrope, Arial, sans-serif; font-size: 16px; line-height: 1.6; color: var(--ink); background: var(--paper); }
   a { color: inherit; text-decoration: none; }
-  a:focus-visible, button:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
-  .hdr { position: relative; z-index: 5; flex-shrink: 0; height: 96px; display: flex; align-items: center; justify-content: space-between; padding: 0 max(40px, calc((100% - 1440px) / 2 + 64px)); }
-  .hdr img { width: 132px; height: auto; display: block; }
-  .nav { display: flex; gap: 36px; font-weight: 600; font-size: 15px; }
-  .call { display: inline-flex; align-items: center; gap: 10px; padding: 12px 18px; border: 1.5px solid #fff; border-radius: 10px; font-weight: 700; font-size: 15px; }
-  .menu { display: none; width: 44px; height: 44px; border: 1.5px solid #fff; border-radius: 10px; background: none; color: #fff; align-items: center; justify-content: center; }
-  .hero { position: relative; height: calc(100svh + 230vh); }
-  .stage { position: sticky; top: 0; height: 100svh; min-height: 620px; display: flex; flex-direction: column; overflow: hidden; }
-  .intro { position: relative; z-index: 2; display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; padding: 8px max(40px, calc((100% - 1440px) / 2 + 120px)) 18px; }
-  h1 { margin: 0; font-family: Archivo, Arial, sans-serif; font-weight: 600; font-size: clamp(36px, 3.8vw, 54px); line-height: 1.04; letter-spacing: -0.025em; color: #fff; }
-  .lead { margin: 10px 0 0; font-size: 18px; line-height: 1.5; }
-  .actions { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; flex-shrink: 0; }
-  .ctas { display: flex; gap: 10px; }
-  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; height: 54px; padding: 0 20px; border-radius: 10px; font-weight: 700; font-size: 16px; white-space: nowrap; }
-  .btn-primary { background: var(--orange); color: var(--ink); }
-  .btn-outline { border: 1.5px solid #fff; color: #fff; }
-  .line { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 600; }
-  .line::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--orange); }
-  /* The 3D fills the whole pinned screen behind the header and headline, like a
-     full-bleed video; the transparent canvas sits straight on the page's teal. */
-  .scene { position: absolute; inset: 0; z-index: 1; }
-  /* Teal fade under the header and headline: anything rising into the text area dissolves into the page colour. */
-  .stage::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 36%; z-index: 1; pointer-events: none; background: linear-gradient(var(--teal) 58%, rgb(0 119 130 / 0)); }
-  .scene canvas, .scene .poster { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-  .poster { object-fit: cover; transition: opacity 500ms; }
+  h1, p { margin: 0; }
+  a:focus-visible, button:focus-visible { outline: 3px solid #fff; outline-offset: 5px; }
+
+  /* Header: laid over the top of the pinned stage. */
+  .header { position: absolute; top: 0; left: 0; right: 0; z-index: 20; height: 104px; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 0 var(--gutter); color: var(--off-white); }
+  .brand { display: flex; align-items: center; flex-shrink: 0; }
+  .brand img { width: 146px; height: auto; display: block; }
+  .navigation { display: flex; align-items: center; gap: 36px; font-size: 15px; font-weight: 600; line-height: normal; }
+  .navigation > a:hover { color: #fff; }
+  .header-actions { display: flex; align-items: center; gap: 10px; }
+  .header-call { display: flex; align-items: center; gap: 10px; padding: 12px 18px; border: 1.5px solid #fff; border-radius: 10px; font-size: 15px; font-weight: 700; line-height: normal; white-space: nowrap; color: #fff; }
+  .header-call:hover { background: #ffffff14; }
+  .menu-toggle { display: none; }
+
+  /* Stage */
+  .hero { --header: 104px; --gutter: max(clamp(40px, 4.444vw, 64px), calc((100% - 1440px) / 2 + 64px)); position: relative; z-index: 1; height: calc(100svh + 230vh); color: var(--off-white); background: var(--teal); }
+  .stage { position: sticky; top: 0; height: 100svh; min-height: 600px; display: flex; flex-direction: column; padding-top: var(--header); overflow: hidden;
+    background: radial-gradient(ellipse 46% 52% at 50% 66%, #ffffff17, #ffffff00 72%), radial-gradient(ellipse 120% 90% at 50% 0%, #00000000 55%, #00000026), var(--teal); }
+
+  /* Copy */
+  .intro { position: relative; z-index: 2; padding: 22px var(--gutter) 0; text-align: center; }
+  .label { display: inline-flex; align-items: center; gap: 14px; font-size: 12px; font-weight: 700; line-height: normal; letter-spacing: 0.14em; text-transform: uppercase; }
+  .label::before, .label::after { content: ""; width: 28px; height: 3px; flex-shrink: 0; background: var(--orange); }
+  h1 { margin: 18px 0 0; font-family: Archivo, Manrope, Arial, sans-serif; font-size: clamp(38px, min(5.6vw, 9.4vh), 84px); font-weight: 600; line-height: 1.02; letter-spacing: -0.03em; color: #fff; }
+  .word { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: 0.1em; margin-bottom: -0.1em; }
+  .word > span { display: inline-block; }
+  .accent { position: relative; }
+  /* "Neues." is underlined once the house is empty (--a, set from the timeline). */
+  .accent::after { content: ""; position: absolute; left: 0.02em; right: 0.14em; bottom: 0.04em; height: 0.07em; background: var(--orange); transform-origin: left; transform: scaleX(var(--a, 0)); }
+  .br-mobile, .br-tablet { display: none; }
+  /* The sentence lights up word by word while the house empties (--t, the timeline). */
+  .lead { max-width: 31em; margin: 16px auto 0; font-size: 18px; line-height: 1.56; text-wrap: balance; }
+  .lead > span { opacity: calc(0.34 + 0.66 * clamp(0, (var(--t, 0) - 0.02 - var(--i) * 0.053) / 0.06, 1)); }
+
+  /* Scene: the band between the copy and the actions. The canvas covers the whole
+     stage, and the camera frames the house and the truck inside this band. */
+  .scene { position: relative; z-index: 1; flex: 1 1 0; min-height: 0; --lift: 104px; --room: 0.76; }
+  .stage > canvas { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; display: block; pointer-events: none; }
+  .poster { position: absolute; left: 50%; top: 20px; width: calc(var(--room) * 100%); height: calc(100% - 20px - var(--lift)); translate: -50% 0; object-fit: contain; display: block; transition: opacity 500ms; }
   .ready .poster { opacity: 0; pointer-events: none; }
-  .label { position: absolute; left: 50%; bottom: 28px; display: inline-flex; align-items: center; gap: 10px; padding: 10px 16px; border-radius: 999px; background: #ffffffeb; color: var(--ink); font-weight: 700; font-size: 15px; box-shadow: 0 6px 18px #00222630; opacity: 0; transform: translate(-50%, 8px); transition: opacity 300ms, transform 300ms; }
-  .label.on { opacity: 1; transform: translate(-50%, 0); }
-  .label svg { flex-shrink: 0; }
-  .hint { position: absolute; left: 50%; bottom: 28px; transform: translateX(-50%); padding: 6px 12px; border-radius: 999px; background: #00434acc; color: #fff; font-size: 13px; font-weight: 600; transition: opacity 300ms; }
-  .scrolled .hint { opacity: 0; }
-  .status { position: absolute; left: 16px; bottom: 14px; padding: 6px 12px; border-radius: 999px; background: #ffffffd9; color: var(--ink); font-size: 12px; font-weight: 700; }
-  .next { min-height: 70vh; background: #f6f9f9; color: var(--ink); padding: 72px max(40px, calc((100% - 1440px) / 2 + 120px)); }
+
+  /* Actions and statement flank the scene's base. */
+  .actions { position: absolute; z-index: 2; left: var(--gutter); bottom: 40px; display: flex; gap: 10px; }
+  .button { display: inline-flex; align-items: center; justify-content: center; gap: 10px; height: 56px; border-radius: 10px; font-size: 16px; font-weight: 700; line-height: normal; white-space: nowrap; }
+  .button svg { flex-shrink: 0; }
+  .button-primary { padding: 0 18px 0 20px; color: var(--ink); background: var(--orange); }
+  .button-primary:hover { background: var(--orange-hover); }
+  .button-outline { padding: 0 18px 0 16px; border: 1.5px solid #fff; color: #fff; }
+  .button-outline:hover { background: #ffffff14; }
+  .note { position: absolute; z-index: 2; right: var(--gutter); bottom: 58px; display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 600; line-height: normal; }
+  .note > span { width: 7px; height: 7px; flex-shrink: 0; border-radius: 50%; background: var(--orange); }
+  /* Scroll rail: fills with the timeline; a dot hints at scrolling. */
+  .progress { position: absolute; z-index: 2; right: var(--gutter); top: 50%; width: 2px; height: 120px; margin-top: -60px; border-radius: 2px; background: #ffffff2e; }
+  .progress > span { position: absolute; inset: 0; border-radius: inherit; background: var(--orange); transform-origin: top; transform: scaleY(var(--t, 0)); }
+  .progress::before { content: ""; position: absolute; left: -2px; top: 0; width: 6px; height: 6px; border-radius: 50%; background: #fff; opacity: calc(1 - clamp(0, var(--t, 0) / 0.08, 1)); }
+
+  .next { min-height: 70vh; background: var(--paper); color: var(--ink); padding: 72px var(--gutter, 64px); }
   .next h2 { font-family: Archivo, Arial, sans-serif; font-size: 32px; margin: 0 0 12px; }
-  .bar { display: none; }
-  .fallback, .still { display: none; }
-  /* Mobile */
-  @media (max-width: 760px) {
-    .hdr { height: 72px; padding: 0 20px; }
-    .hdr img { width: 100px; }
-    .nav, .hdr .call { display: none; }
-    .menu { display: inline-flex; }
-    .hero { height: calc(100svh + 210vh); }
-    .stage { min-height: 560px; padding-bottom: 92px; }
-    .intro { flex-direction: column; align-items: flex-start; gap: 0; padding: 4px 20px 12px; }
-    h1 { font-size: 34px; }
-    h1 .br { display: block; }
-    .lead { font-size: 15px; font-weight: 400; margin-top: 8px; }
-    .actions { display: none; }
-    .status { display: none; }
-    .stage::after { height: 30%; }
-    .label, .hint { bottom: 108px; }
-    .label { font-size: 13px; padding: 8px 12px; white-space: nowrap; }
-    .bar { position: fixed; z-index: 10; left: 0; right: 0; bottom: 0; display: flex; gap: 8px; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); background: #003e45f2; transition: transform 300ms; }
-    .bar .btn { flex: 1; height: 50px; font-size: 15px; padding: 0 12px; }
-    .bar.away { transform: translateY(110%); }
+  .still { display: none; }
+
+  /* Narrower or shorter desktops: actions and statement move under the scene (kept
+     positioned so they stay above the canvas). */
+  @media (min-width: 1024px) and (max-width: 1279px), (min-width: 1024px) and (max-height: 800px) {
+    .actions, .note { position: relative; inset: auto; justify-content: center; }
+    .actions { padding-top: 4px; }
+    .note { padding: 16px 0 28px; }
+    .scene { --lift: 10px; }
   }
-  /* Reduced motion: no pinning, a clear before / after. */
+  /* Tablet: copy above, scene in the middle, actions below it. */
+  @media (max-width: 1023px) {
+    .header { height: 92px; padding: 0 48px; }
+    .brand img { width: 132px; }
+    .header-call { height: 44px; gap: 9px; padding: 0 16px 0 14px; font-size: 14px; }
+    .menu-toggle { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; border: 1.5px solid #fff; border-radius: 10px; background: transparent; color: #fff; }
+    .navigation { display: none; }
+    .hero { --header: 92px; height: calc(100svh + 200vh); }
+    .intro { padding: 20px 48px 0; }
+    .label { gap: 10px; letter-spacing: 0.12em; }
+    .label::before, .label::after { width: 22px; }
+    h1 { margin-top: 16px; font-size: clamp(38px, min(7.8vw, 6.4vh), 60px); line-height: 1.03; }
+    .br-tablet { display: inline; }
+    .lead { max-width: 30em; margin-top: 14px; font-size: 17px; line-height: 1.55; }
+    .scene { --lift: 8px; --room: 0.88; }
+    .actions, .note { position: relative; inset: auto; justify-content: center; }
+    .actions { gap: 12px; padding: 4px 48px 0; }
+    .button-primary, .button-outline { padding: 0 20px; }
+    .note { padding: 18px 48px 32px; }
+    .progress { right: 24px; }
+  }
+  /* Mobile: compact copy, a full-width scene, stacked actions. */
+  @media (max-width: 760px) {
+    .header { height: 84px; padding: 0 24px; }
+    .brand img { width: 116px; }
+    .header-call { display: none; }
+    .hero { --header: 84px; height: calc(100svh + 190vh); }
+    .stage { min-height: 560px; }
+    .intro { padding: 10px 24px 0; }
+    .label { font-size: 11px; }
+    .label::after { display: none; }
+    h1 { margin-top: 12px; font-size: clamp(32px, min(10.3vw, 6vh), 40px); }
+    .br-tablet { display: none; }
+    .br-mobile { display: inline; }
+    .lead { margin-top: 10px; font-size: 15.5px; line-height: 1.5; }
+    .scene { --lift: 4px; --room: 0.96; }
+    .actions { flex-direction: column; gap: 10px; padding: 0 24px; }
+    .button { width: 100%; height: 52px; }
+    .button-outline { height: 48px; }
+    .note { padding: 14px 24px 18px; font-size: 14px; }
+    .progress { display: none; }
+  }
+  @media (max-width: 760px) and (max-height: 720px) {
+    .note { display: none; }
+    .actions { padding-bottom: 16px; }
+  }
+  @media (max-width: 374px) {
+    .header { height: 80px; padding: 0 20px; }
+    .brand img { width: 112px; }
+    .intro { padding-inline: 20px; }
+    .label { font-size: 10.5px; }
+    .actions, .note { padding-inline: 20px; }
+  }
+
+  /* On load: the headline rises word by word, the rest settles in. */
+  @media (prefers-reduced-motion: no-preference) {
+    .label { animation: rise 700ms 80ms var(--ease) both; }
+    .word > span { animation: word-rise 1000ms calc(140ms + var(--i) * 85ms) var(--ease) both; }
+    .lead { animation: rise 800ms 520ms var(--ease) both; }
+    .scene, .stage > canvas { animation: fade-in 1200ms 260ms var(--ease) both; }
+    .actions, .note { animation: rise 800ms 680ms var(--ease) both; }
+    .progress::before { animation: cue 1800ms 1400ms ease-in-out infinite both; }
+  }
+  @keyframes rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+  @keyframes word-rise { from { translate: 0 108%; } to { translate: 0 0; } }
+  @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes cue { 0% { translate: 0 0; scale: 0; } 20% { scale: 1; } 80% { scale: 1; } 100% { translate: 0 114px; scale: 0; } }
+
+  /* Reduced motion: no pinning, a before / after pair where the scene would be. */
   @media (prefers-reduced-motion: reduce) {
     .hero { height: auto; }
     .stage { position: relative; height: auto; min-height: 0; }
-    .scene { display: none; }
-    .still { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 0 max(24px, calc((100% - 1440px) / 2 + 64px)) 24px; }
-    .still figure { margin: 0; }
-    .still img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 16px; display: block; background: var(--teal); }
-    .still figcaption { margin-top: 8px; font-weight: 700; font-size: 15px; }
-    .hint, .label { display: none; }
-    @media (max-width: 760px) { .still { grid-template-columns: 1fr; margin: 0 16px 24px; } .stage { padding-bottom: 0; } }
+    .scene, .stage > canvas, .progress { display: none; }
+    .lead > span { opacity: 1; }
+    .accent::after { transform: none; }
+    .still { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 28px var(--gutter) 28px; }
+    .still figure { margin: 0; text-align: center; }
+    .still img { width: 100%; aspect-ratio: 16 / 10; object-fit: contain; display: block; }
+    .still figcaption { margin-top: 6px; font-weight: 700; font-size: 15px; }
+    .actions, .note { position: relative; inset: auto; justify-content: center; }
+    .note { padding: 16px 0 32px; }
+    @media (max-width: 760px) { .still { grid-template-columns: 1fr; margin: 16px 24px; } }
   }
-  .no-webgl .scene canvas, .no-webgl .hint { display: none; }
+  /* No WebGL: the poster stands in for the scene. */
+  .no-webgl .stage > canvas, .no-webgl .progress { display: none; }
   .no-webgl .poster { opacity: 1 !important; }
+  .no-webgl .lead > span { opacity: 1; }
+  .no-webgl .accent::after { transform: none; }
 </style>
 </head>
 <body>
   <section class="hero" aria-labelledby="hero-title">
     <div class="stage">
       <!-- The header is part of the pinned stage, so the animation starts on the first pixel of scroll. -->
-      <header class="hdr">
-        <a href="https://starnexstudio.github.io/LS_Transport/" aria-label="L&amp;S – zur Startseite"><img src="static/ls-logo.webp" alt="L&amp;S Entrümpelung &amp; Demontagearbeiten" width="897" height="570" /></a>
-        <nav class="nav" aria-label="Hauptnavigation">
+      <header class="header">
+        <a class="brand" href="https://starnexstudio.github.io/LS_Transport/" aria-label="L&amp;S – zur Startseite"><img src="static/ls-logo.webp" alt="L&amp;S Entrümpelung &amp; Demontagearbeiten" width="897" height="570" /></a>
+        <nav class="navigation" aria-label="Hauptnavigation">
           <a href="https://starnexstudio.github.io/LS_Transport/#leistungen">Leistungen</a>
           <a href="https://starnexstudio.github.io/LS_Transport/#ablauf">Ablauf</a>
           <a href="https://starnexstudio.github.io/LS_Transport/#vorher-nachher">Vorher &amp; Nachher</a>
           <a href="https://starnexstudio.github.io/LS_Transport/#fragen">Fragen</a>
         </nav>
-        <a class="call" href="tel:+491702919567" aria-label="Anrufen: +49 170 2919567">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-          +49 170 2919567
-        </a>
-        <button class="menu" type="button" aria-label="Menü öffnen">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
-        </button>
+        <div class="header-actions">
+          <a class="header-call" href="tel:+491702919567" aria-label="Anrufen: +49 170 2919567">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            +49 170 2919567
+          </a>
+          <button class="menu-toggle" type="button" aria-label="Menü öffnen">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
+          </button>
+        </div>
       </header>
       <div class="intro">
-        <div>
-          <h1 id="hero-title">Wir machen <span class="br"></span>Platz für Neues.</h1>
-          <p class="lead">Wir räumen Häuser und Wohnungen – inklusive Abtransport.</p>
-        </div>
-        <div class="actions">
-          <div class="ctas">
-            <a class="btn btn-primary" href="https://starnexstudio.github.io/LS_Transport/#anfrage">Unverbindlich anfragen
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10M7 17 17 7"/></svg></a>
-            <a class="btn btn-outline" href="tel:+491702919567">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-              Jetzt anrufen</a>
-          </div>
-          <p class="line">Schnell, zuverlässig und stressfrei.</p>
-        </div>
+        <p class="label">Entrümpelung · Demontage · Transport</p>
+        <h1 id="hero-title">
+          <span class="word" style="--i: 0"><span>Wir</span></span>
+          <span class="word" style="--i: 1"><span>machen</span></span><br class="br-mobile" />
+          <span class="word" style="--i: 2"><span>Platz</span></span><br class="br-tablet" />
+          <span class="word" style="--i: 3"><span>für</span></span>
+          <span class="word accent" style="--i: 4"><span>Neues.</span></span>
+        </h1>
+        <p class="lead">Wir übernehmen die komplette Räumung – von der Planung bis zur besenreinen Übergabe.</p>
       </div>
       <div class="scene" role="img" aria-label="Ein volles Haus wird geräumt: Möbel und Kartons wandern in den L&amp;S-Umzugswagen, der Wagen fährt ab, das Haus ist leer.">
-        <img class="poster" src="static/fallback-before.jpg" alt="" />
-        <canvas id="scene-canvas" aria-hidden="true"></canvas>
-        <div class="label" aria-live="polite">
-          <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#007782"/><path d="m7.5 12.5 3 3 6-6.5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Geräumt. Besenrein übergeben.
-        </div>
-        <div class="hint" aria-hidden="true">Scrollen, um die Räumung zu sehen</div>
-        <div class="status" aria-hidden="true">Lokale 3D-Vorschau</div>
+        <img class="poster" src="static/fallback-before.webp" alt="" />
       </div>
+      <canvas id="scene-canvas" aria-hidden="true"></canvas>
       <div class="still" aria-label="Vorher und nachher">
-        <figure><img id="still-before" src="static/fallback-before.jpg" alt="Vorher: das Haus ist voll möbliert, der L&amp;S-Umzugswagen wartet mit offener Hecktür." /><figcaption>Vorher</figcaption></figure>
-        <figure><img id="still-after" src="static/fallback-after.jpg" alt="Nachher: das Haus ist leer und besenrein, der Transporter ist abgefahren." /><figcaption>Nachher – geräumt und besenrein</figcaption></figure>
+        <figure><img id="still-before" src="static/fallback-before.webp" alt="Vorher: das Haus ist voll möbliert, der L&amp;S-Umzugswagen wartet mit offener Hecktür." /><figcaption>Vorher</figcaption></figure>
+        <figure><img id="still-after" src="static/fallback-after.webp" alt="Nachher: das Haus ist leer und besenrein, der Transporter ist abgefahren." /><figcaption>Nachher – geräumt und besenrein</figcaption></figure>
       </div>
+      <div class="actions">
+        <a class="button button-primary" href="https://starnexstudio.github.io/LS_Transport/#anfrage">Unverbindlich anfragen
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+        <a class="button button-outline" href="tel:+491702919567" aria-label="Jetzt anrufen: +49 170 2919567">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          Jetzt anrufen</a>
+      </div>
+      <p class="note"><span aria-hidden="true"></span>Schnell, zuverlässig und stressfrei.</p>
+      <div class="progress" aria-hidden="true"><span></span></div>
     </div>
   </section>
 
@@ -147,11 +234,11 @@
     <p>Hier geht die Website nach dem Hero weiter (Platzhalter in der lokalen Vorschau).</p>
   </section>
 
-  <div class="bar" role="navigation" aria-label="Kontakt">
-    <a class="btn btn-primary" href="https://starnexstudio.github.io/LS_Transport/#anfrage">Unverbindlich anfragen</a>
-    <a class="btn btn-outline" href="tel:+491702919567">Jetzt anrufen</a>
-  </div>
-
+  <script>
+    // The sentence is split into words that light up one after another with the timeline.
+    const lead = document.querySelector(".lead");
+    lead.innerHTML = lead.textContent.split(" ").map((w, i) => `<span style="--i: ${i}">${w}</span>`).join(" ");
+  </script>
   <script type="module" src="src/main.js"></script>
 </body>
 </html>

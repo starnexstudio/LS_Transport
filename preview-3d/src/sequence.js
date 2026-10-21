@@ -280,30 +280,28 @@ export async function buildSequence({ scene, truck, mobile }) {
   }
 
   // ---------- Camera ----------
-  // A slow, continuous dolly like a filmed shot: wide on the full house, easing in as
-  // it empties, round to the truck's doors, then back out as the truck leaves.
-  const camKeys = {
-    wide: [
-      { t: 0, pos: V(-9.2, 9.5, 25.7), look: V(-6.5, 5.8, -0.5) },
-      { t: 0.36, pos: V(-8.6, 9.0, 24.2), look: V(-6.4, 5.6, -0.7) },
-      { t: 0.72, pos: V(-7.4, 8.2, 22.0), look: V(-6.2, 5.3, -1.0) },
-      { t: 0.78, pos: V(-6.0, 8.6, 21.5), look: V(-5.7, 6.0, -1.6) },
-      { t: 0.845, pos: V(-9.9, 6.6, 17.5), look: V(-11.8, 4.6, 1.0) },
-      { t: 0.95, pos: V(-9.0, 10.5, 33.0), look: V(-8.0, 4.8, 2.0) },
-      { t: 1, pos: V(-7.6, 9.2, 26.5), look: V(-6.0, 5.6, -0.8) },
-    ],
-    tall: [
-      { t: 0, pos: V(-9.6, 11.5, 39.0), look: V(-7.9, 4.6, -1.0) },
-      { t: 0.72, pos: V(-9.2, 10.8, 37.0), look: V(-7.7, 4.5, -1.2) },
-      { t: 0.78, pos: V(-6.2, 8.4, 26.0), look: V(-5.6, 4.0, -1.8) },
-      { t: 0.845, pos: V(-10.6, 7.4, 23.0), look: V(-12.2, 3.8, 1.2) },
-      { t: 0.95, pos: V(-9.0, 13.0, 44.0), look: V(-8.0, 3.8, 3.0) },
-      { t: 1, pos: V(-7.6, 11.4, 37.5), look: V(-6.0, 4.6, -0.8) },
-    ],
-  };
+  // A slow, continuous dolly like a filmed shot: the full house and the truck, easing
+  // in as the rooms empty, over to the truck as its doors close, then back out as it
+  // leaves. The keys are composed for a 30° lens on a band 1.8 times as wide as it is
+  // tall (main.js frames that band between the copy and the actions); on any other
+  // band the camera backs off along its line of sight until the same view fits.
+  const REF = { aspect: 1.8, halfTan: Math.tan(THREE.MathUtils.degToRad(15)) };
+  const camKeys = [
+    { t: 0, pos: V(-9.0, 6.9, 22.5), look: V(-6.6, 3.2, -0.8) },
+    { t: 0.36, pos: V(-8.4, 6.7, 21.8), look: V(-6.5, 3.1, -0.9) },
+    { t: 0.72, pos: V(-7.7, 6.6, 21.4), look: V(-6.4, 3.2, -1.0) },
+    { t: 0.78, pos: V(-7.9, 6.4, 21.2), look: V(-7.4, 3.2, -0.4) },
+    { t: 0.845, pos: V(-10.6, 6.1, 21.1), look: V(-10.0, 3.3, 0.5) },
+    // Back out before the truck reverses towards us, and stay back while it drives
+    // off, so it never leaves the band at the bottom.
+    { t: 0.95, pos: V(-8.0, 8.3, 34.0), look: V(-7.5, 2.4, 3.0) },
+    { t: 0.975, pos: V(-8.2, 8.2, 32.6), look: V(-7.3, 2.5, 2.4) },
+    { t: 1, pos: V(-7.5, 7.9, 26.3), look: V(-6.0, 3.0, 0.3) },
+  ];
+
 
   const tmpQ = new THREE.Quaternion(), wob = new THREE.Quaternion(), tan = V(0, 0, 0), side = V(0, 0, 0), look = V(0, 0, 0);
-  function evaluate(t, camera, framing) {
+  function evaluate(t, camera) {
     // Truck
     const tp = truckPose(t);
     truck.root.position.copy(tp.pos); truck.root.rotation.set(0, tp.yaw, 0);
@@ -329,9 +327,10 @@ export async function buildSequence({ scene, truck, mobile }) {
     }
 
     // Camera
-    const keys = camKeys[framing];
-    spline(keys, t, "pos", camera.position);
-    camera.lookAt(spline(keys, t, "look", look));
+    spline(camKeys, t, "pos", camera.position); spline(camKeys, t, "look", look);
+    const fit = (REF.halfTan / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))) * Math.max(1, REF.aspect / camera.aspect);
+    camera.position.sub(look).multiplyScalar(fit).add(look);
+    camera.lookAt(look);
     return { cleared: t >= TL.cleared };
   }
 

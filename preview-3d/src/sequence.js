@@ -103,7 +103,7 @@ const PACKED = {
 };
 
 // Timeline (fractions of the scroll)
-export const TL = { fly0: 0.04, fly1: 0.66, flight: 0.1, cleared: 0.675, door: [0.72, 0.79], lift: [0.775, 0.85], rev: [0.85, 0.935], drive: [0.94, 1.0] };
+export const TL = { fly0: 0.03, fly1: 0.72, flight: 0.12, cleared: 0.73, door: [0.76, 0.82], lift: [0.81, 0.87], rev: [0.87, 0.94], drive: [0.945, 1.0] };
 
 // Moving box: one mesh, a cardboard texture with packing tape over the top and ends.
 let boxMat = null;
@@ -179,6 +179,21 @@ function openBox(models, contents, size) {
   return wrap;
 }
 
+// Camera keys joined by a cubic Hermite spline (Catmull–Rom tangents for uneven key
+// spacing, at rest at both ends): the camera never stops and restarts between keys.
+const m1v = V(0, 0, 0), m2v = V(0, 0, 0);
+function spline(keys, t, prop, out) {
+  if (t <= keys[0].t) return out.copy(keys[0][prop]);
+  if (t >= keys.at(-1).t) return out.copy(keys.at(-1)[prop]);
+  let i = 1; while (keys[i].t < t) i++;
+  const k1 = keys[i - 1], k2 = keys[i], k0 = keys[i - 2], k3 = keys[i + 1];
+  const h = k2.t - k1.t, u = (t - k1.t) / h, u2 = u * u, u3 = u2 * u;
+  const tangent = (a, b, m) => (a && b ? m.subVectors(b[prop], a[prop]).multiplyScalar(0.85 / (b.t - a.t)) : m.set(0, 0, 0));
+  tangent(k0, k2, m1v); tangent(k1, k3, m2v);
+  return out.copy(k1[prop]).multiplyScalar(2 * u3 - 3 * u2 + 1)
+    .addScaledVector(m1v, (u3 - 2 * u2 + u) * h).addScaledVector(k2[prop], -2 * u3 + 3 * u2).addScaledVector(m2v, (u3 - u2) * h);
+}
+
 export async function buildSequence({ scene, truck, mobile }) {
   // ---------- Items ----------
   const procedural = new Set([BOX, "books"]), ids = new Set();
@@ -235,16 +250,19 @@ export async function buildSequence({ scene, truck, mobile }) {
   items.forEach((it, i) => {
     it.t0 = TL.fly0 + i * stagger;
     const p0 = it.home.pos, h = it.size.y;
-    const rise = Math.max(0.2, Math.min(1.25, it.ceiling - (p0.y + h / 2) - 0.12));
+    const upstairs = it.ceiling === C1; // leaves under the eaves and gutter
+    const rise = Math.max(0.2, Math.min(upstairs ? 0.5 : 1.25, it.ceiling - (p0.y + h / 2) - 0.12));
     const p4 = toWorld(it.slot.pos);
     const p3 = toWorld(V(it.slot.pos.x, it.slot.pos.y + 0.2, T.rear - 1.5));
+    // Through the middle of the rear opening, then straight along the cargo space.
+    const pIn = it.slot.pos.z > T.rear + 0.7 ? toWorld(V(it.slot.pos.x, it.slot.pos.y + 0.06, T.rear + 0.25)) : null;
     const p1 = p0.clone().add(V(0, rise, 0.25));
-    const upstairs = it.ceiling === C1;
-    const p2 = V(THREE.MathUtils.lerp(p0.x, p3.x, 0.35), upstairs ? p1.y + 0.1 : Math.max(p1.y, p3.y) + 0.6, Math.max(HOUSE.z1 + 1.9, p0.z + 0.6));
-    it.curve = new THREE.CatmullRomCurve3([p0, p1, p2, p3], false, "centripetal");
-    it.lenC = it.curve.getLength(); it.lenL = p3.distanceTo(p4);
+    const p2 = V(THREE.MathUtils.lerp(p0.x, p3.x, 0.35), upstairs ? p1.y : Math.max(p1.y, p3.y) + 0.6, Math.max(HOUSE.z1 + 1.9, p0.z + 0.6));
+    it.curve = new THREE.CatmullRomCurve3([p0, p1, p2, p3, ...(pIn ? [pIn] : []), p4], false, "centripetal");
+    it.curve.arcLengthDivisions = 400;
+    it.curve.getLength();
     it.p3 = p3; it.p4 = p4;
-    it.roll = (i % 2 ? 1 : -1) * 0.12;
+    it.roll = (i % 2 ? 1 : -1) * 0.06;
   });
 
   // ---------- Departure: reverse out in a quarter turn, then drive off along the street ----------
@@ -265,18 +283,18 @@ export async function buildSequence({ scene, truck, mobile }) {
     wide: [
       { t: 0, pos: V(-9.4, 6.3, 22.5), look: V(-7.1, 2.7, -1.2) },
       { t: 0.32, pos: V(-9.1, 6.0, 21.2), look: V(-7.1, 2.7, -1.2) },
-      { t: 0.66, pos: V(-8.4, 5.5, 19.5), look: V(-6.8, 2.7, -1.4) },
-      { t: 0.715, pos: V(-6.8, 4.7, 14.5), look: V(-5.6, 2.6, -2.2) },
-      { t: 0.79, pos: V(-10.8, 3.9, 13.0), look: V(-12.8, 2.1, 1.6) },
-      { t: 0.93, pos: V(-10.0, 8.0, 26.5), look: V(-9.0, 1.5, 4.0) },
+      { t: 0.72, pos: V(-8.4, 5.5, 19.5), look: V(-6.8, 2.7, -1.4) },
+      { t: 0.765, pos: V(-6.8, 4.7, 14.5), look: V(-5.6, 2.6, -2.2) },
+      { t: 0.83, pos: V(-10.8, 3.9, 13.0), look: V(-12.8, 2.1, 1.6) },
+      { t: 0.94, pos: V(-10.0, 8.0, 26.5), look: V(-9.0, 1.5, 4.0) },
       { t: 1, pos: V(-8.8, 6.2, 22.5), look: V(-6.3, 2.7, -1.0) },
     ],
     tall: [
       { t: 0, pos: V(-9.4, 8.4, 31.5), look: V(-8.0, 2.5, -1.0) },
-      { t: 0.66, pos: V(-9.0, 7.8, 29.5), look: V(-7.8, 2.6, -1.2) },
-      { t: 0.715, pos: V(-6.2, 5.6, 19.5), look: V(-5.6, 2.6, -2.0) },
-      { t: 0.79, pos: V(-11.4, 4.6, 16.5), look: V(-12.8, 2.1, 1.6) },
-      { t: 0.93, pos: V(-9.5, 10.0, 35.0), look: V(-8.6, 1.5, 4.0) },
+      { t: 0.72, pos: V(-9.0, 7.8, 29.5), look: V(-7.8, 2.6, -1.2) },
+      { t: 0.765, pos: V(-6.2, 5.6, 19.5), look: V(-5.6, 2.6, -2.0) },
+      { t: 0.83, pos: V(-11.4, 4.6, 16.5), look: V(-12.8, 2.1, 1.6) },
+      { t: 0.94, pos: V(-9.5, 10.0, 35.0), look: V(-8.6, 1.5, 4.0) },
       { t: 1, pos: V(-8.0, 8.2, 31.0), look: V(-6.0, 2.5, -1.0) },
     ],
   };
@@ -298,11 +316,10 @@ export async function buildSequence({ scene, truck, mobile }) {
       if (u >= 1) { o.position.copy(toWorld(it.slot.pos)); o.quaternion.copy(truckQ).multiply(it.slot.quat); continue; }
       if (u <= 0) { o.position.copy(it.home.pos); o.quaternion.copy(it.home.quat); continue; }
       // Lift off gently, glide out and over, ease into its place in the cargo.
-      const e = u < 0.5 ? 4 * u ** 3 : 1 - (2 - 2 * u) ** 3 / 2;
-      const s = e * (it.lenC + it.lenL);
-      if (s < it.lenC) { o.position.copy(it.curve.getPointAt(s / it.lenC)); it.curve.getTangentAt(s / it.lenC, tan); }
-      else { o.position.lerpVectors(it.p3, it.p4, (s - it.lenC) / it.lenL); tan.subVectors(it.p4, it.p3).normalize(); }
-      const qe = ease(clamp01((e - 0.04) / 0.7));
+      // One smooth path, gentle sine ease in and out.
+      const e = 0.5 - 0.5 * Math.cos(Math.PI * u);
+      o.position.copy(it.curve.getPointAt(e)); it.curve.getTangentAt(e, tan);
+      const qe = ease(clamp01((e - 0.05) / 0.8));
       o.quaternion.slerpQuaternions(it.home.quat, tmpQ.copy(truckQ).multiply(it.slot.quat), qe);
       side.set(tan.z, 0, -tan.x).normalize();
       o.quaternion.premultiply(wob.setFromAxisAngle(side, it.roll * Math.sin(Math.PI * clamp01(e / 0.85))));
@@ -310,10 +327,8 @@ export async function buildSequence({ scene, truck, mobile }) {
 
     // Camera
     const keys = camKeys[framing];
-    let i = 1; while (i < keys.length - 1 && keys[i].t < t) i++;
-    const k0 = keys[i - 1], k1 = keys[i], cu = ease(span(t, k0.t, k1.t));
-    camera.position.lerpVectors(k0.pos, k1.pos, cu);
-    camera.lookAt(look.lerpVectors(k0.look, k1.look, cu));
+    spline(keys, t, "pos", camera.position);
+    camera.lookAt(spline(keys, t, "look", look));
     return { cleared: t >= TL.cleared };
   }
 

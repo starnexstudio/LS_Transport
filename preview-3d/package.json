@@ -8,6 +8,7 @@
     "serve": "python -m http.server 4180"
   },
   "dependencies": {
+    "meshoptimizer": "0.22.0",
     "three": "0.170.0"
   }
 }

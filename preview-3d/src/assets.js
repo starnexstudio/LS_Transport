@@ -3,6 +3,7 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { RGBELoader } from "three/addons/loaders/RGBELoader.js";
+import { MeshoptSimplifier } from "meshoptimizer/simplifier";
 
 const gltfLoader = new GLTFLoader();
 const texLoader = new THREE.TextureLoader();
@@ -33,13 +34,32 @@ async function shrink(root, max) {
   await Promise.all(jobs);
 }
 
+// Thin out dense meshes: the scanned models carry far more triangles than they need
+// at the size they appear on screen. meshoptimizer keeps UV seams and silhouettes.
+async function lighten(root, maxTris = 4000, keep = 0.3, error = 0.01) {
+  await MeshoptSimplifier.ready;
+  const done = new Set();
+  root.traverse((o) => {
+    const g = o.geometry;
+    if (!o.isMesh || !g?.index || done.has(g)) return;
+    done.add(g);
+    const tris = g.index.count / 3;
+    if (tris <= maxTris) return;
+    const pos = g.attributes.position;
+    const positions = pos.isInterleavedBufferAttribute ? Float32Array.from({ length: pos.count * 3 }, (_, i) => pos.getComponent(Math.floor(i / 3), i % 3)) : pos.array;
+    const target = Math.max(maxTris, Math.floor(tris * keep)) * 3;
+    const [indices] = MeshoptSimplifier.simplify(Uint32Array.from(g.index.array), positions, 3, target, error);
+    if (indices.length >= 3) g.setIndex(new THREE.BufferAttribute(indices, 1));
+  });
+}
+
 // A model in a wrapper whose origin is the centre of its footprint at floor level.
 export async function model(id, { texSize = 512, shadows = true } = {}) {
   const g = await gltfLoader.loadAsync(`assets/polyhaven/${id}/${id}.gltf`);
   const root = g.scene;
   if (SCALE[id]) root.scale.multiplyScalar(SCALE[id]);
   root.traverse((o) => { if (o.isMesh) { o.castShadow = shadows; o.receiveShadow = true; } });
-  await shrink(root, texSize);
+  await Promise.all([shrink(root, texSize), lighten(root)]);
   root.updateMatrixWorld(true);
   const box = new THREE.Box3().setFromObject(root);
   const center = box.getCenter(new THREE.Vector3());

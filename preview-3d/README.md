@@ -46,12 +46,19 @@ The removal truck, the house and the street are built in code (`src/truck.js`, `
 
 - **Lighting:** ACES tone mapping, a sun with soft shadows, HDRI image-based lighting turned to match the sun, and a sky dome with procedural clouds.
 - **Merged geometry:** static parts of the house, street and truck are merged per material, about 340 draw calls in all.
+- **Lighter models:** dense Poly Haven models are thinned at load with meshoptimizer (UV seams kept), about 370k triangles in all.
+- **Shadows:** PCF with a wide kernel instead of PCFSoft: soft edges at about half the cost. Below the top level, the shadow map is redrawn every other frame while things move, and always once they settle.
 - **Quality levels:** at load the page times one frame and picks a level:
   - **high:** ground-truth ambient occlusion (GTAO), 4× MSAA and 4K shadows;
   - **medium:** 2K shadows;
-  - **low:** 1K shadows at pixel ratio 1.
+  - **low:** 1K shadows.
 
-  Add `?quality=high|medium|low` to force one. On an Intel integrated GPU it picks medium, at about 25–30 ms a frame.
+  Add `?quality=high|medium|low` to force one.
+- **Dynamic resolution:** while scrolling, the render scale follows the frame rate (aiming for 60 fps), and a full-resolution frame is drawn once the motion stops. On an Intel integrated GPU it holds 60 fps.
+- **Smooth motion:**
+  - **Scroll:** the scene follows the scroll on a critically damped spring, so each wheel step or swipe becomes one glide.
+  - **Camera:** moves on a continuous spline, without stopping between keys.
+  - **Flights:** each piece follows one smooth curve with a sine ease, through the middle of the truck's rear opening.
 - **Phones:** smaller textures, and never the high level.
 - **Framing:** separate camera paths for desktop and phones (`wide` / `tall`).
 - **Fallbacks:** reduced motion shows a before/after pair of stills rendered from the scene, and there are poster images if WebGL is missing.

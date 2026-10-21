@@ -64,8 +64,10 @@ async function start() {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: reduced, powerPreference: "high-performance" });
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 0.62;
-  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-  renderer.setPixelRatio(Math.min(devicePixelRatio, mobile ? 1.5 : 2));
+  // PCF with a wide kernel: soft edges at about half the cost of PCFSoftShadowMap.
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFShadowMap;
+  let baseRatio = Math.min(devicePixelRatio, mobile ? 1.5 : 2);
+  renderer.setPixelRatio(baseRatio);
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 1500);
@@ -89,7 +91,7 @@ async function start() {
   sun.position.copy(focus).addScaledVector(sunDir, 60); sun.target.position.copy(focus);
   sun.castShadow = true; sun.shadow.mapSize.setScalar(mobile ? 2048 : 4096);
   Object.assign(sun.shadow.camera, { left: -22, right: 22, top: 18, bottom: -18, near: 20, far: 110 });
-  sun.shadow.bias = -0.0002; sun.shadow.normalBias = 0.025;
+  sun.shadow.bias = -0.0002; sun.shadow.normalBias = 0.025; sun.shadow.radius = 2.5;
   scene.add(sun, sun.target);
 
   const [, truck] = await Promise.all([buildWorld(scene, { lowDetail: mobile }), buildTruck()]);
@@ -106,7 +108,8 @@ async function start() {
     timeFrame(); // compiles shaders
     const ms = [timeFrame(), timeFrame(), timeFrame()].sort((a, b) => a - b)[1];
     const forced = new URLSearchParams(location.search).get("quality"); // ?quality=high|medium|low for tests and posters
-    const level = forced ?? (!mobile && ms < 14 ? "high" : ms < 30 ? "medium" : "low");
+    // The load-time timing is noisy; dynamic resolution handles the rest while scrolling.
+    const level = forced ?? (!mobile && ms < 9 ? "high" : ms < 40 ? "medium" : "low");
     if (level === "high") {
       composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: 4 }));
       composer.addPass(new RenderPass(scene, camera));
@@ -119,8 +122,12 @@ async function start() {
     } else {
       sun.shadow.mapSize.setScalar(level === "low" ? 1024 : 2048);
       sun.shadow.map?.dispose(); sun.shadow.map = null;
-      renderer.setPixelRatio(Math.min(devicePixelRatio, level === "low" ? 1 : 1.25));
+      baseRatio = Math.min(devicePixelRatio, level === "low" ? 1 : 1.5);
+      renderer.setPixelRatio(baseRatio);
     }
+    // Below the top level the sun's shadow map is redrawn every other frame while
+    // things move (a 16 ms lag nobody sees) and always once the motion settles.
+    renderer.shadowMap.autoUpdate = level === "high";
     resize();
     return { level, ms: Math.round(ms) };
   }
@@ -141,8 +148,9 @@ async function start() {
     const range = r.height - innerHeight;
     return range > 0 ? Math.min(1, Math.max(0, -r.top / range)) : 0;
   };
-  let target = 0, current = 0, last = performance.now(), result = null;
-  const render = (t) => {
+  let target = 0, current = 0, velocity = 0, last = performance.now(), result = null, frameNo = 0;
+  const render = (t, settled = true) => {
+    if (!renderer.shadowMap.autoUpdate) renderer.shadowMap.needsUpdate = settled || frameNo++ % 2 === 0;
     result = seq.evaluate(t, camera, framing);
     const cam = window.__preview?.camOverride; // test hook: inspect details from another angle
     if (cam) { camera.position.set(...cam.pos); camera.lookAt(...cam.look); }
@@ -171,12 +179,39 @@ async function start() {
   addEventListener("resize", resize);
   resize(); onScroll(); current = target;
 
+  // Dynamic resolution: while the scene moves, the render scale follows the frame
+  // interval (aiming for 60 fps); once it settles, a full-resolution frame is drawn.
+  let scale = 1, intervals = [], lastScaleChange = 0;
+  const setScale = (s, now) => {
+    if (Math.abs(s - scale) < 0.01) return;
+    scale = s; lastScaleChange = now;
+    renderer.setPixelRatio(baseRatio * scale); composer?.setPixelRatio?.(baseRatio * scale);
+    resize();
+  };
+  function adapt(now, interval, moving) {
+    if (!moving) { intervals = []; setScale(1, now); return; }
+    intervals.push(interval); if (intervals.length > 8) intervals.shift();
+    if (intervals.length < 8 || now - lastScaleChange < 350) return;
+    const avg = intervals.reduce((a, b) => a + b, 0) / intervals.length;
+    if (avg > 19) setScale(Math.max(0.55, scale - 0.1), now);
+    else if (avg < 14 && scale < 1) setScale(Math.min(1, scale + 0.05), now);
+  }
+
+  // The drawn progress follows the scroll on a critically damped spring: each wheel
+  // step or swipe becomes one smooth glide, with no jumps in speed.
+  const OMEGA = 7.5;
   function frame(now) {
-    const dt = Math.min(0.1, (now - last) / 1000); last = now;
+    const interval = now - last;
+    let dt = Math.min(0.1, interval / 1000); last = now;
     const before = current;
-    current += (target - current) * (1 - Math.exp(-dt / 0.12));
-    if (Math.abs(target - current) < 0.0002) current = target;
-    if (dirty || current !== before) { render(current); dirty = false; }
+    for (; dt > 0; dt -= 1 / 120) {
+      const h = Math.min(dt, 1 / 120);
+      velocity += (OMEGA * OMEGA * (target - current) - 2 * OMEGA * velocity) * h;
+      current += velocity * h;
+    }
+    const settled = Math.abs(target - current) < 0.0003 && Math.abs(velocity) < 0.002;
+    if (settled) { current = target; velocity = 0; }
+    if (dirty || current !== before) { adapt(now, interval, !settled); render(current, settled); dirty = false; }
     requestAnimationFrame(frame);
   }
   render(current);
@@ -185,7 +220,7 @@ async function start() {
   requestAnimationFrame(frame);
 
   // Test hooks for the local preview.
-  window.__preview = { seq, scene, camera, renderer, quality, setTime: (t) => { target = current = t; render(t); }, get time() { return current; } };
+  window.__preview = { seq, scene, camera, renderer, quality, get scale() { return scale; }, setTime: (t) => { target = current = t; velocity = 0; render(t); }, get time() { return current; } };
 }
 
 start().catch((e) => { console.error(e); root.classList.add("no-webgl"); document.title = "ready"; });

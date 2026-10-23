@@ -48,12 +48,11 @@ The office-cleanup collage is no longer used. The homepage now shows these two i
 
 ## Owner-supplied photos (October 2026)
 
-Supplied in the project folder and exported as WebP (quality 80), without retouching. The pairs are shown as drag-to-reveal sliders. The two photos in each pair were taken from slightly different positions, and automatic feature matching failed, so each pair was aligned by a measured offset against fixed reference points: the window (clearance), the room corner (bedroom) and the water heater (bathroom). The shared area was then cropped to the same size. Small differences remain where the camera angle changed.
+Supplied in the project folder and exported as WebP (quality 80), without retouching. The pairs are shown as drag-to-reveal sliders. The two photos in each pair were taken from slightly different positions, and automatic feature matching failed, so each pair was aligned by a measured offset against fixed reference points: the window (clearance) and the water heater (bathroom). The shared area was then cropped to the same size. Small differences remain where the camera angle changed.
 
 | File | Source file | Used on |
 |---|---|---|
 | `clearance-before.webp` / `clearance-after.webp` (800 × 1200) | `Before_ Cluttered Room Restoration-2.png`, `Restored view of a cleared room-1.png` | Home page before/after slider |
-| `bedroom-before.webp` / `bedroom-after.webp` (800 × 1067) | `Original bedroom before restoration-1.png`, `Sunlit empty room with parquet floors-2.png` | Home page before/after slider |
 | `bathroom-before.webp` / `bathroom-after.webp` (800 × 1067) | `Teal-tiled bathroom before restoration-2.png`, `Exposed Bathroom After Demolition-3.png` | Home page before/after slider |
 
 The origin of these files is not recorded. The site labels them only "Before" and "After" and does not call them L&S projects. If any of them are not genuine L&S jobs, add a note that they are example photos.

@@ -24,20 +24,6 @@ export const pairs = {
       height: 1200,
     },
   },
-  bedroom: {
-    before: {
-      src: "/images/bedroom-before.webp",
-      alt: "Schlafzimmer mit Holzbett, Kommode und Stuhl",
-      width: 800,
-      height: 1066,
-    },
-    after: {
-      src: "/images/bedroom-after.webp",
-      alt: "Dasselbe Schlafzimmer, leer nach dem Abtransport der Möbel",
-      width: 800,
-      height: 1066,
-    },
-  },
   bathroom: {
     before: {
       src: "/images/bathroom-before.webp",

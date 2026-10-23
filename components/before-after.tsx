@@ -10,11 +10,6 @@ const pairRows = [
     title: "Von vollgestellt zu geräumt",
   },
   {
-    pair: photoPairs.bedroom,
-    label: "Möbelräumung",
-    title: "Möbel raus, Raum leer",
-  },
-  {
     pair: photoPairs.bathroom,
     label: "Demontage",
     title: "Fliesen und Armaturen entfernt",

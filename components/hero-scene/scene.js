@@ -19,9 +19,21 @@ import { buildWorld } from "./world.js";
 import { buildTruck } from "./truck.js";
 import { buildSequence } from "./sequence.js";
 
-function webglAvailable() {
-  try { const c = document.createElement("canvas"); return !!(c.getContext("webgl2") || c.getContext("webgl")); }
-  catch { return false; }
+// Only WebGL that runs on the graphics card. Where the browser can only render it in
+// software (hardware acceleration off, a blocked driver) every frame would block the
+// page and scrolling would stall, so the poster stays instead. ?software lets tests
+// run on a software renderer anyway.
+const strict = typeof location === "undefined" || !new URLSearchParams(location.search).has("software");
+function webglUsable() {
+  try {
+    const c = document.createElement("canvas"), opts = { failIfMajorPerformanceCaveat: strict };
+    const gl = c.getContext("webgl2", opts) || c.getContext("webgl", opts);
+    if (!gl) return false;
+    const info = gl.getExtension("WEBGL_debug_renderer_info");
+    const name = info ? String(gl.getParameter(info.UNMASKED_RENDERER_WEBGL)) : "";
+    gl.getExtension("WEBGL_lose_context")?.loseContext();
+    return !(strict && /swiftshader|llvmpipe|software|basic render/i.test(name));
+  } catch { return false; }
 }
 
 export function mountHeroScene({ stage, base = "" }) {
@@ -35,7 +47,7 @@ export function mountHeroScene({ stage, base = "" }) {
     cleanups.splice(0).reverse().forEach((f) => f());
   };
   const fallback = () => { hero.classList.add("no-webgl"); hero.dataset.scene = "fallback"; };
-  if (!webglAvailable()) { fallback(); return destroy; }
+  if (!webglUsable()) { fallback(); return destroy; }
 
   setAssetBase(base);
   const canvas = document.createElement("canvas");
@@ -49,7 +61,7 @@ export function mountHeroScene({ stage, base = "" }) {
     const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
     const mobile = matchMedia("(max-width: 760px)").matches;
     // Transparent: only the objects and their shadows are drawn, the teal page shows through.
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: reduced, powerPreference: "high-performance" });
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: reduced, powerPreference: "high-performance", failIfMajorPerformanceCaveat: strict });
     const scene = new THREE.Scene();
     cleanups.push(() => {
       scene.traverse((o) => {
@@ -179,7 +191,14 @@ export function mountHeroScene({ stage, base = "" }) {
     // Quality follows the device: time a mid-sequence frame and pick the shadow
     // resolution and pixel ratio; dynamic resolution handles the rest while scrolling.
     const gl = renderer.getContext(), px = new Uint8Array(4);
-    const timeFrame = () => { const a = performance.now(); renderer.shadowMap.needsUpdate = true; draw(); gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px); return performance.now() - a; };
+    // Average over a few frames with one sync at the end: reading a pixel back stalls
+    // the whole pipeline, and per frame that stall would dwarf the frame itself.
+    const timeFrames = (n) => {
+      const a = performance.now();
+      for (let i = 0; i < n; i++) { renderer.shadowMap.needsUpdate = i === 0; draw(); }
+      gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
+      return (performance.now() - a) / n;
+    };
     // The shadow map is drawn by hand (the AO pass renders the scene a second time):
     // every frame on the top level; below it every other frame while things move (a
     // 16 ms lag nobody sees) and always once the motion settles.
@@ -187,8 +206,10 @@ export function mountHeroScene({ stage, base = "" }) {
     let level = "high";
     function chooseQuality() {
       aoScale = 0.5; resize(); seq.evaluate(0.3, camera);
-      timeFrame(); // compiles shaders
-      const ms = [timeFrame(), timeFrame(), timeFrame()].sort((a, b) => a - b)[1];
+      // The first frames compile shaders and upload textures and the shadow map;
+      // time only once that is done, or a capable device looks slow.
+      timeFrames(4);
+      const ms = [timeFrames(4), timeFrames(4), timeFrames(4)].sort((a, b) => a - b)[1];
       const forced = new URLSearchParams(location.search).get("quality"); // ?quality=high|medium|low for tests
       level = forced ?? (!mobile && ms < 11 ? "high" : ms < 40 ? "medium" : "low");
       if (level !== "high") {
@@ -209,10 +230,18 @@ export function mountHeroScene({ stage, base = "" }) {
       return range > 0 ? Math.min(1, Math.max(0, -r.top / range)) : 0;
     };
     let target = 0, current = 0, velocity = 0, last = performance.now(), frameNo = 0;
+    // Safety net: if drawing keeps blocking the page while it scrolls (over 60 ms a
+    // frame, eight frames running, at the lowest resolution), the 3D stops and the
+    // poster takes over, so the page always scrolls freely.
+    let slowFrames = 0, lowest = false;
     const render = (t, settled = true) => {
+      const start = performance.now();
       renderer.shadowMap.needsUpdate = level === "high" || settled || frameNo++ % 2 === 0;
       seq.evaluate(t, camera);
       draw();
+      if (settled || !strict) return;
+      slowFrames = lowest && performance.now() - start > 60 ? slowFrames + 1 : 0;
+      if (slowFrames >= 8) { console.warn("Hero scene too slow on this device; showing the poster."); fallback(); destroy(); }
     };
     // A still of the moment t at w × h, with a transparent background (WebP keeps the
     // alpha), so it sits on the stage's teal like the live canvas.
@@ -254,7 +283,7 @@ export function mountHeroScene({ stage, base = "" }) {
     let scale = 1, intervals = [], lastScaleChange = 0;
     const setScale = (s, now) => {
       if (Math.abs(s - scale) < 0.01) return;
-      scale = s; lastScaleChange = now;
+      scale = s; lastScaleChange = now; lowest = s <= 0.56;
       renderer.setPixelRatio(baseRatio * scale);
       resize();
     };

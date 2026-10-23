@@ -20,16 +20,28 @@ const sceneEl = document.querySelector(".scene");
 const canvas = document.querySelector("#scene-canvas");
 const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-function webglAvailable() {
-  try { const c = document.createElement("canvas"); return !!(c.getContext("webgl2") || c.getContext("webgl")); }
-  catch { return false; }
+// Only WebGL that runs on the graphics card. Where the browser can only render it in
+// software (hardware acceleration off, a blocked driver) every frame would block the
+// page and scrolling would stall, so the poster stays instead. ?software lets the
+// capture scripts run on a software renderer anyway.
+const strict = !new URLSearchParams(location.search).has("software");
+function webglUsable() {
+  try {
+    const c = document.createElement("canvas"), opts = { failIfMajorPerformanceCaveat: strict };
+    const gl = c.getContext("webgl2", opts) || c.getContext("webgl", opts);
+    if (!gl) return false;
+    const info = gl.getExtension("WEBGL_debug_renderer_info");
+    const name = info ? String(gl.getParameter(info.UNMASKED_RENDERER_WEBGL)) : "";
+    gl.getExtension("WEBGL_lose_context")?.loseContext();
+    return !(strict && /swiftshader|llvmpipe|software|basic render/i.test(name));
+  } catch { return false; }
 }
 
 async function start() {
-  if (!webglAvailable()) { root.classList.add("no-webgl"); document.title = "ready"; return; }
+  if (!webglUsable()) { root.classList.add("no-webgl"); document.title = "ready"; return; }
   const mobile = matchMedia("(max-width: 760px)").matches;
   // Transparent: only the objects and their shadows are drawn, the teal page shows through.
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: reduced, powerPreference: "high-performance" });
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: reduced, powerPreference: "high-performance", failIfMajorPerformanceCaveat: strict });
   renderer.setClearColor(0x000000, 0);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 0.62;
@@ -148,7 +160,14 @@ async function start() {
   // Quality follows the device: time a mid-sequence frame and pick the shadow
   // resolution and pixel ratio; dynamic resolution handles the rest while scrolling.
   const gl = renderer.getContext(), px = new Uint8Array(4);
-  const timeFrame = () => { const a = performance.now(); renderer.shadowMap.needsUpdate = true; draw(); gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px); return performance.now() - a; };
+  // Average over a few frames with one sync at the end: reading a pixel back stalls
+  // the whole pipeline, and per frame that stall would dwarf the frame itself.
+  const timeFrames = (n) => {
+    const a = performance.now();
+    for (let i = 0; i < n; i++) { renderer.shadowMap.needsUpdate = i === 0; draw(); }
+    gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
+    return (performance.now() - a) / n;
+  };
   // The shadow map is drawn by hand (the AO pass renders the scene a second time):
   // every frame on the top level; below it every other frame while things move (a
   // 16 ms lag nobody sees) and always once the motion settles.
@@ -156,8 +175,10 @@ async function start() {
   let level = "high";
   function chooseQuality() {
     aoScale = 0.5; resize(); seq.evaluate(0.3, camera);
-    timeFrame(); // compiles shaders
-    const ms = [timeFrame(), timeFrame(), timeFrame()].sort((a, b) => a - b)[1];
+    // The first frames compile shaders and upload textures and the shadow map;
+    // time only once that is done, or a capable device looks slow.
+    timeFrames(4);
+    const ms = [timeFrames(4), timeFrames(4), timeFrames(4)].sort((a, b) => a - b)[1];
     const forced = new URLSearchParams(location.search).get("quality"); // ?quality=high|medium|low for tests and posters
     level = forced ?? (!mobile && ms < 11 ? "high" : ms < 40 ? "medium" : "low");
     if (level !== "high") {

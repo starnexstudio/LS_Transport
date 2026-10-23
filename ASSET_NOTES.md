@@ -24,7 +24,7 @@
 
 `public/images/hero-room/icon-menu.svg` is the menu glyph, a vector export from the Figma file (BpwhS8xqHLkMte8zwimTER, Assets section).
 
-`public/hero-3d/` holds the hero's 3D scene assets. The furniture and household models, the surface textures (walls, masonry, parquet, concrete, plywood, tread plate) and the HDRI come from Poly Haven and are CC0 (public domain, `public/hero-3d/LICENSE.txt`). They are compressed copies built by `preview-3d/scripts/build-web-assets.mjs`: models as GLB with meshopt-compressed geometry and WebP textures (512 px, 256 px for small props), surfaces as 512 px WebP. The room, the removal van with its L&S livery, the moving boxes, the rolled rug and the art print are built in code (`components/hero-scene/`). The `fallback-*.webp` posters are renders of that scene. All of it is illustrative, not company photographs.
+`public/hero-3d/` holds the hero's 3D scene assets. The furniture and household models, the surface textures (walls, masonry, parquet, concrete, plywood, tread plate) and the HDRI come from Poly Haven and are CC0 (public domain, `public/hero-3d/LICENSE.txt`). They are compressed copies built by `preview-3d/scripts/build-web-assets.mjs`: models as GLB, simplified to about a quarter of their vertices (within 1 % of their size), with meshopt-compressed geometry and WebP textures (512 px, 256 px for small props); surfaces as 512 px WebP; the HDRI at half size (512 × 256). The room, the removal van with its L&S livery, the moving boxes, the rolled rug and the art print are built in code (`components/hero-scene/`). The `fallback-*.webp` posters are renders of that scene. All of it is illustrative, not company photographs.
 
 ## Generation prompt
 

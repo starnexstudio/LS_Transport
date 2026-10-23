@@ -324,6 +324,8 @@ export async function buildTruck() {
 
   root.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
   mergeStatic(body, (o) => o.userData.dynamic);
+  // The moving parts are merged within themselves: each door, the lift, each wheel.
+  for (const part of [...doors, lift, ...wheels.map(({ w }) => w)]) mergeStatic(part);
   setDoor(0); setLift(0); setWheels(0, 0);
   return { root, setDoor, setLift, setWheels, lamp };
 }

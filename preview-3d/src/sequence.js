@@ -98,11 +98,12 @@ export const TL = { fly0: 0.0, fly1: 0.72, flight: 0.12, cleared: 0.73, door: [0
 // and the room written on the sides in marker (plus a fragile sticker on some).
 const BOX_SIZE = V(0.39, 0.34, 0.52);
 const boxMats = new Map();
+let boxBoard = null;
 function boxMaterial({ text = "", glass = false } = {}) {
   const k = text + glass;
   if (boxMats.has(k)) return boxMats.get(k);
   const S = 512, c = document.createElement("canvas"); c.width = c.height = S;
-  const g = c.getContext("2d");
+  let g = c.getContext("2d");
   const R = { side: [0, 0, 256, 168], end: [256, 0, 192, 168], top: [0, 176, 192, 256], bottom: [256, 176, 192, 256] };
   const kraft = (x, y, w, h, flutes) => {
     g.fillStyle = "#b98a51"; g.fillRect(x, y, w, h);
@@ -118,7 +119,14 @@ function boxMaterial({ text = "", glass = false } = {}) {
     g.fillStyle = "rgba(255,255,255,0.22)"; g.fillRect(x + w * 0.18, y, w * 0.12, h);
     g.fillStyle = "rgba(90,60,25,0.25)"; g.fillRect(x, y, 1, h); g.fillRect(x + w - 1, y, 1, h);
   };
-  for (const [name, [x, y, w, h]] of Object.entries(R)) kraft(x, y, w, h, name !== "top" && name !== "bottom");
+  // The board itself is the same on every box: drawn once, then copied.
+  if (!boxBoard) {
+    boxBoard = document.createElement("canvas"); boxBoard.width = boxBoard.height = S;
+    const own = g; g = boxBoard.getContext("2d");
+    for (const [name, [x, y, w, h]] of Object.entries(R)) kraft(x, y, w, h, name !== "top" && name !== "bottom");
+    g = own;
+  }
+  g.drawImage(boxBoard, 0, 0);
   // Lid: the flaps meet along the middle, taped over
   { const [x, y, w, h] = R.top; g.fillStyle = "rgba(60,38,16,0.55)"; g.fillRect(x + w / 2 - 1, y, 2, h); tape(x + w / 2 - 13, y, 26, h); }
   // Ends: tape down from the lid, a hand hole below it
@@ -256,6 +264,7 @@ function openBox(models, contents, size) {
   contents.forEach(([id, x, y, z, r, s], i) => {
     const m = id === "books" ? bookRow(i + 3) : models[id].clone(); m.position.set(x, y, z); m.rotation.y = r; m.scale.setScalar(s); g.add(m);
   });
+  mergeStatic(g, (o) => !!o.material?.vertexColors); // box and contents together; the books keep their colours
   const wrap = new THREE.Group(); wrap.add(g);
   wrap.userData.size = V(w, h + 0.06, d);
   return wrap;
@@ -428,8 +437,11 @@ export async function buildSequence({ scene, truck, mobile }) {
     const truckQ = truck.root.quaternion;
 
     // Items
+    const shut = t >= TL.door[1];
     for (const it of items) {
       const u = clamp01((t - it.t0) / TL.flight), o = it.o;
+      // Loaded pieces drop out of the drawing once the rear doors are shut.
+      o.visible = u < 1 || !shut;
       if (u >= 1) { o.position.copy(toWorld(it.slot.pos)); o.quaternion.copy(truckQ).multiply(it.slot.quat); continue; }
       if (u <= 0) { o.position.copy(it.home.pos); o.quaternion.copy(it.home.quat); continue; }
       // Lift off gently, glide out and over, ease into its place in the cargo.

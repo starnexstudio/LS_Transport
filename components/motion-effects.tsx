@@ -77,10 +77,21 @@ export function MotionEffects() {
       });
     }
 
+    // Endless animations (the review rows) pause while they are off screen.
+    const offscreen = new IntersectionObserver((entries) =>
+      entries.forEach((entry) =>
+        entry.target.classList.toggle("is-offscreen", !entry.isIntersecting),
+      ),
+    );
+    document
+      .querySelectorAll("[data-pause-offscreen]")
+      .forEach((element) => offscreen.observe(element));
+
     start();
     preference.addEventListener("change", start);
     document.addEventListener("focusin", revealFocusedContent);
     return () => {
+      offscreen.disconnect();
       stop();
       preference.removeEventListener("change", start);
       document.removeEventListener("focusin", revealFocusedContent);

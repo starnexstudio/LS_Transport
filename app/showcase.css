@@ -262,13 +262,31 @@
   color: var(--muted);
 }
 .reviews-rows {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 18px;
-  /* Out to the edges of the page; the cards fade in and out at the sides. */
+  /* Out to the edges of the page; the cards fade in and out at the sides (two
+     still overlays rather than a mask, which would repaint every frame). */
   margin: 0 calc(-7.5vw);
-  -webkit-mask-image: linear-gradient(90deg, #0000, #000 8%, #000 92%, #0000);
-  mask-image: linear-gradient(90deg, #0000, #000 8%, #000 92%, #0000);
+}
+.reviews-rows::before,
+.reviews-rows::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  width: 8%;
+  pointer-events: none;
+}
+.reviews-rows::before {
+  left: 0;
+  background: linear-gradient(90deg, var(--paper), #f6f9f900);
+}
+.reviews-rows::after {
+  right: 0;
+  background: linear-gradient(270deg, var(--paper), #f6f9f900);
 }
 .reviews-row {
   overflow: hidden;
@@ -367,8 +385,10 @@
     grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
     gap: 18px;
     margin: 0;
-    -webkit-mask-image: none;
-    mask-image: none;
+  }
+  .reviews-rows::before,
+  .reviews-rows::after {
+    display: none;
   }
   .reviews-row,
   .reviews-track {
@@ -413,16 +433,17 @@
     transform: scaleY(1);
   }
 }
+/* Opacity and transforms only, which the compositor runs without repainting. */
 @keyframes gallery-unveil {
   from {
-    opacity: 0.3;
-    clip-path: inset(22% 6% 0 6% round 22px);
-    translate: 0 48px;
+    opacity: 0;
+    translate: 0 64px;
+    scale: 0.94;
   }
   to {
     opacity: 1;
-    clip-path: inset(0 0 0 0 round 22px);
     translate: 0 0;
+    scale: 1;
   }
 }
 @keyframes gallery-drift {
@@ -441,7 +462,8 @@
     animation-direction: reverse;
   }
   .reviews-row:hover .reviews-track,
-  .reviews-row:focus-within .reviews-track {
+  .reviews-row:focus-within .reviews-track,
+  .is-offscreen .reviews-track {
     animation-play-state: paused;
   }
   .review-card {

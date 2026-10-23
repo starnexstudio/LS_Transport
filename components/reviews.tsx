@@ -69,7 +69,7 @@ export function Reviews() {
           </div>
         </div>
       </div>
-      <div className="reviews-rows">
+      <div className="reviews-rows" data-pause-offscreen>
         {rows.map((row, r) => (
           <div
             key={r}

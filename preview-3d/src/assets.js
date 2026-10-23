@@ -4,6 +4,7 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { RGBELoader } from "three/addons/loaders/RGBELoader.js";
 import { MeshoptSimplifier } from "meshoptimizer/simplifier";
+import { mergeStatic } from "./merge.js";
 
 const gltfLoader = new GLTFLoader();
 const texLoader = new THREE.TextureLoader();
@@ -77,6 +78,9 @@ export async function model(id, { texSize = 512, shadows = true } = {}) {
   wrap.name = id; wrap.userData.model = true; // left alone when static geometry is merged
   wrap.add(root);
   wrap.userData.size = box.getSize(new THREE.Vector3());
+  // One mesh per material: a model's parts never move apart, and fewer meshes mean
+  // fewer draw calls every frame. Parts with vertex colours stay as they are.
+  mergeStatic(wrap, (o) => !!o.geometry?.attributes.color);
   return wrap;
 }
 

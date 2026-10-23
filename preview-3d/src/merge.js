@@ -11,9 +11,15 @@ function clean(g) {
   n.clearGroups();
   return n;
 }
+// A range of vertices as plain float attributes: compressed models store positions
+// and normals as normalised integers (interleaved, too), which getComponent unpacks.
 function slice(g, start, count) {
   const out = new THREE.BufferGeometry();
-  for (const [k, a] of Object.entries(g.attributes)) out.setAttribute(k, new THREE.BufferAttribute(a.array.slice(start * a.itemSize, (start + count) * a.itemSize), a.itemSize));
+  for (const [k, a] of Object.entries(g.attributes)) {
+    const n = a.itemSize, array = new Float32Array(count * n);
+    for (let i = 0; i < count; i++) for (let c = 0; c < n; c++) array[i * n + c] = a.getComponent(start + i, c);
+    out.setAttribute(k, new THREE.BufferAttribute(array, n));
+  }
   return out;
 }
 

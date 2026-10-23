@@ -11,7 +11,7 @@ npm run fetch-assets
 npm run serve
 ```
 
-`npm run build-web-assets` then writes the compact copy the website loads to `public/hero-3d/` (models as meshopt-compressed GLB with WebP textures, surfaces as WebP; about 5 MB).
+`npm run build-web-assets` then writes the compact copy the website loads to `public/hero-3d/` (models simplified to about a quarter and meshopt-compressed as GLB with WebP textures, surfaces as WebP, the HDRI at half size; about 3.6 MB).
 
 Then open http://localhost:4180. Scrolling drives the whole sequence: about two and a half screen heights on desktop, and slightly less on tablets and phones. The header is part of the pinned stage, so the clearance starts on the first pixel of scroll. Nothing moves on its own, and scrolling back plays it in reverse.
 

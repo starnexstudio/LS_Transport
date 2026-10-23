@@ -71,9 +71,10 @@ The "Im Einsatz" gallery shows six photos generated in Figma and two licensed Pe
 
 The hero is a pinned stage around a three.js scene (`components/hero-scene.tsx`, code in `components/hero-scene/`): a room packed for the move empties into the L&S van, the van shuts and drives off, and scrolling plays it like a video, forwards and backwards. The prototype it comes from, with notes on the scene, the camera and the rendering, is in `preview-3d/` (its README).
 
-- **Loading:** three.js loads after the page; the poster shows until the first frame. The assets in `public/hero-3d/` are about 5 MB.
+- **Loading:** three.js and the assets (about 3.6 MB in `public/hero-3d/`) load only once the page has loaded and the browser is idle; the poster, which shows the same first frame, stands in until then.
+- **Speed:** shaders compile in parallel before the first frame (compiling them on first use froze Chrome on Windows for seconds), textures upload a few per frame, and the quality check is spread over frames, so the page keeps scrolling while the scene starts. Per frame, each model is one mesh per material, each open box one mesh, all closed boxes one instanced mesh and the loaded cargo drops out once the van is shut (about 250 draw calls instead of 530). The loop stops while the hero is off screen.
 - **Large screens:** the four services in the corners, the buttons centred under the scene. Tablets and phones keep the centred copy.
-- **Quality:** the scene times one frame and picks shadows, resolution and ambient occlusion to suit the device.
+- **Quality:** the scene times a few frames and picks shadows, resolution, multisampling and ambient occlusion to suit the device. Without hardware acceleration (WebGL only in software) it shows the poster instead, and it falls back to the poster if frames keep blocking the page. Test hooks: `?quality=high|medium|low`, `?res=0.75` (fixed render scale), `?software` (allow software WebGL).
 - **Fallbacks:** without WebGL the poster stays; with reduced motion a before / after pair rendered from the scene replaces it, and nothing is pinned.
 - **Assets:** to change models or textures, run `npm run fetch-assets` and `npm run build-web-assets` in `preview-3d/`.
 

@@ -61,7 +61,9 @@ export function mountHeroScene({ stage, base = "" }) {
     const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
     const mobile = matchMedia("(max-width: 760px)").matches;
     // Transparent: only the objects and their shadows are drawn, the teal page shows through.
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: reduced, powerPreference: "high-performance", failIfMajorPerformanceCaveat: strict });
+    // No multisampling on the canvas: every frame goes through the composer, whose
+    // target is multisampled, and its last pass is a full-screen quad.
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true, preserveDrawingBuffer: reduced, powerPreference: "high-performance", failIfMajorPerformanceCaveat: strict });
     const scene = new THREE.Scene();
     cleanups.push(() => {
       scene.traverse((o) => {
@@ -71,6 +73,7 @@ export function mountHeroScene({ stage, base = "" }) {
       scene.environment?.dispose(); renderer.dispose(); renderer.forceContextLoss();
     });
     renderer.setClearColor(0x000000, 0);
+    renderer.debug.checkShaderErrors = process.env.NODE_ENV !== "production"; // costly per program
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 0.62;
     // PCF with a wide kernel: soft edges at about half the cost of PCFSoftShadowMap.
@@ -153,8 +156,9 @@ export function mountHeroScene({ stage, base = "" }) {
       }
       setSize(w, h) { ao.setSize(w, h); blurRT.setSize(ao.width, ao.height); blur.uniforms.resolution.value.set(ao.width, ao.height); }
     }
+    const aoPass = new SoftAOPass();
     composer.addPass(new RenderPass(scene, camera));
-    composer.addPass(new SoftAOPass());
+    composer.addPass(aoPass);
     // The target holds premultiplied colour (the canvas is transparent): undo that
     // before tone mapping and sRGB, redo it after, or see-through pixels (the glass,
     // shadows on the teal) come out too bright.
@@ -164,7 +168,10 @@ export function mountHeroScene({ stage, base = "" }) {
       .replace(/}\s*$/, "gl_FragColor.rgb *= alpha; }");
     composer.addPass(output);
     cleanups.push(() => { composer.dispose(); ao.dispose(); blurRT.dispose(); blur.dispose(); });
-    const draw = () => (useAO ? composer.render() : renderer.render(scene, camera));
+    // Always through the composer (the AO pass switched on or off), so the scene's
+    // shaders are the same on every quality level and can be compiled up front.
+    const draw = () => { aoPass.enabled = useAO; composer.render(); };
+    const nextFrame = () => new Promise((resolve) => requestAnimationFrame(resolve));
 
     // The canvas covers the whole stage; the camera is set up for the band between the
     // copy and the actions (.hero-scene, less the room the actions take below it, at
@@ -199,17 +206,18 @@ export function mountHeroScene({ stage, base = "" }) {
       gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
       return (performance.now() - a) / n;
     };
-    // The shadow map is drawn by hand (the AO pass renders the scene a second time):
-    // every frame on the top level; below it every other frame while things move (a
-    // 16 ms lag nobody sees) and always once the motion settles.
+    // The shadow map is drawn by hand (see render): less often while things move, a
+    // lag of a frame or two nobody sees.
     renderer.shadowMap.autoUpdate = false;
     let level = "high";
-    function chooseQuality() {
+    async function chooseQuality() {
       aoScale = 0.5; resize(); seq.evaluate(0.3, camera);
-      // The first frames compile shaders and upload textures and the shadow map;
-      // time only once that is done, or a capable device looks slow.
-      timeFrames(4);
-      const ms = [timeFrames(4), timeFrames(4), timeFrames(4)].sort((a, b) => a - b)[1];
+      // A warm-up frame (the shadow map, the last shaders), then three short timings,
+      // each in a frame of its own so none blocks the page for long.
+      timeFrames(1);
+      const samples = [];
+      for (let i = 0; i < 3; i++) { await nextFrame(); if (!alive) return null; samples.push(timeFrames(2)); }
+      const ms = samples.sort((a, b) => a - b)[1];
       const forced = new URLSearchParams(location.search).get("quality"); // ?quality=high|medium|low for tests
       level = forced ?? (!mobile && ms < 11 ? "high" : ms < 40 ? "medium" : "low");
       if (level !== "high") {
@@ -219,6 +227,8 @@ export function mountHeroScene({ stage, base = "" }) {
         renderer.setPixelRatio(baseRatio);
       }
       aoScale = level === "high" ? 1 : 0.5; useAO = level !== "low";
+      // 2× multisampling on the lowest level instead of 4×: half the memory traffic.
+      if (level === "low") for (const target of [composer.renderTarget1, composer.renderTarget2]) { target.dispose(); target.samples = 2; }
       resize();
       return { level, ms: Math.round(ms), ao: useAO ? aoScale : 0 };
     }
@@ -236,7 +246,9 @@ export function mountHeroScene({ stage, base = "" }) {
     let slowFrames = 0, lowest = false;
     const render = (t, settled = true) => {
       const start = performance.now();
-      renderer.shadowMap.needsUpdate = level === "high" || settled || frameNo++ % 2 === 0;
+      // Shadows: redrawn every frame on the top level; while moving, every second frame
+      // on medium and every third on low; always once the motion settles.
+      renderer.shadowMap.needsUpdate = level === "high" || settled || frameNo++ % (level === "low" ? 3 : 2) === 0;
       seq.evaluate(t, camera);
       draw();
       if (settled || !strict) return;
@@ -264,7 +276,55 @@ export function mountHeroScene({ stage, base = "" }) {
       return;
     }
 
-    const quality = chooseQuality();
+    // Before the first frame, everything that used to stall it, done without blocking
+    // the page: shaders compile in parallel (KHR_parallel_shader_compile; compiling them
+    // on first use froze Chrome on Windows for seconds), textures upload a few per frame.
+    // The scene compiles for the composer's target (linear, no tone mapping), the
+    // passes' own materials on stand-in quads; the last one draws to the canvas.
+    resize(); seq.evaluate(0.3, camera);
+    renderer.setRenderTarget(composer.renderTarget1);
+    await renderer.compileAsync(scene, camera);
+    const quads = new THREE.Scene(), quad = new THREE.PlaneGeometry(1, 1);
+    // Drawn with the scene's lights: the AO pass's normals and the shadow-map depth
+    // materials, one per variant three.js will make from the scene's materials (side
+    // flipped, their map, alpha map and alpha test). Kept alive until the end, or
+    // disposing them would drop the compiled programs.
+    const flip = { [THREE.FrontSide]: THREE.BackSide, [THREE.BackSide]: THREE.FrontSide, [THREE.DoubleSide]: THREE.DoubleSide };
+    const depths = new Map();
+    scene.traverse((o) => {
+      for (const m of o.isMesh && o.castShadow ? [o.material].flat() : []) {
+        const side = m.shadowSide ?? flip[m.side];
+        const key = [side, !!m.map, !!m.alphaMap, m.alphaTest > 0].join();
+        if (!depths.has(key)) depths.set(key, new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, side, map: m.map, alphaMap: m.alphaMap, alphaTest: m.alphaTest }));
+      }
+    });
+    cleanups.push(() => depths.forEach((d) => d.dispose()));
+    // Each also as an instanced mesh, for the batch of closed boxes.
+    for (const m of [ao.normalMaterial, ...depths.values()]) quads.add(new THREE.Mesh(quad, m), new THREE.InstancedMesh(quad, m, 1));
+    await renderer.compileAsync(quads, camera, scene);
+    // The passes' full-screen quads, drawn on their own (no lights).
+    quads.clear();
+    for (const m of [ao.gtaoMaterial, ao.pdMaterial, ao.copyMaterial, ao.blendMaterial, blur]) quads.add(new THREE.Mesh(quad, m));
+    await renderer.compileAsync(quads, camera);
+    renderer.setRenderTarget(null);
+    // OutputPass sets its tone-mapping defines on its first render; set them now.
+    output.material.defines = { SRGB_TRANSFER: "", ACES_FILMIC_TONE_MAPPING: "" };
+    output._outputColorSpace = renderer.outputColorSpace; output._toneMapping = renderer.toneMapping;
+    output.material.needsUpdate = true;
+    quads.clear(); quads.add(new THREE.Mesh(quad, output.material));
+    await renderer.compileAsync(quads, camera);
+    quad.dispose();
+    if (!alive) return;
+    const textures = new Set();
+    scene.traverse((o) => { for (const m of [o.material ?? []].flat()) for (const v of Object.values(m)) if (v?.isTexture) textures.add(v); });
+    let slice = performance.now();
+    for (const texture of textures) {
+      renderer.initTexture(texture);
+      if (performance.now() - slice > 12) { await nextFrame(); if (!alive) return; slice = performance.now(); }
+    }
+
+    const quality = await chooseQuality();
+    if (!alive || !quality) return;
 
     const onScroll = () => {
       if (window.__heroScene?.frozen) return; // test hook: time set by setTime only
@@ -272,6 +332,15 @@ export function mountHeroScene({ stage, base = "" }) {
     };
     addEventListener("scroll", onScroll, { passive: true });
     cleanups.push(() => removeEventListener("scroll", onScroll));
+    // Nothing to draw once the hero has scrolled out of view: the loop stops, and
+    // starts again when it comes back.
+    let onScreen = true;
+    const io = new IntersectionObserver(([entry]) => {
+      onScreen = entry.isIntersecting;
+      if (onScreen && alive && !raf) { last = performance.now(); dirty = true; raf = requestAnimationFrame(frame); }
+    });
+    io.observe(hero);
+    cleanups.push(() => io.disconnect());
     // The band moves when the window or the copy above it changes size (fonts loading).
     const ro = new ResizeObserver(() => resize());
     ro.observe(sceneEl);
@@ -287,12 +356,14 @@ export function mountHeroScene({ stage, base = "" }) {
       renderer.setPixelRatio(baseRatio * scale);
       resize();
     };
+    const fixedScale = Number(new URLSearchParams(location.search).get("res")) || 0; // ?res=0.75 for tests
     function adapt(now, interval, moving) {
+      if (fixedScale) { setScale(fixedScale, now); return; }
       if (!moving) { intervals = []; setScale(1, now); return; }
-      intervals.push(interval); if (intervals.length > 8) intervals.shift();
-      if (intervals.length < 8 || now - lastScaleChange < 350) return;
+      intervals.push(interval); if (intervals.length > 6) intervals.shift();
+      if (intervals.length < 6 || now - lastScaleChange < 200) return;
       const avg = intervals.reduce((a, b) => a + b, 0) / intervals.length;
-      if (avg > 19) setScale(Math.max(0.55, scale - 0.1), now);
+      if (avg > 19) setScale(Math.max(0.55, scale - (avg > 30 ? 0.2 : 0.1)), now);
       else if (avg < 14 && scale < 1) setScale(Math.min(1, scale + 0.05), now);
     }
 
@@ -300,7 +371,8 @@ export function mountHeroScene({ stage, base = "" }) {
     // step or swipe becomes one smooth glide, with no jumps in speed.
     const OMEGA = 7.5;
     function frame(now) {
-      if (!alive) return;
+      raf = 0;
+      if (!alive || !onScreen) return;
       const interval = now - last;
       // No cap on the step: when frames come slowly (a throttled or unfocused tab, a weak
       // GPU) the scene still keeps up with the scroll in real time, in bigger steps.
@@ -326,7 +398,7 @@ export function mountHeroScene({ stage, base = "" }) {
 
     // Test hooks (used by the capture scripts).
     window.__heroScene = {
-      seq, quality, frozen: false,
+      seq, scene, renderer, camera, quality, frozen: false,
       shoot: (t, w, h) => { const url = shoot(t, w, h); renderer.setPixelRatio(baseRatio * scale); resize(); render(current); return url; },
       get time() { return current; },
       setTime: (t) => { target = current = t; velocity = 0; render(t); },

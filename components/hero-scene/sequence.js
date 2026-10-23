@@ -98,11 +98,12 @@ export const TL = { fly0: 0.0, fly1: 0.72, flight: 0.12, cleared: 0.73, door: [0
 // and the room written on the sides in marker (plus a fragile sticker on some).
 const BOX_SIZE = V(0.39, 0.34, 0.52);
 const boxMats = new Map();
+let boxBoard = null;
 function boxMaterial({ text = "", glass = false } = {}) {
   const k = text + glass;
   if (boxMats.has(k)) return boxMats.get(k);
   const S = 512, c = document.createElement("canvas"); c.width = c.height = S;
-  const g = c.getContext("2d");
+  let g = c.getContext("2d");
   const R = { side: [0, 0, 256, 168], end: [256, 0, 192, 168], top: [0, 176, 192, 256], bottom: [256, 176, 192, 256] };
   const kraft = (x, y, w, h, flutes) => {
     g.fillStyle = "#b98a51"; g.fillRect(x, y, w, h);
@@ -118,7 +119,14 @@ function boxMaterial({ text = "", glass = false } = {}) {
     g.fillStyle = "rgba(255,255,255,0.22)"; g.fillRect(x + w * 0.18, y, w * 0.12, h);
     g.fillStyle = "rgba(90,60,25,0.25)"; g.fillRect(x, y, 1, h); g.fillRect(x + w - 1, y, 1, h);
   };
-  for (const [name, [x, y, w, h]] of Object.entries(R)) kraft(x, y, w, h, name !== "top" && name !== "bottom");
+  // The board itself is the same on every box: drawn once, then copied.
+  if (!boxBoard) {
+    boxBoard = document.createElement("canvas"); boxBoard.width = boxBoard.height = S;
+    const own = g; g = boxBoard.getContext("2d");
+    for (const [name, [x, y, w, h]] of Object.entries(R)) kraft(x, y, w, h, name !== "top" && name !== "bottom");
+    g = own;
+  }
+  g.drawImage(boxBoard, 0, 0);
   // Lid: the flaps meet along the middle, taped over
   { const [x, y, w, h] = R.top; g.fillStyle = "rgba(60,38,16,0.55)"; g.fillRect(x + w / 2 - 1, y, 2, h); tape(x + w / 2 - 13, y, 26, h); }
   // Ends: tape down from the lid, a hand hole below it
@@ -148,6 +156,31 @@ function boxMaterial({ text = "", glass = false } = {}) {
   boxMats.set(k, mat);
   return mat;
 }
+// All closed boxes are drawn as one instanced mesh: one draw call for the lot. Each
+// label's texture is a tile of one atlas, chosen per instance in the shader.
+const LABEL_TILES = 3;
+function boxBatch(labels, count) {
+  const S = 512, atlas = document.createElement("canvas"); atlas.width = atlas.height = S * LABEL_TILES;
+  const g = atlas.getContext("2d"), tiles = new Map();
+  labels.forEach((label, i) => {
+    g.drawImage(boxMaterial(label).map.image, (i % LABEL_TILES) * S, Math.floor(i / LABEL_TILES) * S);
+    tiles.set(label, i);
+  });
+  const map = new THREE.CanvasTexture(atlas); map.colorSpace = THREE.SRGBColorSpace; map.anisotropy = 8;
+  const material = new THREE.MeshStandardMaterial({ map, roughness: 0.85 });
+  material.onBeforeCompile = (shader) => {
+    shader.vertexShader = shader.vertexShader
+      .replace("#include <common>", "#include <common>\nattribute float tile;")
+      .replace("#include <uv_vertex>", `#include <uv_vertex>\nvMapUv = (vMapUv + vec2(mod(tile, ${LABEL_TILES}.0), ${LABEL_TILES - 1}.0 - floor(tile / ${LABEL_TILES}.0))) / ${LABEL_TILES}.0;`);
+  };
+  const geometry = cardboardBox(labels[0]).children[0].geometry.clone(); // centred, like the item holders
+  const mesh = new THREE.InstancedMesh(geometry, material, count);
+  mesh.geometry.setAttribute("tile", new THREE.InstancedBufferAttribute(new Float32Array(count), 1));
+  mesh.castShadow = mesh.receiveShadow = true;
+  mesh.frustumCulled = false; // instances move all over the scene
+  return { mesh, tile: (label) => tiles.get(label) ?? 0 };
+}
+
 function cardboardBox(label) {
   const mat = boxMaterial(label), { regions: R, size: S } = mat.userData;
   const geo = new THREE.BoxGeometry(BOX_SIZE.x, BOX_SIZE.y, BOX_SIZE.z), uv = geo.attributes.uv;
@@ -256,9 +289,58 @@ function openBox(models, contents, size) {
   contents.forEach(([id, x, y, z, r, s], i) => {
     const m = id === "books" ? bookRow(i + 3) : models[id].clone(); m.position.set(x, y, z); m.rotation.y = r; m.scale.setScalar(s); g.add(m);
   });
-  const wrap = new THREE.Group(); wrap.add(g);
+  const wrap = new THREE.Group(); wrap.add(bakeColours(g));
   wrap.userData.size = V(w, h + 0.06, d);
   return wrap;
+}
+
+// The average colour of a texture (sampled down to 16 × 16), times the material colour.
+const averages = new Map();
+function averageColour(material) {
+  const colour = material.color?.clone() ?? new THREE.Color(1, 1, 1), image = material.map?.image;
+  if (!image) return colour;
+  if (!averages.has(image)) {
+    const c = document.createElement("canvas"); c.width = c.height = 16;
+    const g = c.getContext("2d"); g.drawImage(image, 0, 0, 16, 16);
+    const px = g.getImageData(0, 0, 16, 16).data, sum = [0, 0, 0];
+    for (let i = 0; i < px.length; i += 4) for (let k = 0; k < 3; k++) sum[k] += px[i + k];
+    averages.set(image, new THREE.Color().setRGB(sum[0] / 65280, sum[1] / 65280, sum[2] / 65280, THREE.SRGBColorSpace));
+  }
+  return colour.multiply(averages.get(image));
+}
+
+// Bakes a group into a single mesh with vertex colours (each part in its material's
+// average colour; parts that have vertex colours keep them): one draw call instead
+// of one per part. For small things where texture detail is lost on screen anyway.
+const bakedMaterial = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.85 });
+function bakeColours(root) {
+  root.updateMatrixWorld(true);
+  const toRoot = root.matrixWorld.clone().invert(), parts = [];
+  root.traverse((o) => {
+    if (!o.isMesh) return;
+    const mats = [o.material].flat(), base = o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone();
+    const groups = Array.isArray(o.material) && base.groups.length ? base.groups : [{ start: 0, count: base.attributes.position.count, materialIndex: 0 }];
+    const own = base.attributes.color;
+    // Plain floats (compressed models store normalised integers), then into the root's frame.
+    const float = (a) => { const out = new Float32Array(a.count * 3); for (let i = 0; i < a.count; i++) for (let c = 0; c < 3; c++) out[i * 3 + c] = a.getComponent(i, c); return new THREE.BufferAttribute(out, 3); };
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", float(base.attributes.position));
+    if (base.attributes.normal && !mats.some((m) => m.flatShading)) geo.setAttribute("normal", float(base.attributes.normal));
+    geo.applyMatrix4(o.matrixWorld.clone().premultiply(toRoot));
+    if (!geo.attributes.normal) geo.computeVertexNormals(); // flat: no shared vertices
+    const colours = new Float32Array(base.attributes.position.count * 3);
+    for (const grp of groups) {
+      const c = averageColour(mats[grp.materialIndex ?? 0]);
+      for (let v = grp.start; v < Math.min(grp.start + grp.count, base.attributes.position.count); v++) {
+        if (own) colours.set([own.getX(v), own.getY(v), own.getZ(v)], v * 3); else colours.set([c.r, c.g, c.b], v * 3);
+      }
+    }
+    geo.setAttribute("color", new THREE.BufferAttribute(colours, 3));
+    parts.push(geo);
+  });
+  const mesh = new THREE.Mesh(mergeGeometries(parts), bakedMaterial);
+  mesh.castShadow = mesh.receiveShadow = true;
+  return mesh;
 }
 
 // Camera keys joined by a cubic Hermite spline (Catmull–Rom tangents for uneven key
@@ -289,7 +371,7 @@ export async function buildSequence({ scene, truck, mobile }) {
   const items = CONTENTS.map((c) => {
     let src;
     if (c.m.startsWith("openbox:")) src = openBox(models, PACKED[c.m.split(":")[1]], V(0.39, 0.34, 0.52));
-    else if (c.m === BOX) src = cardboardBox(LABELS[c.key.replace(/\d+$/, "")]);
+    else if (c.m === BOX) { src = new THREE.Group(); src.userData.size = BOX_SIZE.clone(); src.userData.label = LABELS[c.key.replace(/\d+$/, "")]; } // drawn by the box batch
     else if (c.m === RUG) src = rugRoll();
     else if (c.m === "books") src = bookRow(c.key.length + c.x);
     else { src = used.has(c.m) ? models[c.m].clone() : models[c.m]; used.add(c.m); }
@@ -303,6 +385,18 @@ export async function buildSequence({ scene, truck, mobile }) {
     byKey.set(c.key, it);
     return it;
   });
+  // The closed boxes: one instanced mesh, each instance following its holder.
+  const boxed = items.filter((it) => it.c.m === BOX);
+  const labels = [...new Set(boxed.map((it) => it.o.children[0].userData.label))];
+  const batch = boxBatch(labels, boxed.length);
+  boxed.forEach((it, i) => batch.mesh.geometry.attributes.tile.setX(i, batch.tile(it.o.children[0].userData.label)));
+  scene.add(batch.mesh);
+  const hidden = new THREE.Matrix4().makeScale(0, 0, 0);
+  const syncBoxes = () => {
+    boxed.forEach((it, i) => { it.o.updateMatrix(); batch.mesh.setMatrixAt(i, it.o.visible ? it.o.matrix : hidden); });
+    batch.mesh.instanceMatrix.needsUpdate = true;
+  };
+
   // Home poses; pieces standing on others take their height from them.
   const baseOf = (it) => (it.c.on ? baseOf(byKey.get(it.c.on)) + byKey.get(it.c.on).size.y : it.c.y);
   for (const it of items) {
@@ -428,8 +522,11 @@ export async function buildSequence({ scene, truck, mobile }) {
     const truckQ = truck.root.quaternion;
 
     // Items
+    const shut = t >= TL.door[1];
     for (const it of items) {
       const u = clamp01((t - it.t0) / TL.flight), o = it.o;
+      // Loaded pieces drop out of the drawing once the rear doors are shut.
+      o.visible = u < 1 || !shut;
       if (u >= 1) { o.position.copy(toWorld(it.slot.pos)); o.quaternion.copy(truckQ).multiply(it.slot.quat); continue; }
       if (u <= 0) { o.position.copy(it.home.pos); o.quaternion.copy(it.home.quat); continue; }
       // Lift off gently, glide out and over, ease into its place in the cargo.
@@ -441,6 +538,7 @@ export async function buildSequence({ scene, truck, mobile }) {
       side.set(tan.z, 0, -tan.x).normalize();
       o.quaternion.premultiply(wob.setFromAxisAngle(side, it.roll * Math.sin(Math.PI * clamp01(e / 0.85))));
     }
+    syncBoxes();
 
     // Camera, fitted to the band
     spline(path.keys, t, "pos", camera.position); spline(path.keys, t, "look", look);

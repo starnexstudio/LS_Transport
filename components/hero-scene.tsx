@@ -13,11 +13,29 @@ export function HeroScene() {
     if (!stage) return;
     let destroy: (() => void) | undefined;
     let cancelled = false;
-    import("./hero-scene/scene.js").then(({ mountHeroScene }) => {
-      if (!cancelled) destroy = mountHeroScene({ stage, base: basePath });
-    });
+    let idle = 0;
+    // The scene (three.js and about 5 MB of models) starts once the page has loaded
+    // and the browser is idle, so it never competes with the first paint; the poster,
+    // which shows the same first frame, stands in until then.
+    const begin = () => {
+      const go = () =>
+        import("./hero-scene/scene.js").then(({ mountHeroScene }) => {
+          if (!cancelled) destroy = mountHeroScene({ stage, base: basePath });
+        });
+      // Safari has no requestIdleCallback.
+      idle =
+        typeof window.requestIdleCallback === "function"
+          ? window.requestIdleCallback(go, { timeout: 1500 })
+          : window.setTimeout(go, 300);
+    };
+    if (document.readyState === "complete") begin();
+    else addEventListener("load", begin, { once: true });
     return () => {
       cancelled = true;
+      removeEventListener("load", begin);
+      if (typeof window.cancelIdleCallback === "function")
+        window.cancelIdleCallback(idle);
+      window.clearTimeout(idle);
       destroy?.();
     };
   }, []);

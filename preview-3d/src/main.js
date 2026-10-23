@@ -250,8 +250,12 @@ async function start() {
   const OMEGA = 7.5;
   function frame(now) {
     const interval = now - last;
-    let dt = Math.min(0.1, interval / 1000); last = now;
+    // No cap on the step: when frames come slowly (a throttled or unfocused tab, a weak
+    // GPU) the scene still keeps up with the scroll in real time, in bigger steps.
+    // Back from a long pause (another tab), it jumps straight to the scroll position.
+    let dt = interval / 1000; last = now;
     const before = current;
+    if (dt > 1) { current = target; velocity = 0; dt = 0; }
     for (; dt > 0; dt -= 1 / 120) {
       const h = Math.min(dt, 1 / 120);
       velocity += (OMEGA * OMEGA * (target - current) - 2 * OMEGA * velocity) * h;

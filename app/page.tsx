@@ -5,7 +5,9 @@ import { ServicesOverview } from "@/components/services-overview";
 import { Inquiry } from "@/components/inquiry";
 import { Footer } from "@/components/footer";
 import { ContactActions } from "@/components/contact-actions";
-import { PhotoExample } from "@/components/photo-example";
+import { TrustBand } from "@/components/trust-band";
+import { Gallery } from "@/components/gallery";
+import { Reviews } from "@/components/reviews";
 import { BeforeAfter } from "@/components/before-after";
 const faqs = [
   [
@@ -38,6 +40,7 @@ export default function Home() {
       <Header />
       <main id="inhalt">
         <Hero />
+        <TrustBand />
         <ServicesOverview />
         <section className="process section" id="ablauf">
           <div className="process-intro">
@@ -82,7 +85,8 @@ export default function Home() {
           </ol>
         </section>
         <BeforeAfter />
-        <PhotoExample />
+        <Gallery />
+        <Reviews />
         <section className="questions section" id="fragen">
           <div>
             <span className="eyebrow">02 / GUT ZU WISSEN</span>

@@ -253,9 +253,6 @@
   .faq-plus {
     transition: transform 250ms var(--motion-ease);
   }
-  .moving-photo img {
-    transition: transform 800ms var(--motion-ease);
-  }
   .button,
   .hero-button {
     transition:
@@ -288,9 +285,6 @@
     transform: translateY(0) scale(0.985);
   }
   @media (hover: hover) and (pointer: fine) {
-    .moving-photo:hover img {
-      transform: scale(1.035);
-    }
     .button:hover svg,
     .hero-button:hover svg,
     .text-link:hover svg {

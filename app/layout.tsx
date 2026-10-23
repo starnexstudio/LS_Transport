@@ -4,6 +4,7 @@ import "./globals.css";
 import "./motion.css";
 import "./hero.css";
 import "./before-after.css";
+import "./showcase.css";
 import { FloatingContact } from "@/components/floating-contact";
 import { MotionEffects } from "@/components/motion-effects";
 const manrope = Manrope({

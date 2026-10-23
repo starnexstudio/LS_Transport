@@ -9,8 +9,6 @@ const revealSelectors = [
   ".section-top",
   ".process-intro",
   ".process-steps li",
-  ".photo-example-intro",
-  ".moving-photo",
   ".questions > div",
   ".contact-intro",
   ".inquiry",

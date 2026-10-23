@@ -28,15 +28,13 @@ for (const slider of await sliders.all()) {
   assert.equal(await input.inputValue(), "51");
 }
 
-// Moving photos.
-assert.equal(await page.locator(".moving-photo img").count(), 2);
-await page.locator(".moving-photo-grid").scrollIntoViewIfNeeded();
+// Gallery photos ("Im Einsatz").
+assert.equal(await page.locator(".gallery-tile img").count(), 8);
+await page.locator(".gallery-grid").scrollIntoViewIfNeeded();
 await page
-  .locator(".moving-photo img")
+  .locator(".gallery-tile img")
   .evaluateAll((images) => Promise.all(images.map((image) => image.decode())));
-await page
-  .locator(".photo-example")
-  .screenshot({ path: "artifacts/photo-example.png" });
+await page.locator(".gallery").screenshot({ path: "artifacts/gallery.png" });
 
 // Responsive widths.
 for (const width of [1440, 768, 390, 320]) {

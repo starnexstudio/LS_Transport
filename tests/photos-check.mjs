@@ -12,10 +12,14 @@ const errors = [];
 page.on("pageerror", (error) => errors.push(error.message));
 await page.goto(base, { waitUntil: "networkidle" });
 
-// Before/after sliders: all photos load, and each slider moves by keyboard.
-const sliders = page.locator(".compare");
-assert.equal(await sliders.count(), 3);
-for (const slider of await sliders.all()) {
+// Before/after: one slider; each project's photos load, and the slider moves by keyboard.
+const tabs = page.locator('#vorher-nachher [role="tab"]');
+assert.equal(await tabs.count(), 2);
+for (const tab of await tabs.all()) {
+  await tab.click();
+  assert.equal(await tab.getAttribute("aria-selected"), "true");
+  const slider = page.locator(".compare");
+  assert.equal(await slider.count(), 1);
   await slider.scrollIntoViewIfNeeded();
   await slider
     .locator("img")

@@ -6,19 +6,18 @@ import { asset } from "@/lib/base-path";
 
 export type SliderPair = {
   label: string;
-  // Pixel size shared by both photos; sets the frame's proportions.
-  width: number;
-  height: number;
   before: { src: string; alt: string };
   after: { src: string; alt: string };
 };
 
 // Room each corner label needs (label width plus its inset), in pixels.
-const TAG_SPACE = 130;
+const TAG_SPACE = 104;
 
+// A before/after comparison in a fixed frame (its proportions come from the CSS);
+// both photos cover it. The divider follows a native range input laid over the
+// photos: drag anywhere, arrow keys, screen readers.
 export function CompareSlider({ pair }: { pair: SliderPair }) {
   const [position, setPosition] = useState(50);
-  const [touched, setTouched] = useState(false);
   const [width, setWidth] = useState(0);
   const frame = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -35,17 +34,12 @@ export function CompareSlider({ pair }: { pair: SliderPair }) {
   const divider = (position / 100) * width;
   const hideBefore = width > 0 && divider < TAG_SPACE;
   const hideAfter = width > 0 && width - divider < TAG_SPACE;
-  const sizes = "(max-width: 960px) 90vw, 60vw";
+  const sizes = "(max-width: 760px) 92vw, 500px";
   return (
     <div
       ref={frame}
-      className={touched ? "compare is-touched" : "compare"}
-      style={
-        {
-          "--position": `${position}%`,
-          aspectRatio: `${pair.width} / ${pair.height}`,
-        } as React.CSSProperties
-      }
+      className="compare"
+      style={{ "--position": `${position}%` } as React.CSSProperties}
     >
       <Image
         src={asset(pair.after.src)}
@@ -61,6 +55,7 @@ export function CompareSlider({ pair }: { pair: SliderPair }) {
           sizes={sizes}
         />
       </div>
+      <span className="compare-shade" aria-hidden="true" />
       <span
         className={`compare-tag compare-tag-before${hideBefore ? " is-hidden" : ""}`}
         aria-hidden="true"
@@ -75,11 +70,8 @@ export function CompareSlider({ pair }: { pair: SliderPair }) {
       </span>
       <span className="compare-divider" aria-hidden="true">
         <span className="compare-handle">
-          <ChevronsLeftRight size={22} />
+          <ChevronsLeftRight size={20} strokeWidth={2} />
         </span>
-      </span>
-      <span className="compare-hint" aria-hidden="true">
-        Zum Vergleichen ziehen
       </span>
       <input
         type="range"
@@ -89,10 +81,7 @@ export function CompareSlider({ pair }: { pair: SliderPair }) {
         value={position}
         aria-label={`Vorher-Nachher-Vergleich, ${pair.label}: Regler nach links oder rechts bewegen`}
         aria-valuetext={`${position} % des Vorher-Fotos sichtbar`}
-        onChange={(event) => {
-          setPosition(Number(event.target.value));
-          setTouched(true);
-        }}
+        onChange={(event) => setPosition(Number(event.target.value))}
       />
     </div>
   );

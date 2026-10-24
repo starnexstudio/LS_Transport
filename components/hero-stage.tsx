@@ -9,7 +9,7 @@ const timeline = 4600;
 const clearingShare = 0.8;
 // Time constant of the easing towards the scroll position, in ms: as far behind
 // the scroll as the 3D scene (its spring in hero-scene/scene.js).
-const smoothing = 90;
+const smoothing = 65;
 
 function isScrubbed(animation: Animation): animation is CSSAnimation {
   return (

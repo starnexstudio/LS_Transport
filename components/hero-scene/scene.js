@@ -61,9 +61,8 @@ export function mountHeroScene({ stage, base = "" }) {
     const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
     const mobile = matchMedia("(max-width: 760px)").matches;
     // Transparent: only the objects and their shadows are drawn, the teal page shows through.
-    // No multisampling on the canvas: every frame goes through the composer, whose
-    // target is multisampled, and its last pass is a full-screen quad.
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true, preserveDrawingBuffer: reduced, powerPreference: "high-performance", failIfMajorPerformanceCaveat: strict });
+    // A multisampled canvas: most devices draw the scene straight onto it (see LEVELS).
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: reduced, powerPreference: "high-performance", failIfMajorPerformanceCaveat: strict });
     const scene = new THREE.Scene();
     cleanups.push(() => {
       scene.traverse((o) => {
@@ -116,12 +115,10 @@ export function mountHeroScene({ stage, base = "" }) {
     // under and behind the furniture, round the window and door, that sun and sky
     // light alone leave flat. The scene renders into a multisampled target, the AO is
     // multiplied in, and the output pass tone-maps it onto the transparent canvas.
-    // Full resolution on the top quality level, half below it, none on the lowest.
+    // Only on the top quality level: its targets cover the whole canvas and cost more
+    // than the scene itself (see LEVELS).
     const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: 4 }));
     const ao = new GTAOPass(scene, camera, 1, 1);
-    let aoScale = 1, useAO = true;
-    const aoSetSize = ao.setSize.bind(ao);
-    ao.setSize = (w, h) => aoSetSize(Math.max(1, Math.round(w * aoScale)), Math.max(1, Math.round(h * aoScale)));
     ao.updateGtaoMaterial({ radius: 1.3, distanceExponent: 1, thickness: 2.5, scale: 1.8, samples: 24 });
     ao.updatePdMaterial({ lumaPhi: 10, depthPhi: 2, normalPhi: 3, radius: 8, samples: 16 });
     // GTAO's own denoiser leaves a fine hatch on the flat walls; two depth-aware
@@ -171,9 +168,11 @@ export function mountHeroScene({ stage, base = "" }) {
       .replace(/}\s*$/, "gl_FragColor.rgb *= alpha; }");
     composer.addPass(output);
     cleanups.push(() => { composer.dispose(); ao.dispose(); blurRT.dispose(); blur.dispose(); });
-    // Always through the composer (the AO pass switched on or off), so the scene's
-    // shaders are the same on every quality level and can be compiled up front.
-    const draw = () => { aoPass.enabled = useAO; composer.render(); };
+    let useComposer = false;
+    const draw = () => {
+      if (useComposer) { composer.render(); return; }
+      renderer.setRenderTarget(null); renderer.render(scene, camera);
+    };
     const nextFrame = () => new Promise((resolve) => requestAnimationFrame(resolve));
 
     // The canvas covers the whole stage; the camera is set up for the band between the
@@ -198,52 +197,75 @@ export function mountHeroScene({ stage, base = "" }) {
       dirty = true;
     }
 
-    // Quality follows the device: time a mid-sequence frame and pick the shadow
-    // resolution, ambient occlusion, multisampling and pixel ratio; dynamic resolution
-    // handles the rest while scrolling.
+    // Quality follows the device: time frames mid-sequence and pick the shadow
+    // resolution, ambient occlusion and pixel ratio; dynamic resolution handles the
+    // rest while scrolling.
     const gl = renderer.getContext(), px = new Uint8Array(4);
-    // Average over a few frames with one sync at the end: reading a pixel back stalls
-    // the whole pipeline, and per frame that stall would dwarf the frame itself.
-    const timeFrames = (n) => {
+    // n frames and one pixel read back, which waits for them. The read-back itself is a
+    // round trip that costs more than a frame (about 20 ms in Chrome on Windows), so a
+    // frame's cost is the difference between a run of four and a run of one. The shadow
+    // map is redrawn every other frame, as on medium while the scene moves.
+    const run = (n) => {
       const a = performance.now();
-      for (let i = 0; i < n; i++) { renderer.shadowMap.needsUpdate = i === 0; draw(); }
+      for (let i = 0; i < n; i++) { renderer.shadowMap.needsUpdate = i % 2 === 0; draw(); }
       gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
-      return (performance.now() - a) / n;
+      return performance.now() - a;
     };
     // The shadow map is drawn by hand (see render): less often while things move, a
     // lag of a frame or two nobody sees.
     renderer.shadowMap.autoUpdate = false;
+    // Below the top level the scene goes straight onto the multisampled canvas. Ambient
+    // occlusion needs the composer, whose half-float, multisampled targets cover the
+    // whole canvas: on Intel Iris Xe graphics at 1920 × 912 device pixels a frame through
+    // them costs 7 ms with nothing in it and 27–37 ms with AO, against 4–7 ms for the
+    // scene drawn straight onto the canvas, shadows included.
     const LEVELS = {
-      high: { shadow: mobile ? 2048 : 4096, ao: 1, samples: 4, ratio: dpr },
-      medium: { shadow: 2048, ao: 0.5, samples: 4, ratio: Math.min(dpr, 1.5) },
-      // 2× multisampling instead of 4×: half the memory traffic.
-      low: { shadow: 1024, ao: 0, samples: 2, ratio: Math.min(dpr, 1) },
+      high: { shadow: mobile ? 2048 : 4096, ao: true, ratio: dpr },
+      medium: { shadow: 2048, ao: false, ratio: dpr },
+      low: { shadow: 1024, ao: false, ratio: Math.min(dpr, 1) },
     };
-    let level = "high";
+    const MEDIUM_MS = 14, TRY_HIGH_MS = 2.5, HIGH_MS = 10;
+    let level = "medium";
     function setLevel(name, ratio = LEVELS[name].ratio) {
       const l = LEVELS[name];
-      level = name;
+      level = name; useComposer = l.ao;
       if (sun.shadow.mapSize.x !== l.shadow) { sun.shadow.mapSize.setScalar(l.shadow); sun.shadow.map?.dispose(); sun.shadow.map = null; }
-      for (const target of [composer.renderTarget1, composer.renderTarget2]) if (target.samples !== l.samples) { target.dispose(); target.samples = l.samples; }
-      useAO = l.ao > 0; aoScale = l.ao || 0.5;
       baseRatio = ratio; renderer.setPixelRatio(ratio);
       resize();
     }
-    async function chooseQuality() {
-      // The test frames use the cheapest look at the full pixel ratio, so the test is
-      // short even on a slow device. A frame with shadows at full size and ambient
-      // occlusion costs about twice as much (Intel Iris Xe graphics, phone and laptop
-      // widths): high wants it under 10 ms, medium under about 34 ms.
-      setLevel("low", dpr); seq.evaluate(0.3, camera);
-      // A warm-up frame (the shadow map, the last shaders), then three short timings,
-      // each in a frame of its own so none blocks the page for long.
-      timeFrames(1);
+    // A level's frame at a moment mid-sequence: a warm-up (the shadow map, the last
+    // shaders, and the drawing code itself, which runs slower until the browser has
+    // optimised it), then the fastest of three timings, each run in a frame of its own so
+    // none blocks the page for long; anything else going on only ever slows one down.
+    async function timeLevel(name) {
+      setLevel(name); seq.evaluate(0.3, camera);
+      run(4);
       const samples = [];
-      for (let i = 0; i < 3; i++) { await nextFrame(); if (!alive) return null; samples.push(timeFrames(2)); }
-      const ms = samples.sort((a, b) => a - b)[1];
+      for (let i = 0; i < 3; i++) {
+        await nextFrame(); if (!alive) return null;
+        const one = run(1);
+        await nextFrame(); if (!alive) return null;
+        samples.push(Math.max(0, run(4) - one) / 3);
+      }
+      return Math.min(...samples);
+    }
+    async function chooseQuality() {
       const forced = new URLSearchParams(location.search).get("quality"); // ?quality=high|medium|low for tests
-      setLevel(forced ?? (!mobile && ms < 5 ? "high" : ms < 17 ? "medium" : "low"));
-      return { level, ms: Math.round(ms * 10) / 10, ao: useAO ? aoScale : 0 };
+      const round = (ms) => Math.round(ms * 10) / 10;
+      // Medium wants its frame under MEDIUM_MS; only a device far ahead of that tries
+      // the top level, whose frames cost several times more, and keeps it if they stay
+      // under HIGH_MS.
+      const ms = await timeLevel("medium");
+      if (ms === null) return null;
+      let pick = ms < MEDIUM_MS ? "medium" : "low", highMs;
+      if (forced === "high" || (!forced && !mobile && ms < TRY_HIGH_MS)) {
+        await compileComposer();
+        highMs = alive ? await timeLevel("high") : null;
+        if (highMs === null) return null;
+        if (highMs < HIGH_MS) pick = "high";
+      }
+      setLevel(forced ?? pick);
+      return { level, ms: round(ms), ...(highMs !== undefined && { highMs: round(highMs) }) };
     }
 
     // Scroll → target progress through the pinned section.
@@ -280,7 +302,8 @@ export function mountHeroScene({ stage, base = "" }) {
     };
 
     if (reduced) {
-      // Static before / after, rendered once from the same scene.
+      // Static before / after, rendered once from the same scene, with ambient occlusion.
+      useComposer = true;
       const [before, after] = stage.querySelectorAll(".hero-still img");
       if (before) before.src = shoot(0, 1600, 1000);
       if (after) after.src = shoot(1, 1600, 1000);
@@ -292,16 +315,28 @@ export function mountHeroScene({ stage, base = "" }) {
     // Before the first frame, everything that used to stall it, done without blocking
     // the page: shaders compile in parallel (KHR_parallel_shader_compile; compiling them
     // on first use froze Chrome on Windows for seconds), textures upload a few per frame.
-    // The scene compiles for the composer's target (linear, no tone mapping), the
-    // passes' own materials on stand-in quads; the last one draws to the canvas. All of
-    // them start at once and are awaited together.
+    // A program depends on where it draws: onto the canvas (tone mapping and sRGB in the
+    // material) or into a target (linear). Materials the scene doesn't hold itself are
+    // compiled on stand-in quads; the ones that draw with the scene's lights also as an
+    // instanced mesh, for the batch of closed boxes.
     resize(); seq.evaluate(0.3, camera);
     const quad = new THREE.PlaneGeometry(1, 1);
-    // Drawn with the scene's lights: the AO pass's normals and the shadow-map depth
-    // materials, one per variant three.js will make from the scene's materials (side
-    // flipped, their map, alpha map and alpha test). Kept alive until the end, or
-    // disposing them would drop the compiled programs.
-    const lit = new THREE.Scene();
+    cleanups.push(() => quad.dispose());
+    const standIns = (materials, instanced) => {
+      const s = new THREE.Scene();
+      for (const m of materials) { s.add(new THREE.Mesh(quad, m)); if (instanced) s.add(new THREE.InstancedMesh(quad, m, 1)); }
+      return s;
+    };
+    // Each entry: [scene, the scene whose lights it draws with].
+    const compile = (target, entries) => {
+      renderer.setRenderTarget(target);
+      const all = entries.map(([s, lights]) => renderer.compileAsync(s, camera, lights));
+      renderer.setRenderTarget(null);
+      return Promise.all(all);
+    };
+    // The shadow-map depth materials, one per variant three.js will make from the scene's
+    // materials (side flipped, their map, alpha map and alpha test). Kept alive until the
+    // end, or disposing them would drop the compiled programs.
     const flip = { [THREE.FrontSide]: THREE.BackSide, [THREE.BackSide]: THREE.FrontSide, [THREE.DoubleSide]: THREE.DoubleSide };
     const depths = new Map();
     scene.traverse((o) => {
@@ -312,24 +347,25 @@ export function mountHeroScene({ stage, base = "" }) {
       }
     });
     cleanups.push(() => depths.forEach((d) => d.dispose()));
-    // Each also as an instanced mesh, for the batch of closed boxes.
-    for (const m of [ao.normalMaterial, ...depths.values()]) lit.add(new THREE.Mesh(quad, m), new THREE.InstancedMesh(quad, m, 1));
-    // The passes' full-screen quads, drawn on their own (no lights).
-    const passes = new THREE.Scene();
-    for (const m of [ao.gtaoMaterial, ao.pdMaterial, ao.copyMaterial, ao.blendMaterial, blur]) passes.add(new THREE.Mesh(quad, m));
-    // OutputPass sets its tone-mapping defines on its first render; set them now.
-    output.material.defines = { SRGB_TRANSFER: "", ACES_FILMIC_TONE_MAPPING: "" };
-    output._outputColorSpace = renderer.outputColorSpace; output._toneMapping = renderer.toneMapping;
-    output.material.needsUpdate = true;
-    const onCanvas = new THREE.Scene();
-    onCanvas.add(new THREE.Mesh(quad, output.material));
-    renderer.setRenderTarget(composer.renderTarget1);
-    const compiling = [renderer.compileAsync(scene, camera), renderer.compileAsync(lit, camera, scene), renderer.compileAsync(passes, camera)];
-    renderer.setRenderTarget(null);
-    compiling.push(renderer.compileAsync(onCanvas, camera));
-    await Promise.all(compiling);
-    quad.dispose();
+    // The shadow map is a target; any small one stands in for it.
+    const offscreen = new THREE.WebGLRenderTarget(1, 1);
+    cleanups.push(() => offscreen.dispose());
+    await Promise.all([compile(null, [[scene]]), compile(offscreen, [[standIns(depths.values(), true), scene]])]);
     if (!alive) return;
+    // The top level's programs, compiled only on a device that tries it: the scene into
+    // the composer's target, the AO pass's normals (with the scene's lights) and its
+    // full-screen quads, and the output pass onto the canvas.
+    let composerCompiled;
+    const compileComposer = () => composerCompiled ??= (() => {
+      // OutputPass sets its tone-mapping defines on its first render; set them now.
+      output.material.defines = { SRGB_TRANSFER: "", ACES_FILMIC_TONE_MAPPING: "" };
+      output._outputColorSpace = renderer.outputColorSpace; output._toneMapping = renderer.toneMapping;
+      output.material.needsUpdate = true;
+      return Promise.all([
+        compile(composer.renderTarget1, [[scene], [standIns([ao.normalMaterial], true), scene], [standIns([ao.gtaoMaterial, ao.pdMaterial, ao.copyMaterial, ao.blendMaterial, blur])]]),
+        compile(null, [[standIns([output.material])]]),
+      ]);
+    })();
     const textures = new Set();
     scene.traverse((o) => { for (const m of [o.material ?? []].flat()) for (const v of Object.values(m)) if (v?.isTexture) textures.add(v); });
     let slice = performance.now();
@@ -362,8 +398,12 @@ export function mountHeroScene({ stage, base = "" }) {
     cleanups.push(() => ro.disconnect());
     resize(); onScroll(); current = target;
 
-    // Dynamic resolution: while the scene moves, the render scale follows the frame
-    // interval (aiming for 60 fps); once it settles, a full-resolution frame is drawn.
+    // Dynamic resolution, a safety net for a device the quality test misjudged: while the
+    // scene moves and frames keep coming slowly (the median of the last eight intervals
+    // over 25 ms, under 40 fps), the render scale steps down; once the motion settles, a
+    // full-resolution frame is drawn. Each step resizes the canvas, which costs a frame
+    // of its own, so the scale never steps back up mid-motion, and single slow frames
+    // (the page loading something, garbage collection) don't count.
     let scale = 1, intervals = [], lastScaleChange = 0;
     const setScale = (s, now) => {
       if (Math.abs(s - scale) < 0.01) return;
@@ -375,17 +415,17 @@ export function mountHeroScene({ stage, base = "" }) {
     function adapt(now, interval, moving) {
       if (fixedScale) { setScale(fixedScale, now); return; }
       if (!moving) { intervals = []; setScale(1, now); return; }
-      intervals.push(interval); if (intervals.length > 6) intervals.shift();
-      if (intervals.length < 6 || now - lastScaleChange < 200) return;
-      const avg = intervals.reduce((a, b) => a + b, 0) / intervals.length;
-      if (avg > 19) setScale(Math.max(0.55, scale - (avg > 30 ? 0.2 : 0.1)), now);
-      else if (avg < 14 && scale < 1) setScale(Math.min(1, scale + 0.05), now);
+      intervals.push(interval); if (intervals.length > 8) intervals.shift();
+      if (intervals.length < 8 || now - lastScaleChange < 300) return;
+      const median = [...intervals].sort((a, b) => a - b)[4];
+      if (median > 25) setScale(Math.max(0.55, scale - (median > 40 ? 0.2 : 0.1)), now);
     }
 
     // The drawn progress follows the scroll on a critically damped spring: each wheel
-    // step or swipe becomes one smooth glide, with no jumps in speed, about a tenth of
-    // a second behind the scroll (2 / OMEGA; the copy in hero-stage.tsx keeps pace).
-    const OMEGA = 22;
+    // step or swipe becomes one smooth glide, with no jumps in speed, about 65 ms behind
+    // the scroll (2 / OMEGA; the copy in hero-stage.tsx keeps pace). The browser smooths
+    // wheel steps too, so more would add up to a noticeable delay.
+    const OMEGA = 30;
     function frame(now) {
       raf = 0;
       if (!alive || !onScreen) return;

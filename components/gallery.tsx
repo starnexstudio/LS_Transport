@@ -77,7 +77,7 @@ export function Gallery() {
         </div>
         <p>
           Wir verpacken, tragen, demontieren und entsorgen – und übergeben
-          besenrein.
+          die Räumlichkeiten besenrein.
         </p>
       </div>
       <div className="gallery-grid">

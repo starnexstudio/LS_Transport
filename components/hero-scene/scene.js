@@ -6,7 +6,8 @@
 // mountHeroScene({ stage, base }) adds the canvas to the hero's pinned stage and
 // returns a function that removes it again. The stage holds `.hero-scene` (the band
 // the camera frames, with the poster in it) and, for reduced motion, `.hero-still`
-// images. The hero gets `is-scene-ready` once the first frame is drawn, or
+// images. The hero gets `is-scene-ready` once the first frame is drawn (the canvas is
+// hidden until then, the poster shows the same picture), or
 // `no-webgl` if there is no WebGL; `data-scene` says the same for tests.
 import * as THREE from "three";
 import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
@@ -224,7 +225,7 @@ export function mountHeroScene({ stage, base = "" }) {
       medium: { shadow: 2048, ao: false, ratio: dpr },
       low: { shadow: 1024, ao: false, ratio: Math.min(dpr, 1) },
     };
-    const MEDIUM_MS = 14, TRY_HIGH_MS = 2.5, HIGH_MS = 10;
+    const MEDIUM_MS = 16, TRY_HIGH_MS = 2, HIGH_MS = 10;
     let level = "medium";
     function setLevel(name, ratio = LEVELS[name].ratio) {
       const l = LEVELS[name];
@@ -233,21 +234,27 @@ export function mountHeroScene({ stage, base = "" }) {
       baseRatio = ratio; renderer.setPixelRatio(ratio);
       resize();
     }
-    // A level's frame at a moment mid-sequence: a warm-up (the shadow map, the last
-    // shaders, and the drawing code itself, which runs slower until the browser has
-    // optimised it), then the fastest of three timings, each run in a frame of its own so
-    // none blocks the page for long; anything else going on only ever slows one down.
-    async function timeLevel(name) {
+    // A level's frame at a moment mid-sequence (the canvas stays hidden until the scene
+    // is ready, so none of this shows): a first frame on its own (the shadow map and
+    // targets, the last shader variants), then five runs of one and of four, each in a
+    // frame of its own so none blocks the page for long. Anything else going on (the
+    // drawing code before the browser has optimised it, a busy page) only ever slows a
+    // run down, so the fastest run of one and the fastest of four give the frame's cost;
+    // the difference of a single pair can come out near zero when only its run of one
+    // was slowed. A level clearly over its limit stops after the first pair.
+    async function timeLevel(name, limit) {
       setLevel(name); seq.evaluate(0.3, camera);
-      run(4);
-      const samples = [];
-      for (let i = 0; i < 3; i++) {
+      run(1);
+      const ones = [], fours = [];
+      let ms = 0;
+      for (let i = 0; i < 5 && ms < limit * 2; i++) {
         await nextFrame(); if (!alive) return null;
-        const one = run(1);
+        ones.push(run(1));
         await nextFrame(); if (!alive) return null;
-        samples.push(Math.max(0, run(4) - one) / 3);
+        fours.push(run(4));
+        ms = Math.max(0, Math.min(...fours) - Math.min(...ones)) / 3;
       }
-      return Math.min(...samples);
+      return ms;
     }
     async function chooseQuality() {
       const forced = new URLSearchParams(location.search).get("quality"); // ?quality=high|medium|low for tests
@@ -255,12 +262,12 @@ export function mountHeroScene({ stage, base = "" }) {
       // Medium wants its frame under MEDIUM_MS; only a device far ahead of that tries
       // the top level, whose frames cost several times more, and keeps it if they stay
       // under HIGH_MS.
-      const ms = await timeLevel("medium");
+      const ms = await timeLevel("medium", MEDIUM_MS);
       if (ms === null) return null;
       let pick = ms < MEDIUM_MS ? "medium" : "low", highMs;
       if (forced === "high" || (!forced && !mobile && ms < TRY_HIGH_MS)) {
         await compileComposer();
-        highMs = alive ? await timeLevel("high") : null;
+        highMs = alive ? await timeLevel("high", HIGH_MS) : null;
         if (highMs === null) return null;
         if (highMs < HIGH_MS) pick = "high";
       }
@@ -373,6 +380,7 @@ export function mountHeroScene({ stage, base = "" }) {
       renderer.initTexture(texture);
       if (performance.now() - slice > 12) { await nextFrame(); if (!alive) return; slice = performance.now(); }
     }
+    await nextFrame(); if (!alive) return;
 
     const quality = await chooseQuality();
     if (!alive || !quality) return;

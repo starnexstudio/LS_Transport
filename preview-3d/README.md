@@ -75,7 +75,7 @@ The scene stands on the page's teal like a model on a table, seen from above and
   - **Flights:** each piece follows one smooth curve with a sine ease, through the middle of the truck's rear opening.
 - **Phones:** smaller textures, and never the high level.
 - **Framing:** one camera path per layout, composed for a band of its own shape (2.4 times as wide as it is tall on laptops, 1.38 on phones). On any other band, laptops back the camera off along its line of sight until the same view fits; phones keep the viewpoint and widen the lens, so every phone shows the same picture (the room and van centred, about 6 % of the width to spare either side), only cropped taller or shorter.
-- **Fallbacks:** reduced motion shows a before/after pair of stills rendered from the scene where the scene would be. The posters (`static/fallback-*.webp`, transparent, a `-m` pair for the phone layout, 1104 × 800 like the phone view) stand in while the scene loads and when WebGL is missing.
+- **Fallbacks:** reduced motion shows a before/after pair of stills rendered from the scene where the scene would be. The posters (`static/fallback-*.webp`, transparent, a `-m` pair for the phone layout, 1104 × 800 like the phone view) stand in while the scene loads and when WebGL is missing. On the site, `fallback-poster.webp` (1920 × 800, the laptop view's 2.4 : 1) and `fallback-poster-m.webp` (phones) stand in while the scene loads: the first frame drawn as most devices draw it (the site's medium level, without ambient occlusion), so fitted into the band it lines up with the live scene.
 - **Test hook:** `window.__preview` exposes `setTime(t)` (0–1), `shoot(t, w, h)` for transparent stills, the packing plan and a camera override.
 
 ## Known limits

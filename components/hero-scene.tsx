@@ -36,11 +36,15 @@ export function HeroScene() {
         <picture>
           <source
             media="(max-width: 760px)"
-            srcSet={asset("/hero-3d/fallback-before-m.webp")}
+            srcSet={asset("/hero-3d/fallback-poster-m.webp")}
           />
+          {/* The first frame in the camera's own shape on each layout (2.4 : 1 on
+              laptops, 1.38 : 1 on phones), drawn like the live scene on most
+              devices (no ambient occlusion), so fitted into the band it lines up
+              with it. */}
           <img
             className="hero-poster"
-            src={asset("/hero-3d/fallback-before.webp")}
+            src={asset("/hero-3d/fallback-poster.webp")}
             alt=""
           />
         </picture>

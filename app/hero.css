@@ -123,13 +123,18 @@
   height: 100%;
   pointer-events: none;
 }
-/* A still of the scene while it loads, and in its place without WebGL. */
+/* Hidden until its first real frame: the quality test draws on it before that. */
+.hero:not(.is-scene-ready) .hero-canvas {
+  visibility: hidden;
+}
+/* A still of the scene while it loads, and in its place without WebGL: the band
+   the camera frames (as scene.js measures it), the still fitted into it. */
 .hero-poster {
   position: absolute;
   left: 50%;
   top: 20px;
   display: block;
-  width: calc(var(--room) * 100%);
+  width: min(calc(var(--room) * 100%), var(--room-max, 100%));
   height: calc(100% - 20px - var(--lift));
   translate: -50% 0;
   object-fit: contain;

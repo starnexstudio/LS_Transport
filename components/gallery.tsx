@@ -78,7 +78,6 @@ export function Gallery() {
         <p>
           Wir verpacken, tragen, demontieren und entsorgen – und übergeben
           besenrein.
-          <small>Symbolbilder</small>
         </p>
       </div>
       <div className="gallery-grid">

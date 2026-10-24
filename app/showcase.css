@@ -129,14 +129,6 @@
 .gallery .section-top > p {
   max-width: 400px;
 }
-.gallery .section-top small {
-  display: block;
-  margin-top: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
 .gallery-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));

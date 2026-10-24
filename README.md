@@ -65,7 +65,7 @@ The site has three pages: the home page, `/impressum` and `/datenschutz`, plus t
 
 Phone and WhatsApp links are implemented in `components/contact-actions.tsx`. Set `business.phone` and `business.whatsapp` in `lib/content.ts` to the confirmed international numbers. These values deliberately remain empty until supplied by the owner; the corresponding controls stay hidden to avoid publishing fabricated numbers or broken destinations. Call links use `tel:`; WhatsApp links use `wa.me` with a prefilled message (`whatsappGreeting` in `lib/content.ts`) and open only after a visitor clicks. No WhatsApp script is embedded.
 
-The "Im Einsatz" gallery shows six photos generated in Figma and two licensed Pexels photographs of packed moving boxes and protected living-room furniture. The section labels them "Symbolbilder"; they are not L&S projects. See `ASSET_NOTES.md` for provenance.
+The "Im Einsatz" gallery shows six photos generated in Figma and two licensed Pexels photographs of packed moving boxes and protected living-room furniture. They are not L&S projects. See `ASSET_NOTES.md` for provenance.
 
 ## Hero scene
 
@@ -82,7 +82,7 @@ The hero is a pinned stage around a three.js scene (`components/hero-scene.tsx`,
 ## Trust sections
 
 - **Stats band** (`components/trust-band.tsx`), right under the hero: four key numbers that count up as the band scrolls in, with the rating stars popping in.
-- **Im Einsatz** (`components/gallery.tsx`): a bento grid of eight photos that unveil and drift with the scroll (CSS scroll-driven animations where the browser supports them), labelled "Symbolbilder".
+- **Im Einsatz** (`components/gallery.tsx`): a bento grid of eight photos that unveil and drift with the scroll (CSS scroll-driven animations where the browser supports them).
 - **Kundenstimmen** (`components/reviews.tsx`): the overall rating and one row of review cards drifting by, paused on hover; a still grid with reduced motion.
 
 **The reviews, numbers and rating in `lib/showcase.ts` are sample content, not real.** They are shown only on the dev server, marked "Beispielinhalt", and a production build leaves the stats band and the reviews out while `sample` is `true`. To publish them, replace every entry with real data (for example from the Google Business profile) and set `sample` to `false`.

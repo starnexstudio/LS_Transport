@@ -82,7 +82,7 @@ The hero is a pinned stage around a three.js scene (`components/hero-scene.tsx`,
 
 - **Stats band** (`components/trust-band.tsx`), right under the hero: four key numbers that count up as the band scrolls in, with the rating stars popping in.
 - **Im Einsatz** (`components/gallery.tsx`): a bento grid of eight photos that unveil and drift with the scroll (CSS scroll-driven animations where the browser supports them), labelled "Symbolbilder".
-- **Kundenstimmen** (`components/reviews.tsx`): the overall rating and two rows of review cards drifting in opposite directions, paused on hover; a still grid with reduced motion.
+- **Kundenstimmen** (`components/reviews.tsx`): the overall rating and one row of review cards drifting by, paused on hover; a still grid with reduced motion.
 
 **The reviews, numbers and rating in `lib/showcase.ts` are sample content, not real.** They are shown only on the dev server, marked "Beispielinhalt", and a production build leaves the stats band and the reviews out while `sample` is `true`. To publish them, replace every entry with real data (for example from the Google Business profile) and set `sample` to `false`.
 

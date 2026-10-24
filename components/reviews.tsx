@@ -34,14 +34,12 @@ function ReviewCard({ review, hidden }: { review: Review; hidden?: boolean }) {
   );
 }
 
-// Customer voices: the overall rating and two rows of review cards drifting in
-// opposite directions (paused on hover). Each row is doubled for a seamless loop;
-// the copies are hidden from assistive technology. With reduced motion the cards
-// stand still in a wrapping grid.
+// Customer voices: the overall rating and one row of review cards drifting by
+// (paused on hover). The row is doubled for a seamless loop; the copies are hidden
+// from assistive technology. With reduced motion the cards stand still in a
+// wrapping grid.
 export function Reviews() {
   if (!showTrust) return null;
-  const half = Math.ceil(reviews.length / 2);
-  const rows = [reviews.slice(0, half), reviews.slice(half)];
   return (
     <section
       className="section reviews"
@@ -70,22 +68,19 @@ export function Reviews() {
         </div>
       </div>
       <div className="reviews-rows" data-pause-offscreen>
-        {rows.map((row, r) => (
-          <div
-            key={r}
-            className={r ? "reviews-row is-reverse" : "reviews-row"}
-            style={{ "--duration": `${row.length * 11}s` } as CSSProperties}
-          >
-            <ul className="reviews-track">
-              {row.map((review) => (
-                <ReviewCard key={review.name} review={review} />
-              ))}
-              {row.map((review) => (
-                <ReviewCard key={`${review.name}-copy`} review={review} hidden />
-              ))}
-            </ul>
-          </div>
-        ))}
+        <div
+          className="reviews-row"
+          style={{ "--duration": `${reviews.length * 9}s` } as CSSProperties}
+        >
+          <ul className="reviews-track">
+            {reviews.map((review) => (
+              <ReviewCard key={review.name} review={review} />
+            ))}
+            {reviews.map((review) => (
+              <ReviewCard key={`${review.name}-copy`} review={review} hidden />
+            ))}
+          </ul>
+        </div>
       </div>
     </section>
   );

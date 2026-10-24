@@ -458,9 +458,6 @@
   .reviews-track {
     animation: reviews-drift var(--duration, 44s) linear infinite;
   }
-  .reviews-row.is-reverse .reviews-track {
-    animation-direction: reverse;
-  }
   .reviews-row:hover .reviews-track,
   .reviews-row:focus-within .reviews-track,
   .is-offscreen .reviews-track {

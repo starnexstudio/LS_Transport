@@ -6,6 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
+  actions: read
   contents: read
   pages: write
   id-token: write
@@ -41,5 +42,18 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      # While the repository's Pages source is "Deploy from a branch", GitHub also builds
+      # the README into a page on every push ("pages build and deployment"), and whichever
+      # deploy finishes last stays live. Wait for that one (at most five minutes), so the
+      # site always goes out last. With the source set to "GitHub Actions" there is none.
+      - name: Wait for GitHub's own Pages build
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for i in $(seq 1 30); do
+            pending=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs?head_sha=$GITHUB_SHA&event=dynamic" --jq '[.workflow_runs[] | select(.status != "completed")] | length' || echo 0)
+            [ "$pending" = "0" ] && break
+            sleep 10
+          done
       - id: deployment
         uses: actions/deploy-pages@v4

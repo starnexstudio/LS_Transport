@@ -9,7 +9,7 @@ const projects = [
   {
     pair: photoPairs.clearance,
     label: "Entrümpelung",
-    title: "Von vollgestellt zu geräumt",
+    title: "Wir nehmen alles mit & schaffen Platz für Neues.",
   },
   {
     pair: photoPairs.bathroom,

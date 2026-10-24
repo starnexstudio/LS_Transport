@@ -178,7 +178,7 @@ export function mountHeroScene({ stage, base = "" }) {
     // the room width; --lift, --room and --room-max in hero.css) and the view extends
     // past it, so nothing is clipped.
     let dirty = true;
-    const lens = (aspect) => { camera.aspect = aspect; camera.fov = aspect < 1.3 ? 38 : 30; };
+    const lens = (aspect) => { camera.aspect = aspect; camera.fov = seq.lens(aspect); };
     function resize() {
       const w = canvas.clientWidth || innerWidth, h = canvas.clientHeight || innerHeight;
       renderer.setSize(w, h, false);

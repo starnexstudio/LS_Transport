@@ -486,8 +486,7 @@ export async function buildSequence({ scene, truck, mobile }) {
   // on a table: the room and the van stay whole in the frame while it is loaded and
   // shut, then the view settles on the empty room as the van leaves. One path for each
   // layout, each composed for a 30° lens on a band of its own aspect (2.4:1 on laptops,
-  // square on phones); on any other band the camera backs off along its line of sight
-  // until the same view fits.
+  // 1.38:1 on phones); on any other band the view is fitted to it (lens and fit, below).
   // Keys: look-at point, distance, azimuth (0 = straight from the front) and elevation.
   const key = (t, look, dist, az, el) => ({ t, look, pos: look.clone().add(V(Math.sin(az) * Math.cos(el), Math.sin(el), Math.cos(az) * Math.cos(el)).multiplyScalar(dist)) });
   const paths = {
@@ -499,16 +498,29 @@ export async function buildSequence({ scene, truck, mobile }) {
       key(0.88, V(2.2, 1.0, -2.2), 15.1, 0, 0.55),
       key(1, V(-2.8, 0.9, -1.8), 11.0, -0.05, 0.6),
     ] },
-    narrow: { aspect: 1.0, keys: [
-      key(0, V(-1.0, 1.2, -3.3), 26.0, 0.14, 0.6),
-      key(0.72, V(-0.9, 1.2, -3.3), 25.0, 0.12, 0.61),
-      key(0.8, V(-0.6, 1.3, -3.1), 24.5, 0.16, 0.58),
-      key(0.88, V(-0.7, 1.3, -3.1), 24.5, 0.14, 0.58),
-      key(1, V(-3.0, 0.9, -1.8), 19.5, 0.05, 0.62),
+    // Phones: the room and van centred with about 6 % of the width to spare either side
+    // (measured on screen), then the empty room on its own. While the van leaves (it
+    // drives away from the camera, then turns right), the view pulls back so the van
+    // stays whole until it turns away, and below the copy.
+    narrow: { aspect: 1.38, keys: [
+      key(0, V(-1.6, 1.2, -3.3), 18.8, 0.14, 0.6),
+      key(0.72, V(-1.7, 1.2, -3.3), 18.35, 0.12, 0.61),
+      key(0.8, V(-1.55, 1.3, -3.1), 18.65, 0.16, 0.58),
+      key(0.88, V(-1.7, 1.4, -4.2), 20.6, 0.14, 0.58),
+      key(0.94, V(0.6, 1.2, -4.0), 26.1, 0.1, 0.6),
+      key(1, V(-3.2, 0.9, -1.8), 13.5, 0.05, 0.62),
     ] },
   };
   const path = mobile ? paths.narrow : paths.wide;
   const halfTan = Math.tan(THREE.MathUtils.degToRad(15));
+  // The lens for a band of this aspect. Laptops: 30° (38° on squarer bands), and the
+  // camera backs off until the composed view fits (fit, below). Phones keep the composed
+  // viewpoint and widen the lens instead: backing off changes the perspective, and with
+  // it the framing, so this way every phone sees the same picture, only cropped taller
+  // or shorter.
+  const lens = (aspect) => mobile
+    ? 2 * THREE.MathUtils.radToDeg(Math.atan(halfTan * Math.max(1, path.aspect / aspect)))
+    : aspect < 1.3 ? 38 : 30;
 
   const tmpQ = new THREE.Quaternion(), wob = new THREE.Quaternion(), tan = V(0, 0, 0), side = V(0, 0, 0), look = V(0, 0, 0);
   function evaluate(t, camera) {
@@ -548,5 +560,5 @@ export async function buildSequence({ scene, truck, mobile }) {
     return { cleared: t >= TL.cleared };
   }
 
-  return { evaluate, items, slots, plan };
+  return { evaluate, lens, items, slots, plan };
 }

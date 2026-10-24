@@ -14,7 +14,7 @@ const projects = [
   {
     pair: photoPairs.bathroom,
     label: "Demontage",
-    title: "Fliesen und Armaturen entfernt",
+    title: "Bad und Fliesen entfernt, bereit für Ihre Sanierung",
   },
 ];
 const number = (i: number) => String(i + 1).padStart(2, "0");

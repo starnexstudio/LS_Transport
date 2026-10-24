@@ -7,8 +7,9 @@ const timeline = 4600;
 // "Neues." is underlined as the room empties; the rest of the scroll shuts
 // the van and drives it off.
 const clearingShare = 0.8;
-// Time constant of the easing towards the scroll position, in ms.
-const smoothing = 110;
+// Time constant of the easing towards the scroll position, in ms: as far behind
+// the scroll as the 3D scene (its spring in hero-scene/scene.js).
+const smoothing = 90;
 
 function isScrubbed(animation: Animation): animation is CSSAnimation {
   return (

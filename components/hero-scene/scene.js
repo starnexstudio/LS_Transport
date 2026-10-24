@@ -14,10 +14,10 @@ import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { GTAOPass } from "three/addons/postprocessing/GTAOPass.js";
 import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 import { Pass } from "three/addons/postprocessing/Pass.js";
-import { hdri, setAssetBase } from "./assets.js";
+import { hdri, prefetchModels, setAssetBase } from "./assets.js";
 import { buildWorld } from "./world.js";
 import { buildTruck } from "./truck.js";
-import { buildSequence } from "./sequence.js";
+import { buildSequence, modelIds } from "./sequence.js";
 
 // Only WebGL that runs on the graphics card. Where the browser can only render it in
 // software (hardware acceleration off, a blocked driver) every frame would block the
@@ -78,7 +78,8 @@ export function mountHeroScene({ stage, base = "" }) {
     renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 0.62;
     // PCF with a wide kernel: soft edges at about half the cost of PCFSoftShadowMap.
     renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFShadowMap;
-    let baseRatio = Math.min(devicePixelRatio, mobile ? 1.5 : 2);
+    const dpr = Math.min(devicePixelRatio, mobile ? 1.5 : 2);
+    let baseRatio = dpr; // the quality level's pixel ratio, which dynamic resolution scales
     renderer.setPixelRatio(baseRatio);
     const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 400);
 
@@ -86,9 +87,13 @@ export function mountHeroScene({ stage, base = "" }) {
     // throws short shadows back and to the left onto the teal.
     const sunDir = new THREE.Vector3(0.35, 0.75, 0.56).normalize();
 
-    // HDRI for ambient light and reflections, turned so its sun lines up with ours.
-    const env = await hdri("kloofendal_48d_partly_cloudy_puresky");
+    // Everything downloads at once: the HDRI, the room's and the van's textures, and
+    // the models the sequence parses once the room and the van stand.
+    prefetchModels(modelIds());
+    const [env, [, truck]] = await Promise.all([hdri("kloofendal_48d_partly_cloudy_puresky"), Promise.all([buildWorld(scene), buildTruck()])]);
     if (!alive) return;
+
+    // HDRI for ambient light and reflections, turned so its sun lines up with ours.
     const pmrem = new THREE.PMREMGenerator(renderer);
     scene.environment = pmrem.fromEquirectangular(env.tex).texture;
     env.tex.dispose(); pmrem.dispose();
@@ -104,8 +109,6 @@ export function mountHeroScene({ stage, base = "" }) {
     sun.shadow.bias = -0.0002; sun.shadow.normalBias = 0.02; sun.shadow.radius = 3;
     scene.add(sun, sun.target);
 
-    const [, truck] = await Promise.all([buildWorld(scene), buildTruck()]);
-    if (!alive) return;
     const seq = await buildSequence({ scene, truck, mobile });
     if (!alive) return;
 
@@ -196,7 +199,8 @@ export function mountHeroScene({ stage, base = "" }) {
     }
 
     // Quality follows the device: time a mid-sequence frame and pick the shadow
-    // resolution and pixel ratio; dynamic resolution handles the rest while scrolling.
+    // resolution, ambient occlusion, multisampling and pixel ratio; dynamic resolution
+    // handles the rest while scrolling.
     const gl = renderer.getContext(), px = new Uint8Array(4);
     // Average over a few frames with one sync at the end: reading a pixel back stalls
     // the whole pipeline, and per frame that stall would dwarf the frame itself.
@@ -209,9 +213,28 @@ export function mountHeroScene({ stage, base = "" }) {
     // The shadow map is drawn by hand (see render): less often while things move, a
     // lag of a frame or two nobody sees.
     renderer.shadowMap.autoUpdate = false;
+    const LEVELS = {
+      high: { shadow: mobile ? 2048 : 4096, ao: 1, samples: 4, ratio: dpr },
+      medium: { shadow: 2048, ao: 0.5, samples: 4, ratio: Math.min(dpr, 1.5) },
+      // 2× multisampling instead of 4×: half the memory traffic.
+      low: { shadow: 1024, ao: 0, samples: 2, ratio: Math.min(dpr, 1) },
+    };
     let level = "high";
+    function setLevel(name, ratio = LEVELS[name].ratio) {
+      const l = LEVELS[name];
+      level = name;
+      if (sun.shadow.mapSize.x !== l.shadow) { sun.shadow.mapSize.setScalar(l.shadow); sun.shadow.map?.dispose(); sun.shadow.map = null; }
+      for (const target of [composer.renderTarget1, composer.renderTarget2]) if (target.samples !== l.samples) { target.dispose(); target.samples = l.samples; }
+      useAO = l.ao > 0; aoScale = l.ao || 0.5;
+      baseRatio = ratio; renderer.setPixelRatio(ratio);
+      resize();
+    }
     async function chooseQuality() {
-      aoScale = 0.5; resize(); seq.evaluate(0.3, camera);
+      // The test frames use the cheapest look at the full pixel ratio, so the test is
+      // short even on a slow device. A frame with shadows at full size and ambient
+      // occlusion costs about twice as much (Intel Iris Xe graphics, phone and laptop
+      // widths): high wants it under 10 ms, medium under about 34 ms.
+      setLevel("low", dpr); seq.evaluate(0.3, camera);
       // A warm-up frame (the shadow map, the last shaders), then three short timings,
       // each in a frame of its own so none blocks the page for long.
       timeFrames(1);
@@ -219,18 +242,8 @@ export function mountHeroScene({ stage, base = "" }) {
       for (let i = 0; i < 3; i++) { await nextFrame(); if (!alive) return null; samples.push(timeFrames(2)); }
       const ms = samples.sort((a, b) => a - b)[1];
       const forced = new URLSearchParams(location.search).get("quality"); // ?quality=high|medium|low for tests
-      level = forced ?? (!mobile && ms < 11 ? "high" : ms < 40 ? "medium" : "low");
-      if (level !== "high") {
-        sun.shadow.mapSize.setScalar(level === "low" ? 1024 : 2048);
-        sun.shadow.map?.dispose(); sun.shadow.map = null;
-        baseRatio = Math.min(devicePixelRatio, level === "low" ? 1 : 1.5);
-        renderer.setPixelRatio(baseRatio);
-      }
-      aoScale = level === "high" ? 1 : 0.5; useAO = level !== "low";
-      // 2× multisampling on the lowest level instead of 4×: half the memory traffic.
-      if (level === "low") for (const target of [composer.renderTarget1, composer.renderTarget2]) { target.dispose(); target.samples = 2; }
-      resize();
-      return { level, ms: Math.round(ms), ao: useAO ? aoScale : 0 };
+      setLevel(forced ?? (!mobile && ms < 5 ? "high" : ms < 17 ? "medium" : "low"));
+      return { level, ms: Math.round(ms * 10) / 10, ao: useAO ? aoScale : 0 };
     }
 
     // Scroll → target progress through the pinned section.
@@ -280,15 +293,15 @@ export function mountHeroScene({ stage, base = "" }) {
     // the page: shaders compile in parallel (KHR_parallel_shader_compile; compiling them
     // on first use froze Chrome on Windows for seconds), textures upload a few per frame.
     // The scene compiles for the composer's target (linear, no tone mapping), the
-    // passes' own materials on stand-in quads; the last one draws to the canvas.
+    // passes' own materials on stand-in quads; the last one draws to the canvas. All of
+    // them start at once and are awaited together.
     resize(); seq.evaluate(0.3, camera);
-    renderer.setRenderTarget(composer.renderTarget1);
-    await renderer.compileAsync(scene, camera);
-    const quads = new THREE.Scene(), quad = new THREE.PlaneGeometry(1, 1);
+    const quad = new THREE.PlaneGeometry(1, 1);
     // Drawn with the scene's lights: the AO pass's normals and the shadow-map depth
     // materials, one per variant three.js will make from the scene's materials (side
     // flipped, their map, alpha map and alpha test). Kept alive until the end, or
     // disposing them would drop the compiled programs.
+    const lit = new THREE.Scene();
     const flip = { [THREE.FrontSide]: THREE.BackSide, [THREE.BackSide]: THREE.FrontSide, [THREE.DoubleSide]: THREE.DoubleSide };
     const depths = new Map();
     scene.traverse((o) => {
@@ -300,19 +313,21 @@ export function mountHeroScene({ stage, base = "" }) {
     });
     cleanups.push(() => depths.forEach((d) => d.dispose()));
     // Each also as an instanced mesh, for the batch of closed boxes.
-    for (const m of [ao.normalMaterial, ...depths.values()]) quads.add(new THREE.Mesh(quad, m), new THREE.InstancedMesh(quad, m, 1));
-    await renderer.compileAsync(quads, camera, scene);
+    for (const m of [ao.normalMaterial, ...depths.values()]) lit.add(new THREE.Mesh(quad, m), new THREE.InstancedMesh(quad, m, 1));
     // The passes' full-screen quads, drawn on their own (no lights).
-    quads.clear();
-    for (const m of [ao.gtaoMaterial, ao.pdMaterial, ao.copyMaterial, ao.blendMaterial, blur]) quads.add(new THREE.Mesh(quad, m));
-    await renderer.compileAsync(quads, camera);
-    renderer.setRenderTarget(null);
+    const passes = new THREE.Scene();
+    for (const m of [ao.gtaoMaterial, ao.pdMaterial, ao.copyMaterial, ao.blendMaterial, blur]) passes.add(new THREE.Mesh(quad, m));
     // OutputPass sets its tone-mapping defines on its first render; set them now.
     output.material.defines = { SRGB_TRANSFER: "", ACES_FILMIC_TONE_MAPPING: "" };
     output._outputColorSpace = renderer.outputColorSpace; output._toneMapping = renderer.toneMapping;
     output.material.needsUpdate = true;
-    quads.clear(); quads.add(new THREE.Mesh(quad, output.material));
-    await renderer.compileAsync(quads, camera);
+    const onCanvas = new THREE.Scene();
+    onCanvas.add(new THREE.Mesh(quad, output.material));
+    renderer.setRenderTarget(composer.renderTarget1);
+    const compiling = [renderer.compileAsync(scene, camera), renderer.compileAsync(lit, camera, scene), renderer.compileAsync(passes, camera)];
+    renderer.setRenderTarget(null);
+    compiling.push(renderer.compileAsync(onCanvas, camera));
+    await Promise.all(compiling);
     quad.dispose();
     if (!alive) return;
     const textures = new Set();
@@ -368,8 +383,9 @@ export function mountHeroScene({ stage, base = "" }) {
     }
 
     // The drawn progress follows the scroll on a critically damped spring: each wheel
-    // step or swipe becomes one smooth glide, with no jumps in speed.
-    const OMEGA = 7.5;
+    // step or swipe becomes one smooth glide, with no jumps in speed, about a tenth of
+    // a second behind the scroll (2 / OMEGA; the copy in hero-stage.tsx keeps pace).
+    const OMEGA = 22;
     function frame(now) {
       raf = 0;
       if (!alive || !onScreen) return;

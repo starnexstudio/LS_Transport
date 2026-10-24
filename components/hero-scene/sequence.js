@@ -358,12 +358,18 @@ function spline(keys, t, prop, out) {
     .addScaledVector(m1v, (u3 - 2 * u2 + u) * h).addScaledVector(k2[prop], -2 * u3 + 3 * u2).addScaledVector(m2v, (u3 - u2) * h);
 }
 
-export async function buildSequence({ scene, truck, mobile }) {
-  // ---------- Items ----------
+// The models the sequence loads (everything else is built in code); the scene starts
+// fetching them before the room and the van are built.
+export function modelIds() {
   const procedural = new Set([BOX, RUG, "books"]), ids = new Set();
   for (const c of CONTENTS) if (!c.m.startsWith("openbox") && !procedural.has(c.m)) ids.add(c.m);
   for (const list of Object.values(PACKED)) for (const [id] of list) if (!procedural.has(id)) ids.add(id);
-  const models = Object.fromEntries(await Promise.all([...ids].map(async (id) => [id, await model(id, { texSize: mobile ? 256 : 512 })])));
+  return [...ids];
+}
+
+export async function buildSequence({ scene, truck, mobile }) {
+  // ---------- Items ----------
+  const models = Object.fromEntries(await Promise.all(modelIds().map(async (id) => [id, await model(id)])));
   // One of the frames ships with a placeholder card; give it a print.
   models.hanging_picture_frame_01?.traverse((o) => { if (o.isMesh && /artwork/i.test(o.material.name)) o.material.map = artPrint(); });
   const used = new Set();

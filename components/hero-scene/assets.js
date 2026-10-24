@@ -19,14 +19,29 @@ export const assetUrl = (path) => `${base}${path}`;
 // Fixes for models that don't come in metres with their origin on the floor.
 const SCALE = { steel_frame_shelves_01: 0.1 };
 
+// Model files, downloaded once per page. The scene asks for all of them before it
+// builds anything (prefetchModels); each scene parses its own copies.
+const files = new Map();
+const modelFile = (id) => {
+  const url = assetUrl(`/hero-3d/models/${id}.glb`);
+  if (!files.has(url)) {
+    files.set(url, fetch(url).then((r) => {
+      if (!r.ok) throw new Error(`${r.status} ${url}`);
+      return r.arrayBuffer();
+    }).catch((e) => { files.delete(url); throw e; }));
+  }
+  return files.get(url);
+};
+export const prefetchModels = (ids) => ids.forEach((id) => modelFile(id).catch(() => {}));
+
 // A model in a wrapper whose origin is the centre of its footprint at floor level.
-export async function model(id, { shadows = true } = {}) {
-  const g = await gltfLoader.loadAsync(assetUrl(`/hero-3d/models/${id}.glb`));
+export async function model(id) {
+  const g = await gltfLoader.parseAsync(await modelFile(id), assetUrl("/hero-3d/models/"));
   const root = g.scene;
   if (SCALE[id]) root.scale.multiplyScalar(SCALE[id]);
   root.traverse((o) => {
     if (!o.isMesh) return;
-    o.castShadow = shadows; o.receiveShadow = true;
+    o.castShadow = true; o.receiveShadow = true;
     // Picture glass: its colour map has no alpha here, so it would cover the artwork
     // in flat white; make it a thin clear pane that only catches reflections.
     if (/glass/i.test(o.material.name)) {

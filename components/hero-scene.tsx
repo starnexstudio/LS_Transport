@@ -13,29 +13,15 @@ export function HeroScene() {
     if (!stage) return;
     let destroy: (() => void) | undefined;
     let cancelled = false;
-    let idle = 0;
-    // The scene (three.js and about 5 MB of models) starts once the page has loaded
-    // and the browser is idle, so it never competes with the first paint; the poster,
-    // which shows the same first frame, stands in until then.
-    const begin = () => {
-      const go = () =>
-        import("./hero-scene/scene.js").then(({ mountHeroScene }) => {
-          if (!cancelled) destroy = mountHeroScene({ stage, base: basePath });
-        });
-      // Safari has no requestIdleCallback.
-      idle =
-        typeof window.requestIdleCallback === "function"
-          ? window.requestIdleCallback(go, { timeout: 1500 })
-          : window.setTimeout(go, 300);
-    };
-    if (document.readyState === "complete") begin();
-    else addEventListener("load", begin, { once: true });
+    // The scene (three.js and about 3 MB of models) starts as soon as the page is
+    // up, without waiting for the rest of it to load: the 3D is the hero's main
+    // picture. The poster, which shows the same first frame, stands in until the
+    // first frame is drawn.
+    import("./hero-scene/scene.js").then(({ mountHeroScene }) => {
+      if (!cancelled) destroy = mountHeroScene({ stage, base: basePath });
+    });
     return () => {
       cancelled = true;
-      removeEventListener("load", begin);
-      if (typeof window.cancelIdleCallback === "function")
-        window.cancelIdleCallback(idle);
-      window.clearTimeout(idle);
       destroy?.();
     };
   }, []);
@@ -63,6 +49,7 @@ export function HeroScene() {
         <figure>
           <img
             src={asset("/hero-3d/fallback-before.webp")}
+            loading="lazy"
             alt="Vorher: das Zimmer ist voll mit Möbeln und Umzugskartons, der L&S-Umzugswagen wartet mit offener Hecktür."
           />
           <figcaption>Vorher</figcaption>
@@ -70,6 +57,7 @@ export function HeroScene() {
         <figure>
           <img
             src={asset("/hero-3d/fallback-after.webp")}
+            loading="lazy"
             alt="Nachher: das Zimmer ist leer und besenrein, der Umzugswagen ist abgefahren."
           />
           <figcaption>Nachher – geräumt und besenrein</figcaption>

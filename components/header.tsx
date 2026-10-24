@@ -9,7 +9,6 @@ import { business } from "@/lib/content";
 const links = [
   ["/#leistungen", "Leistungen"],
   ["/#ablauf", "Ablauf"],
-  ["/#vorher-nachher", "Vorher & Nachher"],
   ["/#fragen", "Fragen"],
 ];
 

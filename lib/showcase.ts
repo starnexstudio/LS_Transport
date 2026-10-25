@@ -35,7 +35,6 @@ export const rating = { score: 4.9, count: 9, source: "Google" };
 
 export type Review = {
   name: string;
-  place: string;
   service: string;
   stars: number;
   text: string;
@@ -45,7 +44,6 @@ export type Review = {
 export const reviews: Review[] = [
   {
     name: "Sabine K.",
-    place: "Köln",
     service: "Haushaltsauflösung",
     stars: 5,
     text: "Die Wohnung meiner Mutter war in zwei Tagen komplett geräumt – besenrein, wie versprochen. Sehr respektvoller Umgang mit allem, was ihr wichtig war.",
@@ -53,7 +51,6 @@ export const reviews: Review[] = [
   },
   {
     name: "Markus T.",
-    place: "Düsseldorf",
     service: "Kellerentrümpelung",
     stars: 5,
     text: "Pünktlich, schnell und ein fester Preis vorab. Der Keller war nach drei Stunden leer.",
@@ -61,7 +58,6 @@ export const reviews: Review[] = [
   },
   {
     name: "Aylin D.",
-    place: "Essen",
     service: "Demontage",
     stars: 5,
     text: "Küche und Einbauschränke sauber demontiert, nichts beschädigt, alles mitgenommen. Klare Empfehlung.",
@@ -69,7 +65,6 @@ export const reviews: Review[] = [
   },
   {
     name: "Jonas W.",
-    place: "Bonn",
     service: "Möbeltransport",
     stars: 5,
     text: "Das Sofa durchs enge Treppenhaus in den vierten Stock – kein Kratzer an der Wand. Super Team!",
@@ -77,7 +72,6 @@ export const reviews: Review[] = [
   },
   {
     name: "Petra M.",
-    place: "Neuss",
     service: "Entsorgung",
     stars: 5,
     text: "Alles wurde sortiert und fachgerecht entsorgt. Ich musste mich um gar nichts kümmern.",
@@ -85,7 +79,6 @@ export const reviews: Review[] = [
   },
   {
     name: "Thomas R.",
-    place: "Leverkusen",
     service: "Wohnungsräumung",
     stars: 5,
     text: "Sehr freundlich am Telefon, Termin schon in der nächsten Woche. Die Übergabe an den Vermieter lief problemlos.",
@@ -93,7 +86,6 @@ export const reviews: Review[] = [
   },
   {
     name: "Elena S.",
-    place: "Duisburg",
     service: "Entrümpelung",
     stars: 4,
     text: "Faire Beratung und keine versteckten Kosten. Einen Tag später als geplant, dafür sehr gründlich.",
@@ -101,7 +93,6 @@ export const reviews: Review[] = [
   },
   {
     name: "Michael B.",
-    place: "Mönchengladbach",
     service: "Dachbodenräumung",
     stars: 5,
     text: "Dachboden voller alter Möbel – an einem Vormittag erledigt und danach sogar gefegt.",

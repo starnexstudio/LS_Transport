@@ -26,7 +26,7 @@ function ReviewCard({ review, hidden }: { review: Review; hidden?: boolean }) {
         </span>
         <span>
           <strong>{review.name}</strong>
-          {review.place} · {review.service}
+          {review.service}
         </span>
         <time>{review.when}</time>
       </div>

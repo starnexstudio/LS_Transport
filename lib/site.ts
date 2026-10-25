@@ -24,9 +24,9 @@ export function absolute(path: string) {
 }
 
 export const shareImage = {
-  path: "/og-logo.jpg",
+  path: "/og-share.jpg",
   width: 1200,
-  height: 630,
+  height: 1200,
   alt: "L&S Entrümpelung & Demontagearbeiten – Logo",
 };
 

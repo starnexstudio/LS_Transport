@@ -13,7 +13,7 @@ Status on 25 October 2026: **ready after the configuration listed below.** The c
 | Variable | Where | Value | Effect |
 |---|---|---|---|
 | `NEXT_PUBLIC_BASE_PATH` | set by the workflow | `/LS_Transport` on github.io, empty on a custom domain | Prefix for all pages and files. |
-| `SITE_URL` | repository variable, defaults to `https://ls-entruempelung-demontage.de` in the workflow | The public address including the base path, without a trailing slash | Adds canonical links, Open Graph tags with the share image (`public/og-logo.jpg`) and absolute URLs. The build stops if it does not end with the base path, so a CI build without the custom domain fails instead of deploying a site with the wrong prefix. Unset in a local build: no absolute URLs are published. |
+| `SITE_URL` | repository variable, defaults to `https://ls-entruempelung-demontage.de` in the workflow | The public address including the base path, without a trailing slash | Adds canonical links, Open Graph tags with the share image (`public/og-share.jpg`) and absolute URLs. The build stops if it does not end with the base path, so a CI build without the custom domain fails instead of deploying a site with the wrong prefix. Unset in a local build: no absolute URLs are published. |
 | `ALLOW_INDEXING` | repository variable | `true` only after launch approval | With `SITE_URL` set: removes `noindex`, fills `sitemap.xml` and names it in `robots.txt`. Otherwise every page is `noindex` and the sitemap is empty. |
 
 Repository variables are under Settings → Secrets and variables → Actions → Variables. They are not secrets; nothing in this site needs one. Contact details (email, phone, WhatsApp) are in `lib/content.ts`.

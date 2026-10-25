@@ -71,28 +71,36 @@ for (const field of ["#service", "#name", "#place", "#message"])
     await page.locator(field).evaluate((element) => element.required),
     `${field} is announced as required`,
   );
-await page.getByRole("button", { name: "E-Mail-Anfrage vorbereiten" }).click();
+await page.getByRole("button", { name: "Senden", exact: true }).click();
 assert.equal(
   await page.locator("#name-error").innerText(),
   "Bitte geben Sie Ihren Namen ein.",
 );
 await page.locator("#name").fill("Erika Muster");
 await page.locator("#place").fill("10115 Berlin");
-await page
-  .locator("#message")
-  .fill("Ein Kleiderschrank, 2. Stock. Termin nach Absprache.");
-await page.getByRole("button", { name: "E-Mail-Anfrage vorbereiten" }).click();
-assert.ok(
-  await page
-    .getByRole("heading", { name: "Ihr Entwurf ist fertig." })
-    .isVisible(),
+const message = "Ein Kleiderschrank, 2. Stock.\nMaße: 2 × 1 m & Zubehör.";
+await page.locator("#message").fill(message);
+assert.equal(await page.locator(".inquiry button").count(), 1);
+assert.equal(await page.locator(".inquiry a, .draft, .form-hint").count(), 0);
+// Intercept the WhatsApp destination: verify the handoff without contacting WhatsApp.
+await page.context().route("https://wa.me/**", (route) =>
+  route.fulfill({
+    contentType: "text/html",
+    body: "<title>WhatsApp test</title>",
+  }),
 );
-const mailto = await page
-  .getByRole("link", { name: "E-Mail öffnen" })
-  .getAttribute("href");
-assert.match(mailto, /^mailto:Info@entruempelung-demontage.de/);
-assert.match(decodeURIComponent(mailto), /Erika Muster/);
-assert.match(decodeURIComponent(mailto), /10115 Berlin/);
+const whatsappOpened = page.context().waitForEvent("page");
+await page.getByRole("button", { name: "Senden", exact: true }).click();
+const whatsappPage = await whatsappOpened;
+await whatsappPage.waitForURL("https://wa.me/**");
+const whatsapp = new URL(whatsappPage.url());
+assert.equal(whatsapp.pathname, "/491702919567");
+const text = whatsapp.searchParams.get("text");
+assert.ok(text.includes("Leistung: Reinigung nach der Räumung"));
+assert.ok(text.includes("Name: Erika Muster"));
+assert.ok(text.includes("Einsatzort: 10115 Berlin"));
+assert.ok(text.includes(message));
+await whatsappPage.close();
 await page
   .locator("summary")
   .filter({ hasText: "Was kostet mein Auftrag?" })
@@ -150,7 +158,7 @@ await fs.writeFile(
         "Required fields exposed",
         "Service preselection",
         "Form validation",
-        "Email draft contents",
+        "Single send button and WhatsApp recipient/message contents",
         "FAQ expansion",
         "Image loading",
         "Legal routes with header and footer, no overflow at 320px",

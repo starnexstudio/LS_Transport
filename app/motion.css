@@ -246,8 +246,7 @@
   .navigation.is-open {
     animation: entrance-rise 250ms var(--motion-ease);
   }
-  .faq-list details[open] > p,
-  .draft {
+  .faq-list details[open] > p {
     animation: entrance-rise 300ms var(--motion-ease);
   }
   .faq-plus {

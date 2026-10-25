@@ -468,14 +468,9 @@ h2 {
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
   column-gap: 16px;
 }
-.form-hint {
-  font-size: 11px;
-  line-height: 1.8;
-  color: var(--muted);
-  margin: 16px 0 19px;
-}
 .inquiry > .button {
   width: 100%;
+  margin-top: 20px;
   background: var(--orange);
   color: var(--ink);
 }
@@ -490,34 +485,6 @@ h2 {
 }
 .inquiry [aria-invalid="true"] {
   border-color: #a12e1b;
-}
-.draft {
-  padding: 20px;
-  background: #fff;
-  margin-top: 20px;
-  border: 1px solid var(--line);
-}
-.draft h3 {
-  font-size: 17px;
-  display: flex;
-  gap: 8px;
-  letter-spacing: -0.02em;
-}
-.draft p {
-  font-size: 12px;
-  margin: 12px 0;
-}
-.draft-actions {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-.draft details {
-  margin-top: 20px;
-  font-size: 12px;
-}
-.draft textarea {
-  margin-top: 10px;
 }
 .footer {
   background: var(--teal-ink);
@@ -851,9 +818,6 @@ main:focus {
   .inquiry label {
     font-size: 12px;
   }
-  .form-hint {
-    font-size: 12px;
-  }
   .footer {
     padding: 30px 7% 25px;
   }
@@ -915,7 +879,6 @@ main:focus {
 }
 .contact-email,
 .contact-note,
-.form-hint,
 .footer-contact a {
   font-size: 13px;
 }
@@ -942,9 +905,6 @@ main:focus {
   }
   .contact-email {
     font-size: 13px;
-  }
-  .form-hint {
-    font-size: 12px;
   }
   .footer-bottom {
     font-size: 11px;

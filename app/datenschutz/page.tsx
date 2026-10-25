@@ -34,21 +34,19 @@ export default function Datenschutz() {
         )}
         <a href={`mailto:${business.email}`}>{business.email}</a>
       </p>
-      <h2>Anfragen per E-Mail</h2>
+      <h2>Anfragen über WhatsApp</h2>
       <p>
-        Das Anfrageformular bereitet nur einen E-Mail-Text in Ihrem Browser vor.
-        Es sendet keine Formulardaten an einen Server und speichert sie nicht
-        dauerhaft. Ihre Angaben werden erst über Ihren E-Mail-Anbieter
-        übermittelt, wenn Sie den Entwurf selbst aus Ihrem E-Mail-Programm
-        senden. Auf Ihren Wunsch legt die Kopierfunktion den Anfragetext in
-        Ihrer Zwischenablage ab.
+        Das Anfrageformular öffnet WhatsApp mit Ihrer ausgewählten Leistung,
+        Ihrem Namen, dem Einsatzort und Ihrer Nachricht. Diese Angaben werden
+        beim Öffnen an WhatsApp übergeben. Sie senden die vorbereitete Nachricht
+        anschließend selbst in WhatsApp ab. Die Website speichert Ihre
+        Formulareingaben nicht dauerhaft.
       </p>
       <h2>Anruf und WhatsApp</h2>
       <p>
         Die Anruf-Links öffnen die Telefon-App Ihres Geräts. Der Link „Per
         WhatsApp schreiben“ öffnet WhatsApp (wa.me) mit einer vorbereiteten
-        Nachricht; dort gelten die Datenschutzbestimmungen von WhatsApp. Die
-        Website selbst überträgt dabei keine Daten.
+        Nachricht; dort gelten die Datenschutzbestimmungen von WhatsApp.
       </p>
       <h2>Technische Umsetzung</h2>
       <p>

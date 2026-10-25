@@ -1,13 +1,9 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
-import { ArrowUpRight, Check, Copy, Mail } from "lucide-react";
+import { useEffect, useState } from "react";
 import { services, business } from "@/lib/content";
 export function Inquiry({ initialService = "" }: { initialService?: string }) {
   const [service, setService] = useState(initialService);
-  const [draft, setDraft] = useState("");
-  const [copied, setCopied] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const draftText = useRef<HTMLDetailsElement>(null);
   useEffect(() => {
     const handler = (e: Event) => setService((e as CustomEvent<string>).detail);
     window.addEventListener("service-select", handler);
@@ -29,12 +25,13 @@ export function Inquiry({ initialService = "" }: { initialService?: string }) {
       document.getElementById(Object.keys(next)[0])?.focus();
       return;
     }
-    setDraft(
-      `Hallo L&S,\n\nich möchte ein Angebot für folgenden Auftrag anfragen:\n\nLeistung: ${service}\nName: ${name}\nEinsatzort: ${place}\n\n${message}\n\nMit freundlichen Grüßen\n${name}`,
+    const text = `Hallo L&S,\n\nich möchte ein Angebot für folgenden Auftrag anfragen:\n\nLeistung: ${service}\nName: ${name}\nEinsatzort: ${place}\n\n${message}\n\nMit freundlichen Grüßen\n${name}`;
+    window.open(
+      `https://wa.me/${business.whatsapp.replace(/\D/g, "")}?text=${encodeURIComponent(text)}`,
+      "_blank",
+      "noopener,noreferrer",
     );
-    setCopied(false);
   }
-  const mailto = `mailto:${business.email}?subject=${encodeURIComponent("Angebotsanfrage – " + service)}&body=${encodeURIComponent(draft)}`;
   return (
     <form className="inquiry" noValidate onSubmit={submit}>
       <div className="form-heading">
@@ -47,10 +44,7 @@ export function Inquiry({ initialService = "" }: { initialService?: string }) {
         name="service"
         value={service}
         required
-        onChange={(e) => {
-          setService(e.target.value);
-          setDraft("");
-        }}
+        onChange={(e) => setService(e.target.value)}
         aria-invalid={!!errors.service}
         aria-describedby={errors.service ? "service-error" : undefined}
       >
@@ -77,7 +71,6 @@ export function Inquiry({ initialService = "" }: { initialService?: string }) {
             placeholder="Vor- und Nachname"
             aria-invalid={!!errors.name}
             aria-describedby={errors.name ? "name-error" : undefined}
-            onChange={() => setDraft("")}
           />
           {errors.name && (
             <span className="error" id="name-error">
@@ -96,7 +89,6 @@ export function Inquiry({ initialService = "" }: { initialService?: string }) {
             placeholder="PLZ und Ort"
             aria-invalid={!!errors.place}
             aria-describedby={errors.place ? "place-error" : undefined}
-            onChange={() => setDraft("")}
           />
           {errors.place && (
             <span className="error" id="place-error">
@@ -115,79 +107,15 @@ export function Inquiry({ initialService = "" }: { initialService?: string }) {
         placeholder="Was ist zu tun? Ungefähre Menge, Stockwerk und Wunschtermin …"
         aria-invalid={!!errors.message}
         aria-describedby={errors.message ? "message-error" : undefined}
-        onChange={() => setDraft("")}
       />
       {errors.message && (
         <span className="error" id="message-error">
           {errors.message}
         </span>
       )}
-      <p className="form-hint">
-        Ihre Angaben bleiben vorerst in Ihrem Browser. Im nächsten Schritt
-        öffnen Sie den Entwurf in Ihrem E-Mail-Programm und senden ihn selbst
-        ab.
-      </p>
       <button className="button button-dark" type="submit">
-        E-Mail-Anfrage vorbereiten <ArrowUpRight size={19} />
+        Senden
       </button>
-      {draft && (
-        <div className="draft" role="status">
-          <h3>
-            <Check size={18} /> Ihr Entwurf ist fertig.
-          </h3>
-          <p>
-            Es wurde noch nichts gesendet. Öffnen Sie Ihr E-Mail-Programm oder
-            kopieren Sie den Text. Dort können Sie auch Fotos anhängen.
-          </p>
-          <div className="draft-actions">
-            <a className="text-link" href={mailto}>
-              <Mail size={16} /> E-Mail öffnen
-            </a>
-            <button
-              type="button"
-              className="text-link"
-              onClick={async () => {
-                try {
-                  await navigator.clipboard.writeText(draft);
-                  setCopied(true);
-                } catch {
-                  // Show the text, selected, so it can be copied by hand.
-                  setCopied(false);
-                  setErrors({
-                    ...errors,
-                    copy: "Kopieren ist hier nicht möglich. Der Text ist unten markiert – kopieren Sie ihn mit Strg+C (Mac: ⌘+C).",
-                  });
-                  const details = draftText.current;
-                  if (details) {
-                    details.open = true;
-                    details.querySelector("textarea")?.select();
-                  }
-                }
-              }}
-            >
-              <Copy size={16} />
-              {copied ? "Text kopiert" : "Text kopieren"}
-            </button>
-          </div>
-          {mailto.length > 1800 && (
-            <p>
-              Bei sehr langen Nachrichten übernehmen manche E-Mail-Programme
-              nicht den ganzen Text. Prüfen Sie den Entwurf oder kopieren Sie
-              den Text.
-            </p>
-          )}
-          <details ref={draftText}>
-            <summary>Anfragetext anzeigen</summary>
-            <textarea
-              aria-label="Vorbereiteter Anfragetext"
-              readOnly
-              value={draft}
-              rows={9}
-            />
-          </details>
-          {errors.copy && <p>{errors.copy}</p>}
-        </div>
-      )}
     </form>
   );
 }

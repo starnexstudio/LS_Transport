@@ -10,6 +10,12 @@ const browser = await chromium.launch({ channel: "chrome", headless: true });
 // Reduced motion: scans see each element's final colours, not a frame of its
 // entrance animation.
 const context = await browser.newContext({ reducedMotion: "reduce" });
+await context.route("https://wa.me/**", (route) =>
+  route.fulfill({
+    contentType: "text/html",
+    body: "<title>WhatsApp test</title>",
+  }),
+);
 const page = await context.newPage();
 const reports = [];
 const report = async (state, include) =>
@@ -30,7 +36,8 @@ for (const width of [1440, 390]) {
   await report(`${width} service dialog`, ".service-dialog");
   await page.keyboard.press("Escape");
   const submit = page.getByRole("button", {
-    name: "E-Mail-Anfrage vorbereiten",
+    name: "Senden",
+    exact: true,
   });
   await submit.click();
   await report(`${width} form errors`, ".inquiry");
@@ -38,8 +45,12 @@ for (const width of [1440, 390]) {
   await page.locator("#name").fill("Erika Muster");
   await page.locator("#place").fill("10115 Berlin");
   await page.locator("#message").fill("Ein Kleiderschrank, 2. Stock.");
+  const whatsappOpened = context.waitForEvent("page");
   await submit.click();
-  await report(`${width} email draft`, ".inquiry");
+  const whatsappPage = await whatsappOpened;
+  await whatsappPage.waitForURL("https://wa.me/**");
+  await whatsappPage.close();
+  await report(`${width} completed form`, ".inquiry");
 }
 await fs.writeFile(
   "artifacts/accessibility-results.json",

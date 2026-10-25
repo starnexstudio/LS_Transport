@@ -34,7 +34,7 @@ npm run typecheck
 npx prettier --check app components lib tests
 ```
 
-The tests read the site's address from `BASE_URL` (default http://localhost:4173). The browser checks cover responsive overflow, the skip link, navigation and the mobile menu, service preselection and focus, form validation and required fields, generated mailto contents, FAQ expansion, image loading, the legal pages and the custom 404 page with header and footer, unique page titles, and runtime exceptions. The accessibility check runs axe (WCAG 2.2 A/AA and best practices) on every page and on the open menu, service dialog, form errors and email draft; it covers only what automated tools can detect. Screenshots and machine-readable results are saved under `artifacts/`.
+The tests read the site's address from `BASE_URL` (default http://localhost:4173). The browser checks cover responsive overflow, the skip link, navigation and the mobile menu, service preselection and focus, form validation and required fields, the WhatsApp recipient and message contents, FAQ expansion, image loading, the legal pages and the custom 404 page with header and footer, unique page titles, and runtime exceptions. WhatsApp navigation is intercepted during testing, so no test inquiry reaches the service. The accessibility check runs axe (WCAG 2.2 A/AA and best practices) on every page and on the open menu, service dialog, form errors and completed form; it covers only what automated tools can detect. Screenshots and machine-readable results are saved under `artifacts/`.
 
 ## Project structure
 
@@ -49,7 +49,7 @@ The tests read the site's address from `BASE_URL` (default http://localhost:4173
 
 ## Inquiry behavior
 
-The form validates locally and prepares an email draft. It never reports that a message was sent. The visitor explicitly opens their email application or copies the draft, then sends it themselves. No form data is sent to a server or saved in browser storage. Photos can be attached in the visitor's email application. A configured email application is required to use mailto; copying provides a fallback.
+The form validates locally. Its only action, "Senden", opens WhatsApp in a new tab for `business.whatsapp` with the selected service, name, location and message. The visitor sends the prepared message inside WhatsApp; the website does not report it as delivered. Form details are passed to WhatsApp in the click-to-chat URL, with no form backend or browser storage. Photos can be attached inside WhatsApp. Email remains available as a separate contact option elsewhere on the site.
 
 ## Before public launch
 

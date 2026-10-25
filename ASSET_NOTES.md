@@ -22,6 +22,8 @@ The gallery is captioned "Symbolbilder – keine Aufnahmen von L&S-Aufträgen", 
 
 `public/og-logo.jpg` (1200 × 630, the link preview once `SITE_URL` is set) is `ls-logo.webp` at 560 px wide, centred on the brand teal (#00757F) with a soft centre glow, composed with sharp. The logo stays inside the central 630 × 630 square, which WhatsApp and other apps crop small previews to. It replaces `og-image.jpg` (the hero scene); the new name makes apps that cached the old preview fetch the new image.
 
+The site icons are the roof and "L&S" from `ls-logo.webp` (its four shapes only, without the truck, speed lines and wordmark, which are unreadable at icon size) on the brand teal, composed with sharp: `app/icon.png` (512 × 512, rounded corners), `app/apple-icon.png` (180 × 180, square; iOS rounds it) and `app/favicon.ico` (16, 32 and 48 px).
+
 ## Owner-supplied photos (October 2026)
 
 Supplied in the project folder and exported as WebP (quality 80), without retouching. The pairs are shown as drag-to-reveal sliders. The two photos in each pair were taken from slightly different positions, and automatic feature matching failed, so each pair was aligned by a measured offset against fixed reference points: the window (clearance) and the water heater (bathroom). The shared area was then cropped to the same size. Small differences remain where the camera angle changed.

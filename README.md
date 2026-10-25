@@ -88,7 +88,7 @@ The hero is a pinned stage around a three.js scene (`components/hero-scene.tsx`,
 - **Im Einsatz** (`components/gallery.tsx`): a bento grid of eight photos that unveil and drift with the scroll (CSS scroll-driven animations where the browser supports them).
 - **Kundenstimmen** (`components/reviews.tsx`): the overall rating and one row of review cards drifting by, paused on hover; a still grid with reduced motion.
 
-**The reviews, numbers and rating in `lib/showcase.ts` are sample content, not real.** They are shown only on the dev server, marked "Beispielinhalt", and a production build leaves the stats band and the reviews out while `sample` is `true`. To publish them, replace every entry with real data (for example from the Google Business profile) and set `sample` to `false`.
+**The reviews, numbers and rating in `lib/showcase.ts` are sample content, not real.** They are shown only on the dev server (the "Beispielinhalt" tag that marks them there is switched off for now: `markSample` in `lib/showcase.ts`), and a production build leaves the stats band and the reviews out while `sample` is `true`. To publish them, replace every entry with real data (for example from the Google Business profile) and set `sample` to `false`.
 
 ## Motion
 

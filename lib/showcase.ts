@@ -9,6 +9,9 @@
 // `sample` to false.
 export const sample = true;
 export const showTrust = !sample || process.env.NODE_ENV !== "production";
+// The "Beispielinhalt" tag that marks this content on the dev server. Switched
+// off for now; set to true to show it again.
+export const markSample = false;
 
 export type Stat = {
   /** Counted up from zero when the band comes into view. */

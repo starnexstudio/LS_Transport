@@ -11,15 +11,27 @@ export default function Datenschutz() {
   return (
     <Subpage>
       <h1>Datenschutz&shy;hinweise</h1>
-      <div className="legal-note">
-        Vorläufiger Hinweis. Vor dem Livegang müssen die Angaben zum
-        Verantwortlichen und zum endgültigen Hosting ergänzt und die
-        Datenschutzerklärung rechtlich geprüft werden.
-      </div>
       <h2>Kontakt</h2>
       <p>
-        L&S Entrümpelung & Demontagearbeiten
+        {business.name}
         <br />
+        {business.owner}
+        <br />
+        {business.address.street}
+        <br />
+        {business.address.postalCode} {business.address.city}
+        <br />
+        Deutschland
+        <br />
+        {business.phone && (
+          <>
+            Telefon:{" "}
+            <a href={`tel:${business.phone.replace(/[^+\d]/g, "")}`}>
+              {business.phone}
+            </a>
+            <br />
+          </>
+        )}
         <a href={`mailto:${business.email}`}>{business.email}</a>
       </p>
       <h2>Anfragen per E-Mail</h2>
@@ -42,18 +54,9 @@ export default function Datenschutz() {
       <p>
         Die Website verwendet keine Analysewerkzeuge, keine Werbetracker und
         keine eingebetteten Karten. Bilder und Schriften werden lokal mit der
-        Website ausgeliefert. Die Website setzt keine Cookies. Die derzeitige
-        Vorschau wird über GitHub Pages (GitHub, Inc.) bereitgestellt; beim
-        Aufruf verarbeitet der Hoster technisch notwendige Verbindungsdaten wie
-        Ihre IP-Adresse.
-      </p>
-      <h2>Vor der Veröffentlichung</h2>
-      <p>
-        Der endgültige Hinweis muss insbesondere den vollständigen
-        Verantwortlichen, Hosting und Logdaten, den Umgang mit eingehenden
-        E-Mails sowie die jeweiligen Rechtsgrundlagen, Speicherfristen und
-        Betroffenenrechte abdecken. Die dafür nötigen Firmen- und Hostingangaben
-        liegen noch nicht vor.
+        Website ausgeliefert. Die Website setzt keine Cookies. Die Website wird
+        über GitHub Pages (GitHub, Inc.) bereitgestellt; beim Aufruf verarbeitet
+        der Hoster technisch notwendige Verbindungsdaten wie Ihre IP-Adresse.
       </p>
     </Subpage>
   );

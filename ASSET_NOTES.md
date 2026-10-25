@@ -14,9 +14,9 @@ Two of the eight gallery tiles are Pexels photos, shown with responsive CSS crop
 
 - `public/images/packed-moving-boxes.jpg` ("Sorgfältig verpackt"): Ketut Subiyanto, https://www.pexels.com/photo/empty-apartment-with-packed-carton-boxes-before-moving-4246119/
 - `public/images/wrapped-living-room.jpg` ("Möbel geschützt"): MART PRODUCTION, https://www.pexels.com/photo/furniture-covered-with-plastics-7415019/
-- License: https://www.pexels.com/license/ (website and marketing use permitted; credit not required, given in the Impressum).
+- License: https://www.pexels.com/license/ (website and marketing use permitted; credit not required).
 
-The gallery is captioned "Symbolbilder – keine Aufnahmen von L&S-Aufträgen", and the Impressum lists the credits.
+Image sources are recorded here for maintenance. The public gallery and English legal notice do not display source notes or credits.
 
 ## Share image
 
@@ -31,7 +31,7 @@ Supplied in the project folder and exported as WebP (quality 80), without retouc
 | `clearance-before.webp` / `clearance-after.webp` (800 × 1200) | `Before_ Cluttered Room Restoration-2.png`, `Restored view of a cleared room-1.png` | Home page before/after slider |
 | `bathroom-before.webp` / `bathroom-after.webp` (800 × 1067) | `Teal-tiled bathroom before restoration-2.png`, `Exposed Bathroom After Demolition-3.png` | Home page before/after slider |
 
-The origin of these files is not recorded. The site labels them only "Vorher" and "Nachher", does not call them L&S projects, and the Impressum credits them as photos provided by the operator. Before launch, the owner must confirm that L&S may publish them; if they are not genuine L&S jobs, label them as example photos on the page.
+The origin of these files is not recorded. The site labels them only "Vorher" and "Nachher" and does not call them L&S projects. Before launch, the owner must confirm that L&S may publish them; if they are not genuine L&S jobs, label them as example photos on the page.
 
 The service pages and their extra photos (bathtub removal; Pexels disposal and cleaning photos) were removed with those pages. The owner's original `Bathroom demolition with tub removal-1.png` is still in the project folder.
 

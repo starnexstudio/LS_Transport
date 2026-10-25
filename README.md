@@ -53,12 +53,12 @@ The form validates locally and prepares an email draft. It never reports that a 
 
 ## Before public launch
 
-- Supply the legal owner's full name, legal entity where applicable, service address, and any applicable registration or tax details.
-- Complete and review the legal notice and privacy policy against the actual hosting and email processing arrangements. Current legal routes explicitly identify their incomplete status.
+- Confirm the business details in `lib/content.ts`, including any applicable registration details and the type of the supplied tax reference.
+- Complete and review the legal notice and privacy policy against the actual hosting and email processing arrangements. The English legal notice lists the supplied business name, owner, address, tax reference and contact details.
 - Confirm the remaining pricing brief: the supplied request ended after “individual price after”. Current public wording only promises an individually agreed price.
 - Set `SITE_URL` (the confirmed public address) and `ALLOW_INDEXING=true` when the website is approved for publication; see `DEPLOYMENT.md`.
 - Replace the sample reviews, numbers and rating in `lib/showcase.ts` with real ones and set `sample` to `false`; until then those sections stay out of the build.
-- Replace the "Im Einsatz" symbol images with authorized business photography if available. They are labeled "Symbolbilder" and credited in the Impressum.
+- Replace the "Im Einsatz" symbol images with authorized business photography if available. Image provenance is recorded in `ASSET_NOTES.md`; source notes are not displayed on the site.
 
 No phone number, street address, certifications, reviews, fixed prices, or project statistics were invented. No analytics, tracking scripts, cookie storage, or remotely embedded maps are used.
 
@@ -88,7 +88,7 @@ The hero is a pinned stage around a three.js scene (`components/hero-scene.tsx`,
 - **Im Einsatz** (`components/gallery.tsx`): a bento grid of eight photos that unveil and drift with the scroll (CSS scroll-driven animations where the browser supports them).
 - **Kundenstimmen** (`components/reviews.tsx`): the overall rating and one row of review cards drifting by, paused on hover; a still grid with reduced motion.
 
-**The reviews, numbers and rating in `lib/showcase.ts` are sample content, not real.** For demos they are shown on the dev server and the noindex preview (the "Beispielinhalt" tag that marks them is switched off for now: `markSample` in `lib/showcase.ts`). A build that may be indexed (`ALLOW_INDEXING=true`) leaves the stats band and the reviews out while `sample` is `true`. To publish them, replace every entry with real data (for example from the Google Business profile) and set `sample` to `false`.
+**The reviews, numbers and rating in `lib/showcase.ts` are sample content, not real.** The stats band and reviews stay hidden in every environment while `sample` is `true`, including development and preview builds. To publish them, replace every entry with real data (for example from the Google Business profile) and set `sample` to `false`.
 
 ## Motion
 

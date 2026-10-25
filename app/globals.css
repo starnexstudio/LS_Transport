@@ -545,7 +545,12 @@ h2 {
 .footer-top p span {
   color: var(--teal-pale);
 }
-.footer-top > a:last-child {
+.footer-contact {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.footer-contact a {
   display: flex;
   align-items: center;
   gap: 18px;
@@ -566,7 +571,7 @@ h2 {
   gap: 0 23px;
 }
 .footer-bottom a,
-.footer-top > a:last-child,
+.footer-contact a,
 .contact-email {
   min-height: 24px;
 }
@@ -618,11 +623,6 @@ main:focus {
 }
 .legal a:not(.button) {
   text-decoration: underline;
-}
-.legal-note {
-  border-left: 3px solid var(--orange);
-  padding: 15px 20px;
-  background: var(--mist);
 }
 @media (min-width: 1600px) {
   body {
@@ -833,7 +833,7 @@ main:focus {
   .footer-top p {
     font-size: 25px;
   }
-  .footer-top > a:last-child {
+  .footer-contact {
     width: 100%;
     margin-top: 3px;
   }
@@ -884,7 +884,7 @@ main:focus {
 .contact-email,
 .contact-note,
 .form-hint,
-.footer-top > a:last-child {
+.footer-contact a {
   font-size: 13px;
 }
 .inquiry input,

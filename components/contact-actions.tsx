@@ -16,7 +16,7 @@ export function ContactActions({ compact = false }: { compact?: boolean }) {
           href={`tel:${phone.replace(/[^+\d]/g, "")}`}
         >
           <Phone size={18} />
-          <span>{compact ? "Anrufen" : phone}</span>
+          <span>{phone}</span>
         </a>
       )}
       {whatsapp && (

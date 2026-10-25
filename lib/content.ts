@@ -1,5 +1,13 @@
 export const business = {
   name: "L&S Entrümpelung & Demontagearbeiten",
+  owner: "Leutrim Sopa",
+  address: {
+    street: "Augsburgerstraße 20",
+    postalCode: "86551",
+    city: "Aichach",
+    country: "Germany",
+  },
+  taxReference: "DE83125094627",
   email: "Info@entruempelung-demontage.de",
   // Set confirmed international numbers to enable direct contact links.
   phone: "+49 170 2919567",

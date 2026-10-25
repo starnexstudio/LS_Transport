@@ -106,9 +106,6 @@ export function Gallery() {
           </figure>
         ))}
       </div>
-      <p className="gallery-note">
-        Symbolbilder – keine Aufnahmen von L&S-Aufträgen.
-      </p>
     </section>
   );
 }

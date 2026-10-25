@@ -11,14 +11,13 @@ import { Reviews } from "@/components/reviews";
 import { BeforeAfter } from "@/components/before-after";
 import { business } from "@/lib/content";
 import { sample } from "@/lib/showcase";
-import { homeDescription, indexable, pageMetadata } from "@/lib/site";
+import { homeDescription, pageMetadata } from "@/lib/site";
 export const metadata = pageMetadata({
   description: homeDescription,
   path: "/",
 });
-// The stats band and the reviews hold sample content (lib/showcase.ts): shown for
-// demos on the dev server and the preview, left out of any build that may be indexed.
-const showTrust = !sample || !indexable;
+// Show reviews and figures only after the sample data is replaced with real data.
+const showTrust = !sample;
 const faqs = [
   [
     "Was kostet mein Auftrag?",

@@ -35,6 +35,10 @@ export function Footer() {
         <span>
           © {new Date().getFullYear()} {business.name}
         </span>
+        <p className="footer-credit">
+          Website gestaltet von{" "}
+          <a href="https://starnexstudio.com/">StarNex Studio</a>
+        </p>
         <div>
           <Link href="/impressum" lang="en">
             Legal Notice

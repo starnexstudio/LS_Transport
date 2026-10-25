@@ -559,8 +559,10 @@ h2 {
 .footer-bottom {
   border-top: 1px solid #ffffff2e;
   padding-top: 22px;
-  display: flex;
-  justify-content: space-between;
+  /* Copyright left, credit centred, links right. */
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
   gap: 20px;
   font-size: 10px;
   color: #cfe6e7;
@@ -568,6 +570,7 @@ h2 {
 .footer-bottom > div {
   display: flex;
   flex-wrap: wrap;
+  justify-content: flex-end;
   gap: 0 23px;
 }
 .footer-bottom a,
@@ -578,6 +581,35 @@ h2 {
 .footer-bottom a {
   display: inline-flex;
   align-items: center;
+}
+.footer-credit {
+  text-align: center;
+  font-size: 14px;
+  color: var(--teal-pale);
+}
+/* Too narrow for three columns: stack them, credit between copyright and links. */
+@media (max-width: 1100px) {
+  .footer-bottom {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 18px;
+  }
+  .footer-bottom > div {
+    justify-content: flex-start;
+  }
+  .footer-credit {
+    text-align: left;
+  }
+}
+.footer-credit a {
+  font-weight: 700;
+  color: var(--paper);
+  text-decoration: underline 2px var(--orange);
+  text-underline-offset: 4px;
+}
+.footer-credit a:hover {
+  color: var(--orange-hover);
 }
 .skip-link {
   position: fixed;

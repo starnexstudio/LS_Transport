@@ -28,13 +28,16 @@ jobs:
         uses: actions/configure-pages@v5
       - run: npm ci
       - run: npm run typecheck
-      # SITE_URL and ALLOW_INDEXING are repository variables (Settings → Secrets and
-      # variables → Actions → Variables); unset, the site deploys as a noindex preview.
-      # See DEPLOYMENT.md.
+      # The base path is empty while the custom domain is set and "/LS_Transport" on
+      # github.io; it is baked into every asset URL, so the site must be rebuilt after
+      # the domain changes. SITE_URL (a repository variable, defaulting to the custom
+      # domain) must end with that base path, so a build that would point its assets at
+      # the wrong prefix stops instead of deploying. ALLOW_INDEXING is a repository
+      # variable; unset, every page stays noindex. See DEPLOYMENT.md.
       - run: npm run build
         env:
           NEXT_PUBLIC_BASE_PATH: ${{ steps.pages.outputs.base_path }}
-          SITE_URL: ${{ vars.SITE_URL }}
+          SITE_URL: ${{ vars.SITE_URL || 'https://ls-entruempelung-demontage.de' }}
           ALLOW_INDEXING: ${{ vars.ALLOW_INDEXING }}
       - run: touch out/.nojekyll
       - uses: actions/upload-pages-artifact@v3

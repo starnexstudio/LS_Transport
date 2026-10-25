@@ -24,10 +24,10 @@ export function absolute(path: string) {
 }
 
 export const shareImage = {
-  path: "/og-image.jpg",
+  path: "/og-share.jpg",
   width: 1200,
-  height: 630,
-  alt: "L&S-Logo, ein Zimmer voller Umzugskartons und ein Umzugswagen in L&S-Farben (Illustration)",
+  height: 1200,
+  alt: "L&S Entrümpelung & Demontagearbeiten – Logo",
 };
 
 export const siteName = "L&S Entrümpelung & Demontage";

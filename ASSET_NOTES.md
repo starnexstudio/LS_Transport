@@ -20,7 +20,9 @@ Image sources are recorded here for maintenance. The public gallery and English 
 
 ## Share image
 
-`public/og-image.jpg` (1200 × 630, for link previews once `SITE_URL` is set) is the hero's `fallback-poster.webp` render and the logo on the brand teal, composed with sharp. Like the scene, it is an illustration.
+`public/og-share.jpg` (1200 × 1200, the link preview once `SITE_URL` is set) is the whole `ls-logo.webp` at 80 % of the width, centred on flat brand teal (#00757F), composed with sharp. It is square so WhatsApp's square thumbnail shows the whole logo, and the logo is short enough to survive the 1.91:1 centre crop of Facebook and LinkedIn. It replaces `og-image.jpg` (the hero scene) and `og-logo.jpg`; each new name makes apps that cached the old preview fetch the new image.
+
+The site icons are the whole logo on the brand teal too, composed with sharp: `app/icon.png` (512 × 512, rounded corners), `app/apple-icon.png` (180 × 180, square; iOS rounds it) and `app/favicon.ico` (16, 32 and 48 px). At tab size only the roof and "L&S" stay recognisable.
 
 ## Owner-supplied photos (October 2026)
 

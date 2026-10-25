@@ -2,18 +2,18 @@ import { Subpage } from "@/components/subpage";
 import { business } from "@/lib/content";
 import { pageMetadata } from "@/lib/site";
 export const metadata = pageMetadata({
-  title: "Legal Notice",
+  title: "Impressum",
   description:
-    "Legal notice and contact details for L&S Entrümpelung & Demontagearbeiten.",
+    "Impressum und Kontaktdaten von L&S Entrümpelung & Demontagearbeiten.",
   path: "/impressum/",
 });
 export default function Impressum() {
   return (
-    <Subpage lang="en">
-      <h1>Legal Notice</h1>
-      <h2>Business details</h2>
-      <p lang="de">{business.name}</p>
-      <p>Owner: {business.owner}</p>
+    <Subpage lang="de">
+      <h1>Impressum</h1>
+      <h2>Angaben zum Unternehmen</h2>
+      <p>{business.name}</p>
+      <p>Inhaber: {business.owner}</p>
       <address>
         {business.address.street}
         <br />
@@ -21,19 +21,19 @@ export default function Impressum() {
         <br />
         {business.address.country}
       </address>
-      <p>Tax reference: {business.taxReference}</p>
-      <h2>Contact</h2>
+      <p>Steuerliche Kennnummer: {business.taxReference}</p>
+      <h2>Kontakt</h2>
       <p>
         {business.phone && (
           <>
-            Phone:{" "}
+            Telefon:{" "}
             <a href={`tel:${business.phone.replace(/[^+\d]/g, "")}`}>
               {business.phone}
             </a>
             <br />
           </>
         )}
-        Email: <a href={`mailto:${business.email}`}>{business.email}</a>
+        E-Mail: <a href={`mailto:${business.email}`}>{business.email}</a>
       </p>
     </Subpage>
   );

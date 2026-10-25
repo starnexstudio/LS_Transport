@@ -40,9 +40,7 @@ export function Footer() {
           <a href="https://starnexstudio.com/">StarNex Studio</a>
         </p>
         <div>
-          <Link href="/impressum" lang="en">
-            Legal Notice
-          </Link>
+          <Link href="/impressum">Impressum</Link>
           <Link href="/datenschutz">Datenschutz</Link>
           <a href="#inhalt">Nach oben ↑</a>
         </div>

@@ -16,7 +16,7 @@ Two of the eight gallery tiles are Pexels photos, shown with responsive CSS crop
 - `public/images/wrapped-living-room.jpg` ("Möbel geschützt"): MART PRODUCTION, https://www.pexels.com/photo/furniture-covered-with-plastics-7415019/
 - License: https://www.pexels.com/license/ (website and marketing use permitted; credit not required).
 
-Image sources are recorded here for maintenance. The public gallery and English legal notice do not display source notes or credits.
+Image sources are recorded here for maintenance. The public gallery and legal notice do not display source notes or credits.
 
 ## Share image
 

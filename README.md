@@ -54,7 +54,7 @@ The form validates locally and prepares an email draft. It never reports that a 
 ## Before public launch
 
 - Confirm the business details in `lib/content.ts`, including any applicable registration details and the type of the supplied tax reference.
-- Complete and review the legal notice and privacy policy against the actual hosting and email processing arrangements. The English legal notice lists the supplied business name, owner, address, tax reference and contact details.
+- Complete and review the legal notice and privacy policy against the actual hosting and email processing arrangements. The German legal notice lists the supplied business name, owner, address, tax reference and contact details.
 - Confirm the remaining pricing brief: the supplied request ended after “individual price after”. Current public wording only promises an individually agreed price.
 - Set `SITE_URL` (the confirmed public address) and `ALLOW_INDEXING=true` when the website is approved for publication; see `DEPLOYMENT.md`.
 - Replace the sample reviews, numbers and rating in `lib/showcase.ts` with real ones and set `sample` to `false`; until then those sections stay out of the build.

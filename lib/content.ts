@@ -5,7 +5,7 @@ export const business = {
     street: "Augsburgerstraße 20",
     postalCode: "86551",
     city: "Aichach",
-    country: "Germany",
+    country: "Deutschland",
   },
   taxReference: "DE83125094627",
   email: "Info@entruempelung-demontage.de",

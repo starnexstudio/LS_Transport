@@ -10,11 +10,15 @@ import { Gallery } from "@/components/gallery";
 import { Reviews } from "@/components/reviews";
 import { BeforeAfter } from "@/components/before-after";
 import { business } from "@/lib/content";
-import { homeDescription, pageMetadata } from "@/lib/site";
+import { sample } from "@/lib/showcase";
+import { homeDescription, indexable, pageMetadata } from "@/lib/site";
 export const metadata = pageMetadata({
   description: homeDescription,
   path: "/",
 });
+// The stats band and the reviews hold sample content (lib/showcase.ts): shown for
+// demos on the dev server and the preview, left out of any build that may be indexed.
+const showTrust = !sample || !indexable;
 const faqs = [
   [
     "Was kostet mein Auftrag?",
@@ -46,7 +50,7 @@ export default function Home() {
       <Header />
       <main id="inhalt" tabIndex={-1}>
         <Hero />
-        <TrustBand />
+        {showTrust && <TrustBand />}
         <ServicesOverview />
         <section className="process section" id="ablauf">
           <div className="process-intro">
@@ -92,7 +96,7 @@ export default function Home() {
         </section>
         <BeforeAfter />
         <Gallery />
-        <Reviews />
+        {showTrust && <Reviews />}
         <section className="questions section" id="fragen">
           <div>
             <span className="eyebrow">02 / GUT ZU WISSEN</span>

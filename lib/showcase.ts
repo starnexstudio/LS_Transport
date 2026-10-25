@@ -1,14 +1,13 @@
 // Trust content: key numbers, the Google rating and customer reviews.
 //
 // SAMPLE CONTENT. None of these reviews, numbers or the rating come from L&S
-// customers. They are here to design and test the sections and are shown only on
-// the local dev server: a production build (npm run build, GitHub Pages) leaves
-// the stats band and the reviews out while `sample` is true, because invented
-// reviews and figures must not reach the public site. To go live, replace every
-// entry with real data (e.g. from the Google Business profile) and set
-// `sample` to false.
+// customers. They are here to design the sections and to demo the site, and are
+// shown on the dev server and on the noindex preview build. A build that may be
+// indexed (SITE_URL and ALLOW_INDEXING, see app/page.tsx) leaves the stats band
+// and the reviews out while `sample` is true, so invented reviews and figures
+// never reach the launched site. To go live, replace every entry with real data
+// (e.g. from the Google Business profile) and set `sample` to false.
 export const sample = true;
-export const showTrust = !sample || process.env.NODE_ENV !== "production";
 // The "Beispielinhalt" tag that marks this content on the dev server. Switched
 // off for now; set to true to show it again.
 export const markSample = false;

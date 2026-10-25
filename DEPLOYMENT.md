@@ -74,7 +74,7 @@ Required before the site is public under the business's name:
 
 Optional:
 
-- [ ] Real reviews and figures for the stats band and reviews section: replace the sample content in `lib/showcase.ts` and set `sample = false`. Until then a production build leaves both sections out.
+- [ ] Real reviews and figures for the stats band and reviews section: replace the sample content in `lib/showcase.ts` and set `sample = false`. The preview shows the invented ones, unlabelled, for demos; once `ALLOW_INDEXING=true` is set, a build leaves both sections out until they are real.
 - [ ] Real job photos for the "Im Einsatz" gallery, which currently shows labelled symbol images.
 - [ ] Pages source "GitHub Actions" (see Deploy).
 

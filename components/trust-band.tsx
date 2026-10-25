@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef } from "react";
-import { stats, showTrust } from "@/lib/showcase";
+import { stats } from "@/lib/showcase";
 import { SampleTag } from "@/components/sample-tag";
 import { Stars } from "@/components/stars";
 
@@ -55,7 +55,6 @@ export function TrustBand() {
     };
   }, []);
 
-  if (!showTrust) return null;
   return (
     <section ref={band} className="trust-band" aria-label="L&S in Zahlen">
       <SampleTag className="trust-sample" />

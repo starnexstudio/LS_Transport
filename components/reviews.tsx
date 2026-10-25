@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import { Quote } from "lucide-react";
-import { rating, reviews, showTrust, type Review } from "@/lib/showcase";
+import { rating, reviews, type Review } from "@/lib/showcase";
 import { SampleTag } from "@/components/sample-tag";
 import { Stars } from "@/components/stars";
 
@@ -39,7 +39,6 @@ function ReviewCard({ review, hidden }: { review: Review; hidden?: boolean }) {
 // from assistive technology. With reduced motion the cards stand still in a
 // wrapping grid.
 export function Reviews() {
-  if (!showTrust) return null;
   return (
     <section
       className="section reviews"

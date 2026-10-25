@@ -579,6 +579,10 @@ h2 {
   font-size: 11px;
   color: #cfe6e7b3;
 }
+.footer-credit a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 .skip-link {
   position: fixed;
   top: 8px;

@@ -34,7 +34,9 @@ export function Footer() {
           <a href="#inhalt">Nach oben ↑</a>
         </div>
       </div>
-      <p className="footer-credit">Webdesign von StarNex Studio</p>
+      <p className="footer-credit">
+        Webdesign von <a href="https://starnexstudio.com/">StarNex Studio</a>
+      </p>
     </footer>
   );
 }

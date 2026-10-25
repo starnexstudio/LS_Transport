@@ -9,6 +9,12 @@ import { TrustBand } from "@/components/trust-band";
 import { Gallery } from "@/components/gallery";
 import { Reviews } from "@/components/reviews";
 import { BeforeAfter } from "@/components/before-after";
+import { business } from "@/lib/content";
+import { homeDescription, pageMetadata } from "@/lib/site";
+export const metadata = pageMetadata({
+  description: homeDescription,
+  path: "/",
+});
 const faqs = [
   [
     "Was kostet mein Auftrag?",
@@ -38,7 +44,7 @@ export default function Home() {
         Zum Inhalt springen
       </a>
       <Header />
-      <main id="inhalt">
+      <main id="inhalt" tabIndex={-1}>
         <Hero />
         <TrustBand />
         <ServicesOverview />
@@ -96,10 +102,7 @@ export default function Home() {
               Frage?
             </h2>
             <p>Alles Weitere klären wir gern persönlich mit Ihnen.</p>
-            <a
-              className="text-link"
-              href="mailto:Info@entruempelung-demontage.de"
-            >
+            <a className="text-link" href={`mailto:${business.email}`}>
               Schreiben Sie uns <ArrowUpRight size={18} />
             </a>
           </div>
@@ -126,11 +129,8 @@ export default function Home() {
               für Sie übernehmen?
             </h2>
             <p>Beschreiben Sie es kurz – wir melden uns bei Ihnen.</p>
-            <a
-              className="contact-email"
-              href="mailto:Info@entruempelung-demontage.de"
-            >
-              Info@entruempelung-demontage.de <ArrowUpRight size={18} />
+            <a className="contact-email" href={`mailto:${business.email}`}>
+              {business.email} <ArrowUpRight size={18} />
             </a>
             <ContactActions compact />
             <div className="contact-note">

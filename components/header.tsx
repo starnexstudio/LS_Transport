@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Phone, X } from "lucide-react";
@@ -15,9 +15,20 @@ const links = [
 export function Header() {
   const [open, setOpen] = useState(false);
   const menuButton = useRef<HTMLButtonElement>(null);
+  const header = useRef<HTMLElement>(null);
   const phone = business.phone.trim();
+  // A tap or click anywhere outside the header closes the open menu.
+  useEffect(() => {
+    if (!open) return;
+    const close = (event: PointerEvent) => {
+      if (!header.current?.contains(event.target as Node)) setOpen(false);
+    };
+    document.addEventListener("pointerdown", close);
+    return () => document.removeEventListener("pointerdown", close);
+  }, [open]);
   return (
     <header
+      ref={header}
       className="header"
       onKeyDown={(event) => {
         if (event.key === "Escape" && open) {
@@ -28,12 +39,11 @@ export function Header() {
     >
       <Link className="brand" href="/" aria-label="L&S – zur Startseite">
         <Image
-          src={asset("/images/ls-logo.webp")}
+          src={asset("/images/ls-logo-440.webp")}
           alt="L&S Entrümpelung & Demontagearbeiten"
-          width={897}
-          height={570}
+          width={440}
+          height={280}
           loading="eager"
-          fetchPriority="high"
         />
       </Link>
       <nav

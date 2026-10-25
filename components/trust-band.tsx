@@ -62,7 +62,8 @@ export function TrustBand() {
       <ul className="trust-stats">
         {stats.map((stat) => {
           const shown =
-            stat.text ?? `${format(stat.value ?? 0, stat.decimals)}${stat.suffix ?? ""}`;
+            stat.text ??
+            `${format(stat.value ?? 0, stat.decimals)}${stat.suffix ?? ""}`;
           return (
             <li key={stat.label}>
               <strong>

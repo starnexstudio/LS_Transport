@@ -1,10 +1,62 @@
 [
   {
-    "width": 1440,
+    "state": "1440 /",
     "violations": []
   },
   {
-    "width": 390,
+    "state": "1440 /impressum/",
+    "violations": []
+  },
+  {
+    "state": "1440 /datenschutz/",
+    "violations": []
+  },
+  {
+    "state": "1440 /missing-page/",
+    "violations": []
+  },
+  {
+    "state": "1440 service dialog",
+    "violations": []
+  },
+  {
+    "state": "1440 form errors",
+    "violations": []
+  },
+  {
+    "state": "1440 email draft",
+    "violations": []
+  },
+  {
+    "state": "390 /",
+    "violations": []
+  },
+  {
+    "state": "390 /impressum/",
+    "violations": []
+  },
+  {
+    "state": "390 /datenschutz/",
+    "violations": []
+  },
+  {
+    "state": "390 /missing-page/",
+    "violations": []
+  },
+  {
+    "state": "390 menu open",
+    "violations": []
+  },
+  {
+    "state": "390 service dialog",
+    "violations": []
+  },
+  {
+    "state": "390 form errors",
+    "violations": []
+  },
+  {
+    "state": "390 email draft",
     "violations": []
   }
 ]

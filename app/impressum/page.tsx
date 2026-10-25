@@ -1,13 +1,15 @@
-import Link from "next/link";
-import type { Metadata } from "next";
-export const metadata: Metadata = {
-  title: "Impressum | L&S",
-  robots: { index: false, follow: false },
-};
+import { Subpage } from "@/components/subpage";
+import { business } from "@/lib/content";
+import { pageMetadata } from "@/lib/site";
+export const metadata = pageMetadata({
+  title: "Impressum",
+  description:
+    "Anbieterkennzeichnung von L&S Entrümpelung & Demontagearbeiten: Kontakt und Bildnachweise.",
+  path: "/impressum/",
+});
 export default function Impressum() {
   return (
-    <main id="inhalt" className="legal">
-      <Link href="/">← Zur Startseite</Link>
+    <Subpage>
       <h1>Impressum</h1>
       <div className="legal-note">
         Diese Website befindet sich im Aufbau. Die Anbieterangaben sind noch
@@ -15,10 +17,16 @@ export default function Impressum() {
       </div>
       <h2>L&S Entrümpelung & Demontagearbeiten</h2>
       <p>
-        E-Mail:{" "}
-        <a href="mailto:Info@entruempelung-demontage.de">
-          Info@entruempelung-demontage.de
-        </a>
+        E-Mail: <a href={`mailto:${business.email}`}>{business.email}</a>
+        {business.phone && (
+          <>
+            <br />
+            Telefon:{" "}
+            <a href={`tel:${business.phone.replace(/[^+\d]/g, "")}`}>
+              {business.phone}
+            </a>
+          </>
+        )}
       </p>
       <h2>Noch zu ergänzende Angaben</h2>
       <p>
@@ -28,10 +36,18 @@ export default function Impressum() {
       </p>
       <h2>Bildnachweise</h2>
       <p>
-        Vorher-Nachher-Regler auf der Startseite: Beispielbilder, keine Projekte
-        von L&S; die Nachher-Ansichten wurden bearbeitet. Schlafzimmerfoto:
-        Roger Mommaerts / Flickr (CC).
+        Vorher-Nachher-Vergleiche auf der Startseite: vom Betreiber
+        bereitgestellte Fotos.
       </p>
-    </main>
+      <p>
+        „Im Einsatz“: Symbolbilder, keine Aufnahmen von L&S-Mitarbeitenden oder
+        -Aufträgen. Sechs Bilder wurden mit KI erzeugt; „Möbel geschützt“: MART
+        PRODUCTION / Pexels, „Sorgfältig verpackt“: Ketut Subiyanto / Pexels.
+      </p>
+      <p>
+        Die 3D-Szene oben auf der Startseite ist eine Illustration. Möbel,
+        Oberflächen und Beleuchtung stammen von Poly Haven (CC0).
+      </p>
+    </Subpage>
   );
 }

@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --hostname 0.0.0.0",
+    "dev": "next dev --hostname 0.0.0.0 --port 4173",
+    "preview": "node tests/serve.mjs",
     "build": "next build",
     "typecheck": "tsc --noEmit",
     "test:browser": "node tests/browser-check.mjs",
@@ -12,7 +13,7 @@
   },
   "dependencies": {
     "lucide-react": "^0.468.0",
-    "next": "^16.0.0",
+    "next": "^16.4.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "three": "0.170.0"

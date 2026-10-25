@@ -76,13 +76,17 @@ export function Gallery() {
           </h2>
         </div>
         <p>
-          Wir verpacken, tragen, demontieren und entsorgen – und übergeben
-          die Räumlichkeiten besenrein.
+          Wir verpacken, tragen, demontieren und entsorgen – und übergeben die
+          Räumlichkeiten besenrein.
         </p>
       </div>
       <div className="gallery-grid">
         {tiles.map(({ src, area, label, alt }, i) => (
-          <figure key={area} className="gallery-tile" style={{ gridArea: area }}>
+          <figure
+            key={area}
+            className="gallery-tile"
+            style={{ gridArea: area }}
+          >
             <div className="gallery-media">
               <Image
                 src={asset(src)}
@@ -102,6 +106,9 @@ export function Gallery() {
           </figure>
         ))}
       </div>
+      <p className="gallery-note">
+        Symbolbilder – keine Aufnahmen von L&S-Aufträgen.
+      </p>
     </section>
   );
 }

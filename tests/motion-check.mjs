@@ -1,6 +1,11 @@
 import { chromium } from "@playwright/test";
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
+// The site under test: the dev server, or a production build (BASE_URL).
+const base = (process.env.BASE_URL ?? "http://localhost:4173").replace(
+  /\/$/,
+  "",
+);
 const browser = await chromium.launch({ channel: "chrome", headless: true });
 const context = await browser.newContext({
   viewport: { width: 1440, height: 1000 },
@@ -9,7 +14,7 @@ const context = await browser.newContext({
 const page = await context.newPage();
 const errors = [];
 page.on("pageerror", (error) => errors.push(error.message));
-await page.goto("http://localhost:3000");
+await page.goto(base);
 assert.equal(
   await page
     .locator(".hero-word > span")
@@ -52,7 +57,7 @@ const noScript = await browser.newContext({
   reducedMotion: "reduce",
 });
 const staticPage = await noScript.newPage();
-await staticPage.goto("http://localhost:3000");
+await staticPage.goto(base);
 assert.ok(await staticPage.locator("h1").isVisible());
 assert.ok(await staticPage.locator(".inquiry").isVisible());
 assert.equal(

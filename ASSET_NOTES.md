@@ -2,51 +2,25 @@
 
 `public/images/ls-logo.webp` is the owner-supplied logo on a flat teal background (#00757F). The teal was removed by colour-to-alpha unmixing (no CSS tricks), keeping the white lettering, orange details and dark outlines. It was trimmed to its visible edges with 4 px of padding and exported as 897 × 570 WebP. Because the lettering is white, the logo must sit on teal or other dark surfaces.
 
-`public/images/cleared-room.webp` was generated with the built-in Imagegen tool and converted to WebP for efficient delivery. It is an illustrative scene, not a company project photograph. The website labels it accordingly.
-
-`public/images/vorher.jpg` and `public/images/nachher.jpg` (before/after slider) come from two owner-supplied files, `moving1.jpg` and `moving2.png`:
-
-- `moving1.jpg` is a bedroom full of moving boxes, credited "Roger Mommaerts / Flickr / CC" in its corner. The exact Creative Commons variant could not be verified because the Flickr account is no longer reachable. Confirm that it allows commercial use and modification (no NC or ND clause) before publishing, or replace the pair with the owner's own photos.
-- `moving2.png` is an edited version of the same scene with the boxes removed.
-- Processing: `moving2` was aligned onto `moving1` (SIFT feature matching and a homography, mean error about 1.3 px). Both were cropped to the same 16:9 area, which also removes the corner watermark, and exported at 1600 × 900. The after image's colours were matched to the before image. The website caption credits the photographer and states that the after view is edited.
-- To swap in new photos, keep both files the same size and taken from the same spot.
-
-`public/images/vorher-2.jpg` and `public/images/nachher-2.jpg` (second slider, portrait 3:4) come from the owner-supplied files `movebefore2.jpg` (480 × 640) and `moveafter2.png` (1086 × 1448, an edited version of the same scene):
-
-- Source and licence of the original photo are unknown. Confirm them before publishing.
-- Alignment: a homography (mean error about 1 px). `moveafter2` is effectively the same frame at 2.26× the size.
-- The before photo only has 480 px of real detail, so the after photo was brought to the same detail level. This keeps sharpness equal on both sides of the divider.
-- The after image's colours were matched to the before image.
-- The TV screen was blurred in both images because the before photo showed personal streaming-profile names.
-- Both images were cropped to the same 3:4 area. The crop removes warp edges and a stray object in the bottom-left corner. They were exported at 750 × 1000.
-
 `public/images/showcase/` holds six illustrative photos for the "Im Einsatz" gallery: `loading-van`, `stairwell`, `empty-room`, `dismantling`, `sorting` and `hallway` (WebP, quality 80, at the generated size of 1264 × 848, 848 × 1264 or 1024 × 1024). They were generated with Figma AI (`generate_image`, model gemini-3.1-flash-image) in the Figma file BpwhS8xqHLkMte8zwimTER, Page 1, nodes 87:2 and 88:2 to 92:2. The prompts asked for anonymous workers in plain teal workwear, faces turned away, and no text or logos; the licence plates in the van photo are blank. They do not show L&S staff, vehicles or jobs; replace them with real photos when available.
 
 `public/images/hero-room/icon-menu.svg` is the menu glyph, a vector export from the Figma file (BpwhS8xqHLkMte8zwimTER, Assets section).
 
 `public/hero-3d/` holds the hero's 3D scene assets. The furniture and household models, the surface textures (walls, masonry, parquet, concrete, plywood, tread plate) and the HDRI come from Poly Haven and are CC0 (public domain, `public/hero-3d/LICENSE.txt`). They are compressed copies built by `preview-3d/scripts/build-web-assets.mjs`: models as GLB, simplified to about a quarter of their vertices (within 1 % of their size), with meshopt-compressed geometry and WebP textures (512 px, 256 px for small props); surfaces as 512 px WebP; the HDRI at half size (512 × 256). The room, the removal van with its L&S livery, the moving boxes, the rolled rug and the art print are built in code (`components/hero-scene/`). The `fallback-*.webp` posters are renders of that scene. All of it is illustrative, not company photographs.
 
-## Generation prompt
+## Licensed photos ("Im Einsatz")
 
-Use case: photorealistic-natural. Asset type: editorial hero photograph for a German clearance and furniture dismantling business website. Wide landscape 1536x1024. View through a broad doorway into a bright, freshly emptied European apartment with warm oak parquet, off-white plaster walls, high ceilings and generous windows at right. Foreground right: three tidy cardboard moving boxes with no text, a folded charcoal moving blanket on one box, and a small cordless drill. Left foreground: partial doorframe. A disassembled simple wooden shelving panel leans neatly against the far wall. Calm, credible architectural photography, natural late morning light casting precise geometric shadows, understated warm neutral palette, authentic lived-in material textures. Beautiful spacious composition, no people, no brands, no text, no watermark. Not a luxury showroom, not a construction ruin. This is an illustrative scene, not a documented company project.
+Two of the eight gallery tiles are Pexels photos, shown with responsive CSS cropping and no pixel editing or AI generation:
 
-## Licensed before-and-after photography
+- `public/images/packed-moving-boxes.jpg` ("Sorgfältig verpackt"): Ketut Subiyanto, https://www.pexels.com/photo/empty-apartment-with-packed-carton-boxes-before-moving-4246119/
+- `public/images/wrapped-living-room.jpg` ("Möbel geschützt"): MART PRODUCTION, https://www.pexels.com/photo/furniture-covered-with-plastics-7415019/
+- License: https://www.pexels.com/license/ (website and marketing use permitted; credit not required, given in the Impressum).
 
-`public/images/office-cleanup-comparison.jpg` is the authentic matched home-office comparison “Before and After: Office Cleanup” by Mike McCune.
+The gallery is captioned "Symbolbilder – keine Aufnahmen von L&S-Aufträgen", and the Impressum lists the credits.
 
-- Source: https://www.flickr.com/photos/mccun934/5156498714/
-- Download: https://live.staticflickr.com/4068/5156498714_c2bc95df9a_b.jpg
-- License: Creative Commons Attribution 2.0, https://creativecommons.org/licenses/by/2.0/
-- Verification: the source page's license link points to CC BY 2.0. The author's description confirms clearing and reorganizing the same home office.
-- Presentation: original collage displayed as two CSS-cropped halves; no image content regenerated or retouched. Public captions include author, source, original title, license, cropping notice, and a clear statement that this is not an L&S project.
+## Share image
 
-## Current moving imagery
-
-The office-cleanup collage is no longer used. The homepage now shows these two independently photographed moving-preparation scenes, with no before/after claims:
-
-- `public/images/packed-moving-boxes.jpg`: Ketut Subiyanto, https://www.pexels.com/photo/empty-apartment-with-packed-carton-boxes-before-moving-4246119/
-- `public/images/wrapped-living-room.jpg`: MART PRODUCTION, https://www.pexels.com/photo/furniture-covered-with-plastics-7415019/
-- License: https://www.pexels.com/license/ (website and marketing use permitted). Both source pages mark the images free to use. Local copies are displayed with responsive CSS cropping and photographer credits. No pixel editing or AI generation was used for these photos.
+`public/og-image.jpg` (1200 × 630, for link previews once `SITE_URL` is set) is the hero's `fallback-poster.webp` render and the logo on the brand teal, composed with sharp. Like the scene, it is an illustration.
 
 ## Owner-supplied photos (October 2026)
 
@@ -57,6 +31,10 @@ Supplied in the project folder and exported as WebP (quality 80), without retouc
 | `clearance-before.webp` / `clearance-after.webp` (800 × 1200) | `Before_ Cluttered Room Restoration-2.png`, `Restored view of a cleared room-1.png` | Home page before/after slider |
 | `bathroom-before.webp` / `bathroom-after.webp` (800 × 1067) | `Teal-tiled bathroom before restoration-2.png`, `Exposed Bathroom After Demolition-3.png` | Home page before/after slider |
 
-The origin of these files is not recorded. The site labels them only "Before" and "After" and does not call them L&S projects. If any of them are not genuine L&S jobs, add a note that they are example photos.
+The origin of these files is not recorded. The site labels them only "Vorher" and "Nachher", does not call them L&S projects, and the Impressum credits them as photos provided by the operator. Before launch, the owner must confirm that L&S may publish them; if they are not genuine L&S jobs, label them as example photos on the page.
 
 The service pages and their extra photos (bathtub removal; Pexels disposal and cleaning photos) were removed with those pages. The owner's original `Bathroom demolition with tub removal-1.png` is still in the project folder.
+
+## Removed files
+
+Unused images that were still deployed were deleted in October 2026: `cleared-room.webp`, `vorher.jpg` / `nachher.jpg` (a Flickr photo whose Creative Commons variant could not be verified, plus an edited copy), `vorher-2.jpg` / `nachher-2.jpg` (source and licence unknown) and `office-cleanup-comparison.jpg`. They remain in the git history.

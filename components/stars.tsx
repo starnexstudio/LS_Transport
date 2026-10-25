@@ -22,7 +22,10 @@ export function Stars({
       className={`stars ${className}`}
       {...(decorative
         ? { "aria-hidden": true }
-        : { role: "img", "aria-label": `${value.toLocaleString("de-DE")} von 5 Sternen` })}
+        : {
+            role: "img",
+            "aria-label": `${value.toLocaleString("de-DE")} von 5 Sternen`,
+          })}
     >
       {[0, 1, 2, 3, 4].map((i) => (
         <svg

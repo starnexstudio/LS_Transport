@@ -40,12 +40,15 @@ function webglUsable() {
 export function mountHeroScene({ stage, base = "" }) {
   const hero = stage.closest(".hero");
   const sceneEl = stage.querySelector(".hero-scene");
-  let alive = true, raf = 0;
+  let alive = true, raf = 0, compiling = Promise.resolve();
   const cleanups = [];
   const destroy = () => {
     alive = false;
     cancelAnimationFrame(raf);
-    cleanups.splice(0).reverse().forEach((f) => f());
+    // three.js polls each program until compileAsync settles; disposing the materials
+    // first makes that poll throw (e.g. when the visitor leaves the page mid-load).
+    const run = cleanups.splice(0).reverse();
+    compiling.then(() => run.forEach((f) => f()));
   };
   const fallback = () => { hero.classList.add("no-webgl"); hero.dataset.scene = "fallback"; };
   if (!webglUsable()) { fallback(); return destroy; }
@@ -337,9 +340,10 @@ export function mountHeroScene({ stage, base = "" }) {
     // Each entry: [scene, the scene whose lights it draws with].
     const compile = (target, entries) => {
       renderer.setRenderTarget(target);
-      const all = entries.map(([s, lights]) => renderer.compileAsync(s, camera, lights));
+      const all = Promise.all(entries.map(([s, lights]) => renderer.compileAsync(s, camera, lights)));
       renderer.setRenderTarget(null);
-      return Promise.all(all);
+      compiling = Promise.allSettled([compiling, all]);
+      return all;
     };
     // The shadow-map depth materials, one per variant three.js will make from the scene's
     // materials (side flipped, their map, alpha map and alpha test). Kept alive until the

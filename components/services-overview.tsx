@@ -42,6 +42,8 @@ export function ServicesOverview() {
     );
     dialog.current?.close();
     document.getElementById("anfrage")?.scrollIntoView();
+    // Keyboard and screen reader users continue in the form, not on the card.
+    document.getElementById("service")?.focus({ preventScroll: true });
   }
 
   return (

@@ -4,8 +4,9 @@ import { usePathname } from "next/navigation";
 import { MessageCircle, Phone } from "lucide-react";
 import { business, whatsappGreeting } from "@/lib/content";
 
-// Always-visible quick contact on every page. While the hero's own call and
-// inquiry buttons are on screen it steps aside, so the two never overlap.
+// Quick contact on every page. It steps aside wherever the page shows its own
+// contact buttons (the hero, the inquiry section) and over the footer, so it
+// never covers the form, its buttons or the footer links.
 export function FloatingContact() {
   const phone = business.phone.trim();
   const whatsapp = business.whatsapp.trim();
@@ -13,12 +14,18 @@ export function FloatingContact() {
   const pathname = usePathname();
 
   useEffect(() => {
-    const actions = document.querySelector(".hero-actions");
-    if (!actions || !("IntersectionObserver" in window)) return;
-    const observer = new IntersectionObserver(([entry]) =>
-      setHidden(entry.isIntersecting),
-    );
-    observer.observe(actions);
+    if (!("IntersectionObserver" in window)) return;
+    const onScreen = new Set<Element>();
+    const observer = new IntersectionObserver((entries) => {
+      for (const { target, isIntersecting } of entries) {
+        if (isIntersecting) onScreen.add(target);
+        else onScreen.delete(target);
+      }
+      setHidden(onScreen.size > 0);
+    });
+    document
+      .querySelectorAll(".hero-actions, #anfrage, .footer")
+      .forEach((target) => observer.observe(target));
     return () => {
       observer.disconnect();
       setHidden(false);
@@ -26,7 +33,10 @@ export function FloatingContact() {
   }, [pathname]);
 
   return (
-    <div className={hidden ? "floating-contact is-hidden" : "floating-contact"}>
+    <aside
+      className={hidden ? "floating-contact is-hidden" : "floating-contact"}
+      aria-label="Schnellkontakt"
+    >
       {phone && (
         <a
           className="floating-call"
@@ -47,6 +57,6 @@ export function FloatingContact() {
           <MessageCircle size={24} />
         </a>
       )}
-    </div>
+    </aside>
   );
 }

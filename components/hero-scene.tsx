@@ -46,6 +46,7 @@ export function HeroScene() {
             className="hero-poster"
             src={asset("/hero-3d/fallback-poster.webp")}
             alt=""
+            fetchPriority="high"
           />
         </picture>
       </div>

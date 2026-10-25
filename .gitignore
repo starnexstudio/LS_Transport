@@ -6,6 +6,10 @@ playwright-report/
 *.log
 *.tsbuildinfo
 
+# Local environment files (SITE_URL and the like); never commit secrets
+.env
+.env.*
+
 # 3D preview: dependencies and re-fetchable CC0 assets
 preview-3d/node_modules/
 preview-3d/assets/

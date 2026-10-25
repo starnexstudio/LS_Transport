@@ -2,16 +2,17 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 import { asset } from "@/lib/base-path";
+import { business } from "@/lib/content";
 export function Footer() {
   return (
     <footer className="footer">
       <div className="footer-top">
         <Link href="/" aria-label="L&S – zur Startseite">
           <Image
-            src={asset("/images/ls-logo.webp")}
+            src={asset("/images/ls-logo-440.webp")}
             alt="L&S Entrümpelung & Demontagearbeiten"
-            width={897}
-            height={570}
+            width={440}
+            height={280}
           />
         </Link>
         <p>
@@ -19,13 +20,13 @@ export function Footer() {
           <br />
           <span>Weiterkommen.</span>
         </p>
-        <a href="mailto:Info@entruempelung-demontage.de">
+        <a href={`mailto:${business.email}`}>
           Kontakt aufnehmen <ArrowUpRight size={19} />
         </a>
       </div>
       <div className="footer-bottom">
         <span>
-          © {new Date().getFullYear()} L&S Entrümpelung & Demontagearbeiten
+          © {new Date().getFullYear()} {business.name}
         </span>
         <div>
           <Link href="/impressum">Impressum</Link>

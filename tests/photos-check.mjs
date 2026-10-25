@@ -1,8 +1,12 @@
 import { chromium } from "@playwright/test";
-import AxeBuilder from "@axe-core/playwright";
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
-const base = "http://localhost:3000";
+import { scan } from "./axe.mjs";
+// The site under test: the dev server, or a production build (BASE_URL).
+const base = (process.env.BASE_URL ?? "http://localhost:4173").replace(
+  /\/$/,
+  "",
+);
 const browser = await chromium.launch({ channel: "chrome", headless: true });
 const context = await browser.newContext({
   viewport: { width: 1440, height: 1000 },
@@ -61,14 +65,8 @@ for (const route of ["/services/", "/services/clearance/"]) {
 await page.setViewportSize({ width: 1440, height: 1000 });
 for (const route of ["/", "/impressum/", "/datenschutz/"]) {
   await page.goto(base + route, { waitUntil: "networkidle" });
-  const result = await new AxeBuilder({ page })
-    .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
-    .analyze();
   assert.deepEqual(
-    result.violations.map((v) => ({
-      id: v.id,
-      targets: v.nodes.map((n) => n.target),
-    })),
+    (await scan(page)).map(({ id, targets }) => ({ id, targets })),
     [],
     route,
   );

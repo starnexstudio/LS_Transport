@@ -24,6 +24,8 @@
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 24px;
+  /* Keyboard focus never scrolls under the floating call and WhatsApp buttons. */
+  scroll-padding-bottom: 140px;
 }
 body {
   margin: 0;
@@ -139,6 +141,9 @@ h2 {
 }
 .navigation > a:hover {
   color: #fff;
+}
+.navigation > a {
+  padding-block: 6px;
 }
 .header-actions {
   display: flex;
@@ -459,8 +464,9 @@ h2 {
 }
 .form-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  /* Two fields side by side only where both have room for their placeholders. */
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  column-gap: 16px;
 }
 .form-hint {
   font-size: 11px;
@@ -556,7 +562,17 @@ h2 {
 }
 .footer-bottom > div {
   display: flex;
-  gap: 23px;
+  flex-wrap: wrap;
+  gap: 0 23px;
+}
+.footer-bottom a,
+.footer-top > a:last-child,
+.contact-email {
+  min-height: 24px;
+}
+.footer-bottom a {
+  display: inline-flex;
+  align-items: center;
 }
 .skip-link {
   position: fixed;
@@ -578,6 +594,19 @@ h2 {
 }
 .legal h1 {
   font-size: 44px;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+/* Inner pages: the header sits on a teal band instead of the hero. */
+.subpage-band {
+  background: var(--teal);
+}
+.subpage-band .header {
+  position: relative;
+}
+/* The skip link's target takes focus without drawing a ring around the page. */
+main:focus {
+  outline: none;
 }
 .legal h2 {
   font-size: 23px;
@@ -587,7 +616,7 @@ h2 {
   margin: 15px 0;
   color: var(--muted);
 }
-.legal a {
+.legal a:not(.button) {
   text-decoration: underline;
 }
 .legal-note {
@@ -915,50 +944,4 @@ h2 {
 }
 .direct-contact svg {
   flex-shrink: 0;
-}
-.comparison-pair {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-.comparison-photo {
-  position: relative;
-  aspect-ratio: 1.5;
-  overflow: hidden;
-  background: #ddd;
-}
-.comparison-photo img {
-  position: absolute;
-  width: 100%;
-  height: 200%;
-  max-width: none;
-  object-fit: fill;
-}
-.comparison-before img {
-  top: 0;
-}
-.comparison-after img {
-  bottom: 0;
-}
-.comparison-photo > span {
-  position: absolute;
-  top: 15px;
-  left: 15px;
-  padding: 7px 14px;
-  font-size: 13px;
-  font-weight: 650;
-  background: var(--paper);
-  color: var(--ink);
-}
-.comparison-after > span {
-  background: var(--orange);
-}
-@media (max-width: 760px) {
-  .comparison-pair {
-    grid-template-columns: 1fr;
-  }
-  .comparison-photo > span {
-    top: 10px;
-    left: 10px;
-  }
 }

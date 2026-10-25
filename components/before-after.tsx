@@ -50,10 +50,7 @@ export function BeforeAfter() {
           <br />
           <span>Räumungsabschluss.</span>
         </h2>
-        <p>
-          Echte Räume, echte Ergebnisse: vom ersten Karton bis zur besenreinen
-          Übergabe.
-        </p>
+        <p>Vom ersten Karton bis zur besenreinen Übergabe.</p>
         <div
           className="ba-tabs"
           role="tablist"
@@ -86,7 +83,7 @@ export function BeforeAfter() {
           ))}
         </div>
       </div>
-      <figure
+      <div
         className="ba-stage"
         id="ba-panel"
         role="tabpanel"
@@ -100,7 +97,7 @@ export function BeforeAfter() {
             after: project.pair.after,
           }}
         />
-        <figcaption className="ba-meta">
+        <div className="ba-meta">
           <span className="ba-meta-project">
             <strong>{project.label}</strong>
             {project.title}
@@ -112,8 +109,8 @@ export function BeforeAfter() {
             <ChevronsLeftRight size={16} />
             Regler ziehen zum Vergleichen
           </span>
-        </figcaption>
-      </figure>
+        </div>
+      </div>
       <a href="#anfrage" className="button button-orange ba-cta">
         Unverbindlich anfragen <ArrowRight size={18} />
       </a>

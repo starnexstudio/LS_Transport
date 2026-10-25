@@ -1066,7 +1066,8 @@ html:has(.service-dialog[open]) {
   gap: 12px;
   transition:
     opacity 250ms,
-    transform 250ms;
+    transform 250ms,
+    visibility 250ms;
 }
 .floating-contact.is-hidden {
   opacity: 0;

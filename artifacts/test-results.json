@@ -10,16 +10,19 @@
   "checks": [
     "German language",
     "No horizontal overflow",
-    "Mobile navigation",
-    "Service tabs",
-    "Keyboard navigation",
+    "Skip link focus",
+    "Service request focuses the form",
+    "Floating contact steps aside over the form",
+    "Mobile navigation (also closes on an outside tap)",
+    "Required fields exposed",
     "Service preselection",
-    "German validation",
+    "Form validation",
     "Email draft contents",
     "FAQ expansion",
     "Image loading",
-    "Legal routes",
-    "German 404",
+    "Legal routes with header and footer, no overflow at 320px",
+    "Custom 404 with header",
+    "Unique page titles",
     "No runtime exceptions"
   ]
 }

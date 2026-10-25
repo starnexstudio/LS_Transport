@@ -11,7 +11,7 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:3000. The public interface is in German (`<html lang="de">`); source code and documentation are in English.
+Open http://localhost:4173. The public interface is in German (`<html lang="de">`); source code and documentation are in English.
 
 ## Production
 
@@ -19,20 +19,22 @@ Open http://localhost:3000. The public interface is in German (`<html lang="de">
 npm run build
 ```
 
-The static website is exported to `out/`. Deploy that directory with any static host. No backend, database, external form service, or runtime secrets are needed. Fonts are downloaded at build time by `next/font` and served locally. Images are local and rendered through `next/image` with static-export-compatible settings.
+The static website is exported to `out/`. Deploy that directory with any static host. No backend, database, external form service, or runtime secrets are needed. Two build variables set the public address and whether search engines may list the site (`SITE_URL`, `ALLOW_INDEXING`); without them the build is a noindex preview. Deployment, configuration, rollback and the launch checklist are in `DEPLOYMENT.md`. Fonts are downloaded at build time by `next/font` and served locally. Images are local and rendered through `next/image` with static-export-compatible settings.
 
 ## Verification
 
-With the development server running and Google Chrome installed:
+With the development server running (or a production build served by `npm run preview`, see `DEPLOYMENT.md`) and Google Chrome installed:
 
 ```sh
 node tests/browser-check.mjs
 node tests/accessibility-check.mjs
 node tests/photos-check.mjs
+node tests/motion-check.mjs
 npm run typecheck
+npx prettier --check app components lib tests
 ```
 
-The browser checks cover responsive overflow, navigation, service preselection, form validation, generated mailto contents, FAQ expansion, local image loading, legal pages, the custom 404 page, and runtime exceptions. Screenshots and machine-readable results are saved under `artifacts/`.
+The tests read the site's address from `BASE_URL` (default http://localhost:4173). The browser checks cover responsive overflow, the skip link, navigation and the mobile menu, service preselection and focus, form validation and required fields, generated mailto contents, FAQ expansion, image loading, the legal pages and the custom 404 page with header and footer, unique page titles, and runtime exceptions. The accessibility check runs axe (WCAG 2.2 A/AA and best practices) on every page and on the open menu, service dialog, form errors and email draft; it covers only what automated tools can detect. Screenshots and machine-readable results are saved under `artifacts/`.
 
 ## Project structure
 
@@ -40,9 +42,10 @@ The browser checks cover responsive overflow, navigation, service preselection, 
 - `components/`: shared header, hero (pinned scroll stage with the 3D scene, `components/hero-scene/`), before/after comparisons, footer, and inquiry form.
 - `lib/content.ts`: confirmed contact information and service content.
 - `lib/showcase.ts`: key numbers, rating and reviews for the stats band and the reviews section (sample content, see below).
-- `public/images/`: original supplied logo and generated editorial illustration.
+- `lib/site.ts`: public address, indexing switch and per-page metadata (canonical, Open Graph).
+- `public/images/`: the supplied logo, before/after photos and the "Im Einsatz" gallery (provenance in `ASSET_NOTES.md`).
 - `public/hero-3d/`: the hero scene's compressed CC0 models, textures, HDRI and posters (built by `preview-3d/scripts/build-web-assets.mjs`).
-- `tests/`: browser and accessibility checks.
+- `tests/`: browser, accessibility, photo and motion checks; `serve.mjs` serves a production build like GitHub Pages.
 
 ## Inquiry behavior
 
@@ -53,9 +56,9 @@ The form validates locally and prepares an email draft. It never reports that a 
 - Supply the legal owner's full name, legal entity where applicable, service address, and any applicable registration or tax details.
 - Complete and review the legal notice and privacy policy against the actual hosting and email processing arrangements. Current legal routes explicitly identify their incomplete status.
 - Confirm the remaining pricing brief: the supplied request ended after “individual price after”. Current public wording only promises an individually agreed price.
-- Remove `robots: { index: false, follow: false }` when the website is approved for publication. Add the actual canonical domain once confirmed.
+- Set `SITE_URL` (the confirmed public address) and `ALLOW_INDEXING=true` when the website is approved for publication; see `DEPLOYMENT.md`.
 - Replace the sample reviews, numbers and rating in `lib/showcase.ts` with real ones and set `sample` to `false`; until then those sections stay out of the build.
-- Replace the illustrative image with authorized business photography if available. The existing image is clearly labeled as illustrative and is not presented as a completed company project.
+- Replace the "Im Einsatz" symbol images with authorized business photography if available. They are labeled "Symbolbilder" and credited in the Impressum.
 
 No phone number, street address, certifications, reviews, fixed prices, or project statistics were invented. No analytics, tracking scripts, cookie storage, or remotely embedded maps are used.
 
@@ -63,7 +66,7 @@ No phone number, street address, certifications, reviews, fixed prices, or proje
 
 The site has three pages: the home page, `/impressum` and `/datenschutz`, plus the 404 page. The home page holds everything else: services, before/after sliders (`components/compare-slider.tsx`, photos in `lib/gallery.ts`), FAQ and the inquiry form.
 
-Phone and WhatsApp links are implemented in `components/contact-actions.tsx`. Set `business.phone` and `business.whatsapp` in `lib/content.ts` to the confirmed international numbers. These values deliberately remain empty until supplied by the owner; the corresponding controls stay hidden to avoid publishing fabricated numbers or broken destinations. Call links use `tel:`; WhatsApp links use `wa.me` with a prefilled message (`whatsappGreeting` in `lib/content.ts`) and open only after a visitor clicks. No WhatsApp script is embedded.
+Phone and WhatsApp links are implemented in `components/contact-actions.tsx` and `components/floating-contact.tsx`. They use `business.phone` and `business.whatsapp` in `lib/content.ts` (the owner's number); if either is emptied, its controls disappear rather than link to a wrong destination. Call links use `tel:`; WhatsApp links use `wa.me` with a prefilled message (`whatsappGreeting` in `lib/content.ts`) and open only after a visitor clicks. No WhatsApp script is embedded.
 
 The "Im Einsatz" gallery shows six photos generated in Figma and two licensed Pexels photographs of packed moving boxes and protected living-room furniture. They are not L&S projects. See `ASSET_NOTES.md` for provenance.
 

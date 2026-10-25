@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight, Check, Copy, Mail } from "lucide-react";
 import { services, business } from "@/lib/content";
 export function Inquiry({ initialService = "" }: { initialService?: string }) {
@@ -7,6 +7,7 @@ export function Inquiry({ initialService = "" }: { initialService?: string }) {
   const [draft, setDraft] = useState("");
   const [copied, setCopied] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const draftText = useRef<HTMLDetailsElement>(null);
   useEffect(() => {
     const handler = (e: Event) => setService((e as CustomEvent<string>).detail);
     window.addEventListener("service-select", handler);
@@ -33,6 +34,7 @@ export function Inquiry({ initialService = "" }: { initialService?: string }) {
     );
     setCopied(false);
   }
+  const mailto = `mailto:${business.email}?subject=${encodeURIComponent("Angebotsanfrage – " + service)}&body=${encodeURIComponent(draft)}`;
   return (
     <form className="inquiry" noValidate onSubmit={submit}>
       <div className="form-heading">
@@ -44,6 +46,7 @@ export function Inquiry({ initialService = "" }: { initialService?: string }) {
         id="service"
         name="service"
         value={service}
+        required
         onChange={(e) => {
           setService(e.target.value);
           setDraft("");
@@ -70,6 +73,7 @@ export function Inquiry({ initialService = "" }: { initialService?: string }) {
             name="name"
             autoComplete="name"
             maxLength={120}
+            required
             placeholder="Vor- und Nachname"
             aria-invalid={!!errors.name}
             aria-describedby={errors.name ? "name-error" : undefined}
@@ -88,6 +92,7 @@ export function Inquiry({ initialService = "" }: { initialService?: string }) {
             name="place"
             autoComplete="address-level2"
             maxLength={160}
+            required
             placeholder="PLZ und Ort"
             aria-invalid={!!errors.place}
             aria-describedby={errors.place ? "place-error" : undefined}
@@ -106,6 +111,7 @@ export function Inquiry({ initialService = "" }: { initialService?: string }) {
         name="message"
         rows={3}
         maxLength={2500}
+        required
         placeholder="Was ist zu tun? Ungefähre Menge, Stockwerk und Wunschtermin …"
         aria-invalid={!!errors.message}
         aria-describedby={errors.message ? "message-error" : undefined}
@@ -134,10 +140,7 @@ export function Inquiry({ initialService = "" }: { initialService?: string }) {
             kopieren Sie den Text. Dort können Sie auch Fotos anhängen.
           </p>
           <div className="draft-actions">
-            <a
-              className="text-link"
-              href={`mailto:${business.email}?subject=${encodeURIComponent("Angebotsanfrage – " + service)}&body=${encodeURIComponent(draft)}`}
-            >
+            <a className="text-link" href={mailto}>
               <Mail size={16} /> E-Mail öffnen
             </a>
             <button
@@ -148,11 +151,17 @@ export function Inquiry({ initialService = "" }: { initialService?: string }) {
                   await navigator.clipboard.writeText(draft);
                   setCopied(true);
                 } catch {
+                  // Show the text, selected, so it can be copied by hand.
                   setCopied(false);
                   setErrors({
                     ...errors,
-                    copy: "Kopieren ist nicht möglich. Bitte markieren Sie den Text im Feld unten.",
+                    copy: "Kopieren ist hier nicht möglich. Der Text ist unten markiert – kopieren Sie ihn mit Strg+C (Mac: ⌘+C).",
                   });
+                  const details = draftText.current;
+                  if (details) {
+                    details.open = true;
+                    details.querySelector("textarea")?.select();
+                  }
                 }
               }}
             >
@@ -160,7 +169,14 @@ export function Inquiry({ initialService = "" }: { initialService?: string }) {
               {copied ? "Text kopiert" : "Text kopieren"}
             </button>
           </div>
-          <details>
+          {mailto.length > 1800 && (
+            <p>
+              Bei sehr langen Nachrichten übernehmen manche E-Mail-Programme
+              nicht den ganzen Text. Prüfen Sie den Entwurf oder kopieren Sie
+              den Text.
+            </p>
+          )}
+          <details ref={draftText}>
             <summary>Anfragetext anzeigen</summary>
             <textarea
               aria-label="Vorbereiteter Anfragetext"

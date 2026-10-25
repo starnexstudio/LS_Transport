@@ -8,6 +8,6 @@ const nextConfig: NextConfig = {
   devIndicators: false,
   // The dev server only serves its scripts to localhost by default; without this,
   // a page opened at 127.0.0.1 never starts (no hero scene, no buttons).
-  allowedDevOrigins: ["127.0.0.1"],
+  allowedDevOrigins: ["https://ls-entruempelung-demontage.de/"],
 };
 export default nextConfig;

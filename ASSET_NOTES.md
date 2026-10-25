@@ -20,7 +20,7 @@ The gallery is captioned "Symbolbilder – keine Aufnahmen von L&S-Aufträgen", 
 
 ## Share image
 
-`public/og-image.jpg` (1200 × 630, for link previews once `SITE_URL` is set) is the hero's `fallback-poster.webp` render and the logo on the brand teal, composed with sharp. Like the scene, it is an illustration.
+`public/og-logo.jpg` (1200 × 630, the link preview once `SITE_URL` is set) is `ls-logo.webp` at 560 px wide, centred on the brand teal (#00757F) with a soft centre glow, composed with sharp. The logo stays inside the central 630 × 630 square, which WhatsApp and other apps crop small previews to. It replaces `og-image.jpg` (the hero scene); the new name makes apps that cached the old preview fetch the new image.
 
 ## Owner-supplied photos (October 2026)
 

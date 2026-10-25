@@ -574,6 +574,11 @@ h2 {
   display: inline-flex;
   align-items: center;
 }
+.footer-credit {
+  margin-top: 14px;
+  font-size: 11px;
+  color: #cfe6e7b3;
+}
 .skip-link {
   position: fixed;
   top: 8px;

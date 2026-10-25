@@ -5,20 +5,20 @@ Status on 25 October 2026: **ready after the configuration listed below.** The c
 ## How the site is built and hosted
 
 - Next.js 16 with `output: "export"`: `npm run build` writes a fully static site to `out/`. There is no server code, database, form backend or runtime secret.
-- `.github/workflows/deploy.yml` builds on every push to `main` (and on a manual run) with Node 24 on Ubuntu, runs the typecheck, and publishes `out/` to GitHub Pages: https://starnexstudio.github.io/LS_Transport/
-- The workflow passes the Pages base path (`/LS_Transport`) as `NEXT_PUBLIC_BASE_PATH`. With a custom domain the base path becomes empty on its own.
+- `.github/workflows/deploy.yml` builds on every push to `main` (and on a manual run) with Node 24 on Ubuntu, runs the typecheck, and publishes `out/` to GitHub Pages: https://ls-entruempelung-demontage.de (the old address https://starnexstudio.github.io/LS_Transport/ redirects there).
+- The workflow passes the Pages base path as `NEXT_PUBLIC_BASE_PATH`: empty while the custom domain is set, `/LS_Transport` without it. It is baked into every page and file URL at build time, so after adding, changing or removing the domain the workflow must run again. A build made before the domain was connected loads its CSS, scripts and images from `/LS_Transport/…`, which do not exist on the domain: the page shows up unstyled.
 
 ## Configuration
 
 | Variable | Where | Value | Effect |
 |---|---|---|---|
 | `NEXT_PUBLIC_BASE_PATH` | set by the workflow | `/LS_Transport` on github.io, empty on a custom domain | Prefix for all pages and files. |
-| `SITE_URL` | repository variable | The public address including the base path, without a trailing slash, e.g. `https://starnexstudio.github.io/LS_Transport` or `https://www.example.de` | Adds canonical links, Open Graph tags with the share image (`public/og-image.jpg`) and absolute URLs. The build stops if it does not end with the base path. Unset: no absolute URLs are published. |
+| `SITE_URL` | repository variable, defaults to `https://ls-entruempelung-demontage.de` in the workflow | The public address including the base path, without a trailing slash | Adds canonical links, Open Graph tags with the share image (`public/og-image.jpg`) and absolute URLs. The build stops if it does not end with the base path, so a CI build without the custom domain fails instead of deploying a site with the wrong prefix. Unset in a local build: no absolute URLs are published. |
 | `ALLOW_INDEXING` | repository variable | `true` only after launch approval | With `SITE_URL` set: removes `noindex`, fills `sitemap.xml` and names it in `robots.txt`. Otherwise every page is `noindex` and the sitemap is empty. |
 
 Repository variables are under Settings → Secrets and variables → Actions → Variables. They are not secrets; nothing in this site needs one. Contact details (email, phone, WhatsApp) are in `lib/content.ts`.
 
-`robots.txt` takes effect only at the root of a domain, so on `starnexstudio.github.io/LS_Transport/` only the `noindex` tags keep the preview out of search results. `robots.txt` always allows crawling, so crawlers can see those tags.
+`robots.txt` takes effect only at the root of a domain; it does on the custom domain. `robots.txt` always allows crawling, so crawlers can see those tags.
 
 ## Deploy
 
@@ -30,23 +30,27 @@ The repository's Pages source is still "Deploy from a branch". GitHub then also 
 
 ### Custom domain
 
+The site is live at https://ls-entruempelung-demontage.de (set under Settings → Pages → Custom domain, HTTPS enforced). Because the site deploys through GitHub Actions, the domain is stored in the repository's Pages settings, not in a `CNAME` file. To change it:
+
 1. Settings → Pages → Custom domain: enter the domain, then create the DNS records GitHub shows (CNAME for `www`, A/AAAA records for the apex).
 2. Once the certificate is issued, enable "Enforce HTTPS".
-3. Set `SITE_URL` to `https://<domain>` (no base path) and re-run the workflow.
+3. Set the `SITE_URL` repository variable to `https://<domain>` (no base path), or change the default in `deploy.yml`, and re-run the workflow.
 
 ## Check a build locally
 
-Use the same base path as GitHub Pages and serve `out/` on port 4173 (stop the dev server first). In Git Bash, prefix each command with `MSYS_NO_PATHCONV=1`, or it rewrites `/LS_Transport` into a Windows path.
+Build like CI does for the custom domain (no base path) and serve `out/` at the root on port 4173 (stop the dev server first).
 
 ```sh
-NEXT_PUBLIC_BASE_PATH=/LS_Transport npm run build
-BASE_PATH=/LS_Transport npm run preview
+SITE_URL=https://ls-entruempelung-demontage.de npm run build
+npm run preview
 ```
+
+For a build under a subpath, add `NEXT_PUBLIC_BASE_PATH=/LS_Transport` to the build and `BASE_PATH=/LS_Transport` to the preview (in Git Bash prefix each with `MSYS_NO_PATHCONV=1`, or it rewrites the path).
 
 Then, in a second terminal:
 
 ```sh
-export BASE_URL=http://localhost:4173/LS_Transport
+export BASE_URL=http://localhost:4173
 node tests/browser-check.mjs
 node tests/accessibility-check.mjs
 node tests/photos-check.mjs
@@ -70,7 +74,7 @@ Required before the site is public under the business's name:
 - [ ] Datenschutz: the responsible party, the final hosting and email providers, legal bases, retention periods and data-subject rights, reviewed by someone qualified (`app/datenschutz/page.tsx`). It currently names GitHub Pages as the preview host.
 - [ ] Confirm that L&S may publish the before/after photos (`ASSET_NOTES.md`, "Owner-supplied photos"); their origin is not recorded. If they are not L&S jobs, label them as example photos.
 - [ ] Confirm these statements or have them changed: "Rund um die Uhr erreichbar" (contact section and FAQ), "Deutschlandweit nach Absprache" (FAQ, meta description), and "Kostenlose Besichtigung vor Ort" on the 3D van and its poster images (`components/hero-scene/truck.js`; changing it means re-rendering the posters).
-- [ ] Decide the domain, then set `SITE_URL`; set `ALLOW_INDEXING=true` once the items above are done.
+- [x] Domain: https://ls-entruempelung-demontage.de (`SITE_URL`). Set `ALLOW_INDEXING=true` once the items above are done.
 
 Optional:
 

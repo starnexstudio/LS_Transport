@@ -575,13 +575,21 @@ h2 {
   align-items: center;
 }
 .footer-credit {
-  margin-top: 14px;
-  font-size: 11px;
-  color: #cfe6e7b3;
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid #ffffff1a;
+  text-align: center;
+  font-size: 14px;
+  color: var(--teal-pale);
 }
 .footer-credit a {
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  font-weight: 700;
+  color: var(--paper);
+  text-decoration: underline 2px var(--orange);
+  text-underline-offset: 4px;
+}
+.footer-credit a:hover {
+  color: var(--orange-hover);
 }
 .skip-link {
   position: fixed;

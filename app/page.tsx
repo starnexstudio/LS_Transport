@@ -139,9 +139,9 @@ export default function Home() {
             <div className="contact-note">
               <span className="status-dot" />
               <span>
-                Rund um die Uhr erreichbar
+                {business.address.city}
                 <br />
-                <small>Deutschland – Einsatzgebiet nach Absprache</small>
+                <small>{business.address.country}</small>
               </span>
             </div>
           </div>

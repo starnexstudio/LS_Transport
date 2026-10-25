@@ -31,7 +31,7 @@ export const stats: Stat[] = [
   { text: "24/7", label: "erreichbar – auch am Wochenende" },
 ];
 
-export const rating = { score: 4.9, count: 127, source: "Google" };
+export const rating = { score: 4.9, count: 9, source: "Google" };
 
 export type Review = {
   name: string;

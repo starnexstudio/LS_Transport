@@ -51,9 +51,9 @@ export function Reviews() {
             KUNDENSTIMMEN <SampleTag />
           </span>
           <h2 id="reviews-title">
-            Geräumt.
+            Glauben Sie
             <br />
-            <span>Und gern weiterempfohlen.</span>
+            <span>nicht nur uns.</span>
           </h2>
         </div>
         <div className="reviews-score">

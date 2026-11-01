@@ -526,9 +526,8 @@ h2 {
 .footer-bottom {
   border-top: 1px solid #ffffff2e;
   padding-top: 22px;
-  /* Copyright left, credit centred, links right. */
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  display: flex;
+  justify-content: space-between;
   align-items: center;
   gap: 20px;
   font-size: 10px;
@@ -550,11 +549,12 @@ h2 {
   align-items: center;
 }
 .footer-credit {
+  margin: 14px 0 0;
   text-align: center;
-  font-size: 14px;
-  color: var(--teal-pale);
+  font-size: 11px;
+  color: #8cabad;
 }
-/* Too narrow for three columns: stack them, credit between copyright and links. */
+/* Stack copyright and legal links when space is limited. */
 @media (max-width: 1100px) {
   .footer-bottom {
     display: flex;
@@ -565,18 +565,18 @@ h2 {
   .footer-bottom > div {
     justify-content: flex-start;
   }
-  .footer-credit {
-    text-align: left;
-  }
 }
 .footer-credit a {
-  font-weight: 700;
-  color: var(--paper);
-  text-decoration: underline 2px var(--orange);
-  text-underline-offset: 4px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  font-weight: 500;
 }
-.footer-credit a:hover {
-  color: var(--orange-hover);
+.footer-credit a:hover,
+.footer-credit a:focus-visible {
+  color: var(--paper);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 .skip-link {
   position: fixed;

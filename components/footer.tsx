@@ -33,7 +33,7 @@ export function Footer() {
       </div>
       <div className="footer-bottom">
         <span>
-          © {new Date().getFullYear()} {business.name}
+          © {new Date().getFullYear()} {business.name} Alle Rechte vorbehalten.
         </span>
         <div>
           <Link href="/impressum">Impressum</Link>

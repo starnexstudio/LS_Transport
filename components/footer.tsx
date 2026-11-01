@@ -43,7 +43,7 @@ export function Footer() {
       </div>
       <p className="footer-credit">
         <a href="https://starnexstudio.com/">
-          <CodeXml size={18} strokeWidth={2.5} aria-hidden="true" />
+          <CodeXml size={12} strokeWidth={2.5} aria-hidden="true" />
           <span>Website by StarNex Studio</span>
         </a>
       </p>

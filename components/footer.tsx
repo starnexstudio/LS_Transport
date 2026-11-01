@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowUpRight, Phone } from "lucide-react";
+import { ArrowUpRight, CodeXml, Phone } from "lucide-react";
 import { asset } from "@/lib/base-path";
 import { business } from "@/lib/content";
 export function Footer() {
@@ -42,8 +42,10 @@ export function Footer() {
         </div>
       </div>
       <p className="footer-credit">
-        Website gestaltet von{" "}
-        <a href="https://starnexstudio.com/">StarNex Studio</a>
+        <a href="https://starnexstudio.com/">
+          <CodeXml size={18} strokeWidth={2.5} aria-hidden="true" />
+          <span>Website by StarNex Studio</span>
+        </a>
       </p>
     </footer>
   );

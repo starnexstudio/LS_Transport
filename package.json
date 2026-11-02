@@ -7,6 +7,7 @@
     "preview": "node tests/serve.mjs",
     "build": "next build",
     "typecheck": "tsc --noEmit",
+    "test:seo": "node tests/seo-check.mjs",
     "test:browser": "node tests/browser-check.mjs",
     "test:accessibility": "node tests/accessibility-check.mjs",
     "format": "prettier --write app components lib tests"

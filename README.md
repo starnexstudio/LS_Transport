@@ -19,7 +19,7 @@ Open http://localhost:4173. The public interface is in German (`<html lang="de">
 npm run build
 ```
 
-The static website is exported to `out/`. Deploy that directory with any static host. No backend, database, external form service, or runtime secrets are needed. Two build variables set the public address and whether search engines may list the site (`SITE_URL`, `ALLOW_INDEXING`); without them the build is a noindex preview. Deployment, configuration, rollback and the launch checklist are in `DEPLOYMENT.md`. Fonts are downloaded at build time by `next/font` and served locally. Images are local and rendered through `next/image` with static-export-compatible settings.
+The static website is exported to `out/`. Deploy that directory with any static host. No backend, database, external form service, or runtime secrets are needed. Two build variables set the public address and whether search engines may list the site (`SITE_URL`, `ALLOW_INDEXING`); without them the build is a noindex preview. The GitHub Pages production workflow explicitly sets the production domain and `ALLOW_INDEXING=true`, then runs `npm run test:seo` before publishing. Deployment, configuration, rollback and the launch checklist are in `DEPLOYMENT.md`. Fonts are downloaded at build time by `next/font` and served locally. Images are local and rendered through `next/image` with static-export-compatible settings.
 
 ## Verification
 
@@ -56,7 +56,7 @@ The form validates locally. Its only action, "Senden", opens WhatsApp in a new t
 - Confirm the business details in `lib/content.ts`, including any applicable registration details and the type of the supplied tax reference.
 - Complete and review the legal notice and privacy policy against the actual hosting and email processing arrangements. The German legal notice lists the supplied business name, owner, address, tax reference and contact details.
 - Confirm the remaining pricing brief: the supplied request ended after “individual price after”. Current public wording only promises an individually agreed price.
-- Set `SITE_URL` (the confirmed public address) and `ALLOW_INDEXING=true` when the website is approved for publication; see `DEPLOYMENT.md`.
+- For manual production builds, set `SITE_URL=https://ls-entruempelung-demontage.de`, `ALLOW_INDEXING=true` and an empty `NEXT_PUBLIC_BASE_PATH`, then run `npm run test:seo`; see `DEPLOYMENT.md`. The production workflow already supplies these settings; keep indexing disabled for previews.
 - Replace the sample reviews, numbers and rating in `lib/showcase.ts` with real ones and set `sample` to `false`; until then those sections stay out of the build.
 - Replace the "Im Einsatz" symbol images with authorized business photography if available. Image provenance is recorded in `ASSET_NOTES.md`; source notes are not displayed on the site.
 

@@ -1,11 +1,11 @@
 # Deployment and production readiness
 
-Status on 25 October 2026: **ready after the configuration listed below.** The code, build and deployment path are ready, and the site can keep running as a preview. Before it goes public under the business's name, the owner must supply the legal details for the Impressum and Datenschutz pages and confirm the items in the launch checklist. Until then every page carries `noindex`.
+Indexing configuration updated on 2 November 2026: the production workflow explicitly enables indexing for the public site. Local and preview builds remain `noindex` unless explicitly enabled. The owner checklist below remains a content review checklist; it no longer controls production indexing through an optional repository variable.
 
 ## How the site is built and hosted
 
 - Next.js 16 with `output: "export"`: `npm run build` writes a fully static site to `out/`. There is no server code, database, form backend or runtime secret.
-- `.github/workflows/deploy.yml` builds on every push to `main` (and on a manual run) with Node 24 on Ubuntu, runs the typecheck, and publishes `out/` to GitHub Pages: https://ls-entruempelung-demontage.de (the old address https://starnexstudio.github.io/LS_Transport/ redirects there).
+- `.github/workflows/deploy.yml` builds on every push to `main` (and on a manual run) with Node 24 on Ubuntu, runs the typecheck and exported SEO checks, and publishes `out/` to GitHub Pages: https://ls-entruempelung-demontage.de (the old address https://starnexstudio.github.io/LS_Transport/ redirects there).
 - The workflow passes the Pages base path as `NEXT_PUBLIC_BASE_PATH`: empty while the custom domain is set, `/LS_Transport` without it. It is baked into every page and file URL at build time, so after adding, changing or removing the domain the workflow must run again. A build made before the domain was connected loads its CSS, scripts and images from `/LS_Transport/…`, which do not exist on the domain: the page shows up unstyled.
 
 ## Configuration
@@ -13,10 +13,10 @@ Status on 25 October 2026: **ready after the configuration listed below.** The c
 | Variable | Where | Value | Effect |
 |---|---|---|---|
 | `NEXT_PUBLIC_BASE_PATH` | set by the workflow | `/LS_Transport` on github.io, empty on a custom domain | Prefix for all pages and files. |
-| `SITE_URL` | repository variable, defaults to `https://ls-entruempelung-demontage.de` in the workflow | The public address including the base path, without a trailing slash | Adds canonical links, Open Graph tags with the share image (`public/og-share.jpg`) and absolute URLs. The build stops if it does not end with the base path, so a CI build without the custom domain fails instead of deploying a site with the wrong prefix. Unset in a local build: no absolute URLs are published. |
-| `ALLOW_INDEXING` | repository variable | `true` only after launch approval | With `SITE_URL` set: removes `noindex`, fills `sitemap.xml` and names it in `robots.txt`. Otherwise every page is `noindex` and the sitemap is empty. |
+| `SITE_URL` | explicit production workflow setting; environment for local/preview builds | `https://ls-entruempelung-demontage.de` in production, without a base path | Adds canonical links, Open Graph tags with the share image (`public/og-share.jpg`) and absolute URLs. The build stops if its path differs from `NEXT_PUBLIC_BASE_PATH`. The export check also rejects an incorrect production domain or an obsolete `/LS_Transport` prefix. Unset in a local build: no absolute URLs are published. |
+| `ALLOW_INDEXING` | explicit production workflow setting; environment for local/preview builds | `"true"` in production; unset or `false` for previews | With `SITE_URL` set: permits indexing of public pages, fills `sitemap.xml` and names it in `robots.txt`. Otherwise every page is `noindex` and the sitemap is empty. The 404 and standalone 3D preview keep their own `noindex`. |
 
-Repository variables are under Settings → Secrets and variables → Actions → Variables. They are not secrets; nothing in this site needs one. Contact details (email, phone, WhatsApp) are in `lib/content.ts`.
+The production workflow no longer reads repository variables named `SITE_URL` or `ALLOW_INDEXING`; stale or missing values there cannot silently publish the wrong indexing policy. These settings are evaluated during the static build, so changing an environment setting requires a fresh build and deployment. Contact details (email, phone, WhatsApp) are in `lib/content.ts`.
 
 `robots.txt` takes effect only at the root of a domain; it does on the custom domain. `robots.txt` always allows crawling, so crawlers can see those tags.
 
@@ -25,6 +25,7 @@ Repository variables are under Settings → Secrets and variables → Actions �
 1. Make the change on a branch, run the checks below, and merge or push to `main`.
 2. The "Deploy to GitHub Pages" workflow builds and publishes. Follow it under Actions; the deploy job links the live URL.
 3. Open the live site and check the home page, `/impressum/`, `/datenschutz/` and a missing page (it must return the 404 page).
+4. Inspect the live HTML and response headers: public pages must have no `noindex`/`none` in robots or Googlebot metadata and no restrictive `X-Robots-Tag`. Confirm root-domain canonical URLs, `/robots.txt` with `Allow: /` and `Sitemap: https://ls-entruempelung-demontage.de/sitemap.xml`, and all three public URLs in `/sitemap.xml`. Only after this verification, use Search Console's live URL test and request indexing of the homepage; submit the sitemap. Google decides when to crawl and index it.
 
 The repository's Pages source is still "Deploy from a branch". GitHub then also builds the README into a page on every push, and the workflow waits up to five minutes for that build so the site goes out last. Setting Settings → Pages → Build and deployment → Source to "GitHub Actions" removes that race (recommended; not changed by this audit).
 
@@ -34,18 +35,23 @@ The site is live at https://ls-entruempelung-demontage.de (set under Settings �
 
 1. Settings → Pages → Custom domain: enter the domain, then create the DNS records GitHub shows (CNAME for `www`, A/AAAA records for the apex).
 2. Once the certificate is issued, enable "Enforce HTTPS".
-3. Set the `SITE_URL` repository variable to `https://<domain>` (no base path), or change the default in `deploy.yml`, and re-run the workflow.
+3. Update `SITE_URL` in `deploy.yml` and the expected domain in `tests/seo-check.mjs`, and re-run the workflow.
 
 ## Check a build locally
 
 Build like CI does for the custom domain (no base path) and serve `out/` at the root on port 4173 (stop the dev server first).
 
 ```sh
-SITE_URL=https://ls-entruempelung-demontage.de npm run build
+SITE_URL=https://ls-entruempelung-demontage.de ALLOW_INDEXING=true NEXT_PUBLIC_BASE_PATH= npm run build
+npm run test:seo
 npm run preview
 ```
 
-For a build under a subpath, add `NEXT_PUBLIC_BASE_PATH=/LS_Transport` to the build and `BASE_PATH=/LS_Transport` to the preview (in Git Bash prefix each with `MSYS_NO_PATHCONV=1`, or it rewrites the path).
+In PowerShell, set `$env:SITE_URL = 'https://ls-entruempelung-demontage.de'`, `$env:ALLOW_INDEXING = 'true'` and `$env:NEXT_PUBLIC_BASE_PATH = ''` before `npm run build`, then run `npm run test:seo`.
+
+To verify preview restrictions, build with `ALLOW_INDEXING=false` (or unset), then run `npm run test:seo -- --preview`. Rebuild with the production settings above before checking or publishing production output. A bare `npm run build` without indexing settings intentionally produces a preview; do not upload that output to production.
+
+For a preview build under a subpath, set `SITE_URL` to the preview address including the path, add `NEXT_PUBLIC_BASE_PATH=/LS_Transport` to the build and `BASE_PATH=/LS_Transport` to the preview (in Git Bash prefix each with `MSYS_NO_PATHCONV=1`, or it rewrites the path). Keep `ALLOW_INDEXING=false`. The production SEO check deliberately accepts only the production domain at its root.
 
 Then, in a second terminal:
 
@@ -74,13 +80,22 @@ Required before the site is public under the business's name:
 - [ ] Datenschutz: the responsible party, the final hosting and email providers, legal bases, retention periods and data-subject rights, reviewed by someone qualified (`app/datenschutz/page.tsx`). It currently names GitHub Pages as the preview host.
 - [ ] Confirm that L&S may publish the before/after photos (`ASSET_NOTES.md`, "Owner-supplied photos"); their origin is not recorded. If they are not L&S jobs, label them as example photos.
 - [ ] Confirm these statements or have them changed: "Rund um die Uhr erreichbar" (contact section and FAQ), "Deutschlandweit nach Absprache" (FAQ, meta description), and "Kostenlose Besichtigung vor Ort" on the 3D van and its poster images (`components/hero-scene/truck.js`; changing it means re-rendering the posters).
-- [x] Domain: https://ls-entruempelung-demontage.de (`SITE_URL`). Set `ALLOW_INDEXING=true` once the items above are done.
+- [x] Domain: https://ls-entruempelung-demontage.de (`SITE_URL`). The public production workflow explicitly sets `ALLOW_INDEXING=true`.
 
 Optional:
 
 - [ ] Real reviews and figures for the stats band and reviews section: replace the sample content in `lib/showcase.ts` and set `sample = false`. Both sections stay hidden in development, preview and production until they contain real data.
 - [ ] Real job photos for the "Im Einsatz" gallery, which currently shows illustrative images. Image sources are recorded in `ASSET_NOTES.md`; source notes are not displayed on the site.
 - [ ] Pages source "GitHub Actions" (see Deploy).
+
+## Indexing audit, 2 November 2026 (before deployment)
+
+- The live HTTPS homepage returned 200 with `<meta name="robots" content="noindex, nofollow">`, including when requested with the Googlebot user agent. Neither response had an `X-Robots-Tag` header or a separate Googlebot meta directive. Its canonical was already `https://ls-entruempelung-demontage.de/`.
+- HTTP, HTTPS `www`, and the old `starnexstudio.github.io/LS_Transport/` address each redirected with 301 to the correct HTTPS apex homepage. No `X-Robots-Tag` appeared in the checked redirect chains.
+- Live `robots.txt` allowed `/` but omitted the sitemap; live `sitemap.xml` had no URLs. This matches `lib/site.ts`, `app/layout.tsx`, `app/robots.ts` and `app/sitemap.ts` when `SITE_URL` is set but `ALLOW_INDEXING` is not exactly `true`. The production workflow previously obtained that switch from an optional repository variable. No local `.env` files or indexing environment overrides were present during this audit.
+- The fix makes the production build settings explicit and checks the generated public HTML, canonical URLs, robots file, sitemap and retained error/preview restrictions before artifact upload. No private or admin routes currently exist in `app/`; no page-level restrictions were removed. Local previews and the standalone `preview-3d/index.html` remain excluded.
+- Local validation: `npm run build` with the explicit production settings passed (installed Next.js 16.4.3), as did `npm run test:seo`, TypeScript and formatting checks for the changed code/configuration. Inspection of every exported HTML file found no restrictive robots/Googlebot metadata on the three public pages; all three 404 variants retained `noindex`. Canonicals and sitemap entries used the production root domain, without `/LS_Transport`, and `robots.txt` announced the correct sitemap. The SEO check rejected the pre-existing noindex export in production mode and passed it in preview mode.
+- These are pre-deployment observations. Publish the changed workflow and SEO check through `main`, wait for the production workflow, then repeat the live checks in the Deploy section before considering the live blocker resolved.
 
 ## Audit, October 2026
 

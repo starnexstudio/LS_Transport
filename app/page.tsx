@@ -11,21 +11,21 @@ import { Reviews } from "@/components/reviews";
 import { BeforeAfter } from "@/components/before-after";
 import { business } from "@/lib/content";
 import { sample } from "@/lib/showcase";
-import { homeDescription, pageMetadata, websiteJsonLd } from "@/lib/site";
+import { homeDescription, pageMetadata, structuredData } from "@/lib/site";
 export const metadata = pageMetadata({
   description: homeDescription,
   path: "/",
 });
 // Show reviews and figures only after the sample data is replaced with real data.
 const showTrust = !sample;
-const faqs = [
+const faqs: string[][] = [
   [
     "Was kostet mein Auftrag?",
     "Der Preis hängt vom Umfang und vom Aufwand ab. Beschreiben Sie Ihren Auftrag kurz, und Sie erhalten ein individuelles Angebot.",
   ],
   [
     "In welchen Regionen ist L&S tätig?",
-    "Deutschlandweit nach Absprache. Nennen Sie uns einfach Postleitzahl und Ort.",
+    "Unser Sitz ist in Aichach (Landkreis Aichach-Friedberg). Wir sind in Aichach, Augsburg und der ganzen Region im Einsatz – und deutschlandweit nach Absprache. Nennen Sie uns einfach Postleitzahl und Ort.",
   ],
   [
     "Kann ich mehrere Leistungen kombinieren?",
@@ -46,7 +46,7 @@ export default function Home() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(websiteJsonLd()).replace(/</g, "\\u003c"),
+          __html: JSON.stringify(structuredData(faqs)).replace(/</g, "\\u003c"),
         }}
       />
       <a href="#inhalt" className="skip-link">

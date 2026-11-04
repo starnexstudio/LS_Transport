@@ -21,6 +21,12 @@ export function Footer() {
           <span>Weiterkommen.</span>
         </p>
         <div className="footer-contact">
+          <address className="footer-address">
+            {business.name}
+            <br />
+            {business.address.street}, {business.address.postalCode}{" "}
+            {business.address.city}
+          </address>
           {business.phone && (
             <a href={`tel:${business.phone.replace(/[^+\d]/g, "")}`}>
               <Phone size={17} aria-hidden="true" /> {business.phone}

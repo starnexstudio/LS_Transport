@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { basePath } from "@/lib/base-path";
-import { business } from "@/lib/content";
+import { business, services } from "@/lib/content";
 
 // Where the site is published and whether search engines may list it. Both are
 // read from the build environment (DEPLOYMENT.md). Without SITE_URL the build is a
@@ -40,7 +40,7 @@ export const titles = {
   template: `%s | ${siteName}`,
 };
 export const homeDescription =
-  "Platz für Neues. Entrümpelung, fachgerechte Entsorgung, Demontage, Möbeltransport und Reinigung. Deutschlandweit nach Absprache. Jetzt unverbindlich anfragen.";
+  "Entrümpelung, Haushaltsauflösung, Demontage, Entsorgung, Möbeltransport und Reinigung aus Aichach – für die Region Augsburg und deutschlandweit. Jetzt unverbindlich anfragen.";
 
 /** Per-page title, description and, once SITE_URL is set, canonical and Open Graph URLs. */
 export function pageMetadata({
@@ -72,23 +72,94 @@ export function pageMetadata({
   };
 }
 
-/** WebSite structured data: tells Google which site name to show in results. */
-export function websiteJsonLd() {
+/**
+ * Structured data for Google: the site name, the business with its address,
+ * contact details and services (local search), and the FAQ.
+ */
+export function structuredData(faqs: string[][]) {
+  const home = siteUrl ? `${siteUrl}/` : undefined;
+  const id = (part: string) => (home ? `${home}#${part}` : undefined);
+  const { address } = business;
   return {
     "@context": "https://schema.org",
-    "@type": "WebSite",
-    name: brandName,
-    alternateName: [siteName, "L&S Entrümpelung"],
-    inLanguage: "de-DE",
-    ...(siteUrl && {
-      url: `${siteUrl}/`,
-      // The company and its logo, so Google can link the brand to the site.
-      publisher: {
-        "@type": "Organization",
-        name: business.name,
-        url: `${siteUrl}/`,
-        logo: `${siteUrl}/icon.png`,
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": id("website"),
+        name: brandName,
+        alternateName: [siteName, "L&S Entrümpelung"],
+        inLanguage: "de-DE",
+        url: home,
+        publisher: { "@id": id("business") },
       },
-    }),
+      {
+        "@type": "HomeAndConstructionBusiness",
+        "@id": id("business"),
+        name: business.name,
+        alternateName: brandName,
+        description: homeDescription,
+        url: home,
+        logo: absolute("/icon.png"),
+        image: absolute(shareImage.path),
+        telephone: business.phone || undefined,
+        email: business.email,
+        founder: { "@type": "Person", name: business.owner },
+        address: {
+          "@type": "PostalAddress",
+          streetAddress: address.street,
+          postalCode: address.postalCode,
+          addressLocality: address.city,
+          addressRegion: "Bayern",
+          addressCountry: "DE",
+        },
+        areaServed: [
+          { "@type": "City", name: address.city },
+          {
+            "@type": "AdministrativeArea",
+            name: "Landkreis Aichach-Friedberg",
+          },
+          { "@type": "City", name: "Augsburg" },
+          { "@type": "Country", name: "Deutschland" },
+        ],
+        // Reachable around the clock (see the FAQ).
+        openingHoursSpecification: {
+          "@type": "OpeningHoursSpecification",
+          dayOfWeek: [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday",
+          ],
+          opens: "00:00",
+          closes: "23:59",
+        },
+        knowsLanguage: "de",
+        hasOfferCatalog: {
+          "@type": "OfferCatalog",
+          name: "Leistungen",
+          itemListElement: services.map((service) => ({
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Service",
+              name: service.title,
+              description: `${service.text} ${service.items.join(", ")}.`,
+              areaServed: "DE",
+            },
+          })),
+        },
+      },
+      {
+        "@type": "FAQPage",
+        "@id": id("faq"),
+        mainEntity: faqs.map(([question, answer]) => ({
+          "@type": "Question",
+          name: question,
+          acceptedAnswer: { "@type": "Answer", text: answer },
+        })),
+      },
+    ],
   };
 }

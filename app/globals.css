@@ -591,6 +591,12 @@ h2 {
   gap: 18px;
   font-size: 13px;
 }
+.footer-address {
+  font-style: normal;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #cfe6e7;
+}
 .footer-bottom {
   border-top: 1px solid #ffffff2e;
   padding-top: 22px;

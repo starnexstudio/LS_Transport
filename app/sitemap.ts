@@ -10,5 +10,11 @@ const pages = ["/", "/impressum/", "/datenschutz/"];
 // a preview publishes an empty sitemap rather than placeholder URLs.
 export default function sitemap(): MetadataRoute.Sitemap {
   if (!indexable) return [];
-  return pages.map((path) => ({ url: absolute(path)! }));
+  const lastModified = new Date();
+  return pages.map((path) => ({
+    url: absolute(path)!,
+    lastModified,
+    changeFrequency: "monthly",
+    priority: path === "/" ? 1 : 0.3,
+  }));
 }

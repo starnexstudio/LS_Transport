@@ -486,6 +486,27 @@ h2 {
 .inquiry [aria-invalid="true"] {
   border-color: #a12e1b;
 }
+.inquiry > .button:disabled {
+  opacity: 0.7;
+  cursor: progress;
+}
+.form-status {
+  font-size: 13px;
+  margin-top: 12px;
+}
+.form-status:empty {
+  display: none;
+}
+.form-status a {
+  text-decoration: underline;
+}
+.form-honey {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
 .footer {
   background: var(--teal-ink);
   color: var(--paper);

@@ -4,7 +4,7 @@ import { pageMetadata } from "@/lib/site";
 export const metadata = pageMetadata({
   title: "Datenschutz",
   description:
-    "Datenschutzhinweise von L&S Entrümpelung & Demontagearbeiten: Anfrageformular, Kontakt per Telefon, WhatsApp und E-Mail.",
+    "Datenschutzhinweise von L&S Entrümpelung & Demontagearbeiten: Anfrageformular per E-Mail, Kontakt per Telefon, WhatsApp und E-Mail.",
   path: "/datenschutz/",
 });
 export default function Datenschutz() {
@@ -34,13 +34,17 @@ export default function Datenschutz() {
         )}
         <a href={`mailto:${business.email}`}>{business.email}</a>
       </p>
-      <h2>Anfragen über WhatsApp</h2>
+      <h2>Anfrageformular</h2>
       <p>
-        Das Anfrageformular öffnet WhatsApp mit Ihrer ausgewählten Leistung,
-        Ihrem Namen, dem Einsatzort und Ihrer Nachricht. Diese Angaben werden
-        beim Öffnen an WhatsApp übergeben. Sie senden die vorbereitete Nachricht
-        anschließend selbst in WhatsApp ab. Die Website speichert Ihre
-        Formulareingaben nicht dauerhaft.
+        Wenn Sie das Anfrageformular absenden, werden die ausgewählte Leistung,
+        Ihr Name, Ihre Telefonnummer (falls angegeben), der Einsatzort und Ihre
+        Nachricht per E-Mail an {business.email} übermittelt. Für die
+        Weiterleitung nutzen wir den Dienst FormSubmit (formsubmit.co), der die
+        Angaben dabei verarbeitet. Wir verwenden Ihre Angaben ausschließlich, um
+        Ihre Anfrage zu beantworten (Art. 6 Abs. 1 lit. b DSGVO), und löschen
+        sie, sobald sie dafür nicht mehr benötigt werden und keine gesetzlichen
+        Aufbewahrungspflichten bestehen. Die Website selbst speichert Ihre
+        Formulareingaben nicht.
       </p>
       <h2>Anruf und WhatsApp</h2>
       <p>

@@ -31,8 +31,12 @@ export function Hero() {
   return (
     <HeroStage>
       <div className="hero-intro">
-        <p className="hero-label">Entrümpelung · Demontage · Transport</p>
+        {/* The services line is part of the headline, so search engines read
+            what the business does, not only the slogan. */}
         <h1 id="hero-title" className="hero-title">
+          <span className="hero-label">
+            Entrümpelung · Demontage · Transport
+          </span>{" "}
           <span className="hero-word" style={order(0)}>
             <span>Wir</span>
           </span>{" "}

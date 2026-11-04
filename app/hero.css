@@ -55,13 +55,24 @@
   background: var(--orange);
 }
 .hero h1 {
-  margin: 18px 0 0;
+  --label-gap: 18px;
+  margin: 0;
   font-size: clamp(38px, min(5.6vw, 9.4vh), 84px);
   font-weight: 600;
   font-stretch: 100%;
   line-height: 1.02;
   letter-spacing: -0.03em;
   color: #fff;
+}
+/* The services line above the slogan (inside the h1 for search engines). */
+.hero h1 > .hero-label {
+  display: flex;
+  width: fit-content;
+  /* Keeps the spacing it had as a paragraph above the h1. */
+  margin: 0.8em auto calc(var(--label-gap) + 2px);
+  color: #f5f3ed;
+  font-family: var(--font-manrope), Arial, sans-serif;
+  font-stretch: normal;
 }
 /* Each word sits in its own mask so it can rise into view. */
 .hero-word {
@@ -367,7 +378,7 @@
     width: 22px;
   }
   .hero h1 {
-    margin-top: 16px;
+    --label-gap: 16px;
     font-size: clamp(38px, min(7.8vw, 6.4vh), 60px);
     line-height: 1.03;
   }
@@ -426,7 +437,7 @@
     display: none;
   }
   .hero h1 {
-    margin-top: 12px;
+    --label-gap: 12px;
     font-size: clamp(32px, min(10.3vw, 6vh), 40px);
   }
   .hero-break-tablet {

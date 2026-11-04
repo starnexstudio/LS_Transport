@@ -35,8 +35,10 @@ export const siteName = "L&S Entrümpelung & Demontage";
 // The name Google shows above the result (instead of the bare domain). Matches
 // the homepage title so both lines of the search result read the same.
 export const brandName = "L&S | Entrümpelung & Demontage";
+// Browser tab and search result title of the homepage: the brand plus the
+// town, which helps local searches.
 export const titles = {
-  default: brandName,
+  default: `${brandName} in Aichach`,
   template: `%s | ${siteName}`,
 };
 export const homeDescription =

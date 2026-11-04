@@ -15,7 +15,7 @@ export const business = {
   // Web3Forms access key for the inquiry form (web3forms.com, sent to the
   // business email). Public by design. Empty: the form opens the visitor's
   // email app instead.
-  formKey: "",
+  formKey: "47a7fd60-63c9-41a9-bc4a-1d07b34c3a05",
 };
 // Prefilled text for WhatsApp links.
 export const whatsappGreeting =

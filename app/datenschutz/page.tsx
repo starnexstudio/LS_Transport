@@ -39,7 +39,7 @@ export default function Datenschutz() {
         Wenn Sie das Anfrageformular absenden, werden die ausgewählte Leistung,
         Ihr Name, Ihre Telefonnummer (falls angegeben), der Einsatzort und Ihre
         Nachricht per E-Mail an {business.email} übermittelt. Für die
-        Weiterleitung nutzen wir den Dienst FormSubmit (formsubmit.co), der die
+        Weiterleitung nutzen wir den Dienst Web3Forms (web3forms.com), der die
         Angaben dabei verarbeitet. Wir verwenden Ihre Angaben ausschließlich, um
         Ihre Anfrage zu beantworten (Art. 6 Abs. 1 lit. b DSGVO), und löschen
         sie, sobald sie dafür nicht mehr benötigt werden und keine gesetzlichen

@@ -12,6 +12,10 @@ export const business = {
   // Set confirmed international numbers to enable direct contact links.
   phone: "+49 170 2919567",
   whatsapp: "+49 170 2919567",
+  // Web3Forms access key for the inquiry form (web3forms.com, sent to the
+  // business email). Public by design. Empty: the form opens the visitor's
+  // email app instead.
+  formKey: "",
 };
 // Prefilled text for WhatsApp links.
 export const whatsappGreeting =

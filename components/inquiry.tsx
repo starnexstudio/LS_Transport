@@ -1,9 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
 import { services, business } from "@/lib/content";
-// Static hosting has no server, so FormSubmit forwards each request to the
-// business inbox. The first request triggers a one-time activation email there.
-const endpoint = `https://formsubmit.co/ajax/${business.email.toLowerCase()}`;
+// Static hosting has no server, so Web3Forms forwards each request to the
+// business inbox. Without a key, or if sending fails, the visitor's email app
+// opens with the request filled in.
+const endpoint = "https://api.web3forms.com/submit";
+const timeoutMs = 15000;
 type Status = "idle" | "sending" | "sent" | "failed";
 export function Inquiry({ initialService = "" }: { initialService?: string }) {
   const [service, setService] = useState(initialService);
@@ -38,38 +40,71 @@ export function Inquiry({ initialService = "" }: { initialService?: string }) {
     }
     const text = `Hallo L&S,\n\nich möchte ein Angebot für folgenden Auftrag anfragen:\n\nLeistung: ${service}\nName: ${name}\nTelefon: ${phone || "–"}\nEinsatzort: ${place}\n\n${message}\n\nMit freundlichen Grüßen\n${name}`;
     const subject = `Anfrage: ${service} – ${name}`;
-    setMailto(
-      `mailto:${business.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`,
-    );
+    const mail = `mailto:${business.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`;
+    setMailto(mail);
+    if (!business.formKey) {
+      window.location.href = mail;
+      return;
+    }
     setStatus("sending");
+    const abort = new AbortController();
+    const timer = setTimeout(() => abort.abort(), timeoutMs);
     try {
       const res = await fetch(endpoint, {
         method: "POST",
+        signal: abort.signal,
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
         },
         body: JSON.stringify({
+          access_key: business.formKey,
+          subject,
+          from_name: `Website – ${name}`,
           Leistung: service,
           Name: name,
           Telefon: phone || "–",
           Einsatzort: place,
           Nachricht: message,
-          _subject: subject,
-          _template: "table",
-          _captcha: "false",
-          _honey: String(f.get("_honey") ?? ""),
+          botcheck: f.get("botcheck") ? true : "",
         }),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok || String(data.success) !== "true") throw new Error();
+      if (!res.ok || data.success !== true) throw new Error();
       setStatus("sent");
       form.reset();
       setService("");
     } catch {
       setStatus("failed");
+    } finally {
+      clearTimeout(timer);
     }
   }
+  if (status === "sent")
+    return (
+      <div
+        className="inquiry inquiry-sent"
+        role="status"
+        tabIndex={-1}
+        ref={(el) => el?.focus()}
+      >
+        <span className="sent-check" aria-hidden="true">
+          ✓
+        </span>
+        <h3>Anfrage gesendet!</h3>
+        <p>
+          Vielen Dank – Ihre Anfrage ist bei uns eingegangen. Wir melden uns
+          schnellstmöglich bei Ihnen.
+        </p>
+        <button
+          className="button button-dark"
+          type="button"
+          onClick={() => setStatus("idle")}
+        >
+          Neue Anfrage
+        </button>
+      </div>
+    );
   return (
     <form className="inquiry" noValidate onSubmit={submit}>
       <div className="form-heading">
@@ -172,10 +207,10 @@ export function Inquiry({ initialService = "" }: { initialService?: string }) {
           {errors.message}
         </span>
       )}
-      {/* Hidden from people; bots that fill it are dropped by FormSubmit. */}
+      {/* Hidden from people; bots that tick it are dropped by Web3Forms. */}
       <input
-        type="text"
-        name="_honey"
+        type="checkbox"
+        name="botcheck"
         tabIndex={-1}
         autoComplete="off"
         aria-hidden="true"
@@ -186,11 +221,21 @@ export function Inquiry({ initialService = "" }: { initialService?: string }) {
         type="submit"
         disabled={status === "sending"}
       >
-        {status === "sending" ? "Wird gesendet …" : "Senden"}
+        {status === "sending" ? (
+          <span className="sending">
+            <span className="spinner" aria-hidden="true" /> Wird gesendet …
+          </span>
+        ) : (
+          "Senden"
+        )}
       </button>
-      <p className="form-status" role="status" aria-live="polite">
-        {status === "sent" &&
-          "Vielen Dank! Ihre Anfrage ist bei uns eingegangen. Wir melden uns schnellstmöglich."}
+      <p
+        className={`form-status${status === "failed" ? " form-status-error" : ""}`}
+        role="status"
+        aria-live="polite"
+      >
+        {status === "sending" &&
+          "Ihre Anfrage wird gesendet. Bitte einen Moment warten …"}
         {status === "failed" && (
           <>
             Die Anfrage konnte nicht gesendet werden.{" "}

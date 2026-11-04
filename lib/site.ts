@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { basePath } from "@/lib/base-path";
+import { business } from "@/lib/content";
 
 // Where the site is published and whether search engines may list it. Both are
 // read from the build environment (DEPLOYMENT.md). Without SITE_URL the build is a
@@ -31,8 +32,11 @@ export const shareImage = {
 };
 
 export const siteName = "L&S Entrümpelung & Demontage";
+// The name Google shows above the result (instead of the bare domain). Matches
+// the homepage title so both lines of the search result read the same.
+export const brandName = "L&S | Entrümpelung & Demontage";
 export const titles = {
-  default: "L&S | Entrümpelung & Demontage",
+  default: brandName,
   template: `%s | ${siteName}`,
 };
 export const homeDescription =
@@ -58,11 +62,32 @@ export function pageMetadata({
       openGraph: {
         type: "website",
         locale: "de_DE",
-        siteName,
+        siteName: brandName,
         url,
         title: title ? `${title} | ${siteName}` : titles.default,
         description,
         ...(image && { images: [{ ...shareImage, url: image }] }),
+      },
+    }),
+  };
+}
+
+/** WebSite structured data: tells Google which site name to show in results. */
+export function websiteJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: brandName,
+    alternateName: [siteName, "L&S Entrümpelung"],
+    inLanguage: "de-DE",
+    ...(siteUrl && {
+      url: `${siteUrl}/`,
+      // The company and its logo, so Google can link the brand to the site.
+      publisher: {
+        "@type": "Organization",
+        name: business.name,
+        url: `${siteUrl}/`,
+        logo: `${siteUrl}/icon.png`,
       },
     }),
   };

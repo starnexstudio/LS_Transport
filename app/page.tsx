@@ -11,7 +11,7 @@ import { Reviews } from "@/components/reviews";
 import { BeforeAfter } from "@/components/before-after";
 import { business } from "@/lib/content";
 import { sample } from "@/lib/showcase";
-import { homeDescription, pageMetadata } from "@/lib/site";
+import { homeDescription, pageMetadata, websiteJsonLd } from "@/lib/site";
 export const metadata = pageMetadata({
   description: homeDescription,
   path: "/",
@@ -43,6 +43,12 @@ const faqs = [
 export default function Home() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(websiteJsonLd()).replace(/</g, "\\u003c"),
+        }}
+      />
       <a href="#inhalt" className="skip-link">
         Zum Inhalt springen
       </a>
